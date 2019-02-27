@@ -4,12 +4,15 @@
 \alias{view_tour}
 \title{Animate grand tour with t-SNE neighbourhood graph}
 \usage{
-view_tour(data, tsne_coords)
+view_tour(data, tsne_coords, .subset = NULL)
 }
 \arguments{
 \item{data}{a numeric dataset}
 
 \item{tsne_coords}{a list from running \code{Rtsne::Rtsne()}}
+
+\item{.subset}{a vector of indices to find nearest neighbours, by default
+all nearest neighbours will be used.}
 }
 \description{
 Animate grand tour with t-SNE neighbourhood graph

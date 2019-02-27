@@ -4,10 +4,16 @@
 \alias{get_neighbourhood_graph}
 \title{Generate nearest neighbours graph in t-SNE space}
 \usage{
-get_neighbourhood_graph(tsne_coords)
+get_neighbourhood_graph(tsne_coords, .subset = NULL)
 }
 \arguments{
+\item{.subset}{a vector of indices to find nearest neighbours, by default
+all nearest neighbours will be used.}
+
 \item{tnse_coords}{the list obtained from running \code{Rtsne::Rtsne()}}
+}
+\value{
+an integer matrix with columns from and to
 }
 \description{
 Generate nearest neighbours graph in t-SNE space

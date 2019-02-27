@@ -14,9 +14,54 @@ knitr::opts_chunk$set(
 ```
 # sneezy
 
-[![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
-
-
 Explaining t-SNE via diagnostics and tours.
+
+# Installation
+
+```{r install, eval = FALSE}
+remotes::install_github("sa-lee/sneezy")
+```
+
+# Quick start
+
+sneezy comes preloaded with some datasets from the 
+[multi-challenge dataset](http://ifs.tuwien.ac.at/dm/dataSets.html), to start
+we will subset the data to only consider intertwined rings in three-dimensions.
+
+```{r}
+library(ggplot2)
+library(sneezy)
+tworings <- subset(multi, key == "C")
+tworings
+
+pc <- prcomp(tworings[, -c(1,2)])
+ggplot(as.data.frame(pc$x), aes(PC1, PC2)) +
+  geom_point() +
+  coord_fixed(sqrt(pc$sdev[2] / pc$sdev[1]))
+```
+
+We can run the equivalent t-SNE, with our simplified wrapper which computes
+exact t-SNE for a given perplexity. In this case t-SNE has broken the rings but
+has not preserved the topology.
+```{r}
+set.seed(1999)
+coords <- basic_tsne(tworings[, -c(1,2)], perplexity = 30)
+
+ggplot(as.data.frame(coords$Y), aes(V1, V2)) +
+  geom_point() +
+  coord_fixed(sqrt(pc$sdev[2] / pc$sdev[1]))
+
+```
+
+We can also tour around a data space, and see how the nearest neighbours
+graph (for the point near the edge of a ring) in t-SNE space moves in 
+high dimensional space:
+
+```{r}
+library(gganimate)
+view_tour(as.matrix(tworings[, c(3,4,5)]), coords, .subset = 131)
+```
+
+
 
 
