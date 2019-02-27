@@ -1,5 +1,5 @@
 Package: sneezy
-Title: Interactively explore non-linear projections
+Title: Interactively explore non-linear projections like t-SNE
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "Stuart",
@@ -17,6 +17,11 @@ Imports:
     tourr,
     Rtsne,
     stats,
-    BiocNeighbors
+    BiocNeighbors,
+    geometry,
+    shiny
 URL: https://github.com/sa-lee/sneezy
 BugReports: https://github.com/sa-lee/sneezy/issues
+Suggests: 
+    gifski,
+    gganimate
