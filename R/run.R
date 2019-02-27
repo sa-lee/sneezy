@@ -22,15 +22,19 @@ basic_tsne <- function(data, perplexity ) {
 #' 
 #' @param data a numeric dataset
 #' @param tsne_coords a list from running `Rtsne::Rtsne()`
+#' @param .subset a vector of indices to find nearest neighbours, by default
+#' all nearest neighbours will be used.
+#' 
 #' 
 #' @export
-view_tour <- function(data, tsne_coords) {
+view_tour <- function(data, tsne_coords, .subset = NULL) {
   
-  nn_graph <- get_neighbourhood_graph(tsne_coords)
+  nn_graph <- get_neighbourhood_graph(tsne_coords, .subset)
   
   tourr::animate(data, 
-          tour_path = tourr::grand_tour(),
-          tourr::display_xy(axes = "bottomleft", edges = nn_graph)
+                 tour_path = tourr::grand_tour(),
+                 tourr::display_xy(axes = "bottomleft", 
+                                   edges = nn_graph)
   )
 }
 
