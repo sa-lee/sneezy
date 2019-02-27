@@ -30,13 +30,19 @@ basic_tsne <- function(data, perplexity ) {
 view_tour <- function(data, tsne_coords, .subset = NULL) {
   
   nn_graph <- get_neighbourhood_graph(tsne_coords, .subset)
+  gif_tour(data, nn_graph)
+  
+}
+
+gif_tour <- function(data, edges, ...) {
   dir <- tempdir()
   png_path <- file.path(dir, "frame%03d.png")
   
   tourr::render(data,
                 tour_path = tourr::grand_tour(),
-                 display = tourr::display_xy(axes = "bottomleft", 
-                                             edges = nn_graph),
+                display = tourr::display_xy(axes = "bottomleft", 
+                                            edges = edges,
+                                            ...),
                 dev = "png",
                 png_path,
                 frames = 100
@@ -48,6 +54,14 @@ view_tour <- function(data, tsne_coords, .subset = NULL) {
   gganimate::gif_file(gif_file)
 }
 
+#' @export
+view_tour_nn_centroids <- function(data, tsne_coords) {
+  centroids <- get_centroids_from_nn(data, tsne_coords)
+  col <- c(rep("black", nrow(data)), rep("red", nrow(centroids)))
+  data <- rbind(data, centroids)
+  gif_tour(data, edges = NULL, col = col)
+  
+}
 #' Simplified grand tour history
 #' 
 #' @export

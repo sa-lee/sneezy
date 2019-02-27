@@ -24,7 +24,7 @@ get_neighbourhood_graph <- function(tsne_coords, .subset = NULL) {
 }
 
 
-get_centroids_from_nn <- function(tsne_coords) {
+get_centroids_from_nn <- function(data, tsne_coords) {
   args <- norm_args_nn(tsne_coords)
   
   nn <- BiocNeighbors::findKNN(args$coords, 
@@ -36,17 +36,17 @@ get_centroids_from_nn <- function(tsne_coords) {
   
   # centroids for each neighbour
   seen <- integer(nrow(edges))
-  centroids <- matrix(nrow = nrow(edges), ncol = 2)
+  centroids <- matrix(nrow = nrow(edges), ncol = ncol(data))
   for (i in seq_len(nrow(edges))) {
     if (i %in% seen) {
       next
     } 
     inx <- edges[i,]
     seen <- c(i, inx, seen)
-    centroids[i, ] <- colMeans(args$coord[inx,])
+    centroids[i, ] <- colMeans(data[inx,])
   }
   
-  centroids
+  centroids[!is.na(centroids[,1]), ]
   
   #t(apply(edges, 1, function(.x) colMeans(args$coords[.x, ])))
   
