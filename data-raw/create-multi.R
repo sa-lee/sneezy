@@ -7,11 +7,9 @@ library(dplyr)
 multi <- read_tsv("http://ifs.tuwien.ac.at/dm/download/multiChallenge-matrix.txt",
                 col_names = FALSE) %>% 
   mutate(
-    index = rep(seq_len(200), each = 5),
+    index = rep(seq_len(200), 5),
     key = rep(LETTERS[1:5], each = 200L)
   ) %>%
   select(key, index, X1:X10)
 
-
-
-usethis::use_data(multi)
+usethis::use_data(multi, overwrite = TRUE)
