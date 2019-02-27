@@ -11,31 +11,67 @@
 #' @export
 get_neighbourhood_graph <- function(tsne_coords, .subset = NULL) {
   # find nearest neighbours based on perplexity
-  perpelexity <- tsne_coords$perplexity
-  coords <- tsne_coords$Y
+  args <- norm_args_nn(tsne_coords)
   
-  K <- 3 * perpelexity
-  
-  nn <- BiocNeighbors::findKNN(coords, 
-                               k = K, 
+  nn <- BiocNeighbors::findKNN(args$coords, 
+                               k = args$K, 
                                subset = .subset, 
                                get.index = TRUE,
                                get.distance = FALSE)
   # flatten as an adjancey matrix
+  flatten_edges(nn$index, args, .subset)
+
+}
+
+
+get_centroids_from_nn <- function(tsne_coords) {
+  args <- norm_args_nn(tsne_coords)
+  
+  nn <- BiocNeighbors::findKNN(args$coords, 
+                               k = args$K / 3, 
+                               get.index = TRUE,
+                               get.distance = FALSE)
+  
   edges <- nn$index
   
+  # centroids for each neighbour
+  seen <- integer(nrow(edges))
+  centroids <- matrix(nrow = nrow(edges), ncol = 2)
+  for (i in seq_len(nrow(edges))) {
+    if (i %in% seen) {
+      next
+    } 
+    inx <- edges[i,]
+    seen <- c(i, inx, seen)
+    centroids[i, ] <- colMeans(args$coord[inx,])
+  }
+  
+  centroids
+  
+  #t(apply(edges, 1, function(.x) colMeans(args$coords[.x, ])))
+  
+  
+  
+}
+
+norm_args_nn <- function(tsne_coords) {
+  list(
+    coords =  tsne_coords$Y,
+    K = 3 * tsne_coords$perplexity
+  )
+}
+
+flatten_edges <- function(edges, args, .subset) {
   # set up dimensions
   if (!is.null(.subset)) {
     n <- length(.subset)
   } else {
-    n <- nrow(coords)
+    n <- nrow(args$coords)
     .subset <- seq_len(n)
   }
   # reshape to include from edges
-  dim(edges) <- c(n * K, 1)
-  edges <- cbind(rep(.subset, each = K), edges)
+  dim(edges) <- c(n * args$K, 1)
+  edges <- cbind(rep(.subset, each = args$K), edges)
   colnames(edges) <- c("from", "to")
   edges 
 }
-
-
