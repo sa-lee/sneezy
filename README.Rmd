@@ -30,6 +30,7 @@ we will subset the data to only consider intertwined rings in three-dimensions.
 
 ```{r}
 library(ggplot2)
+library(gganimate)
 library(sneezy)
 tworings <- subset(multi, key == "C")
 tworings
@@ -54,14 +55,19 @@ ggplot(as.data.frame(coords$Y), aes(V1, V2)) +
 ```
 
 We can also tour around a data space, and see how the nearest neighbours
-graph (for the point near the edge of a ring) in t-SNE space moves in 
-high dimensional space:
+graph from t-SNE space is preserved in high-dimensional space. We can take
+subsets of the nn graph to see how the t-SNE preserves local topology 
+(i.e. the point that are on the outer part of the first ring on the right, are
+closest to points on the opposite ring)
 
 ```{r}
-library(gganimate)
 view_tour(as.matrix(tworings[, c(3,4,5)]), coords, .subset = 131)
 ```
 
+We can also look at the t-SNE output in data space by taking the centroids
+of nearest neighbour graph with respect to the data:
 
-
+```{r}
+view_tour_nn_centroids(as.matrix(tworings[, c(3,4,5)]), coords)
+```
 

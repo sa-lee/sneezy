@@ -19,6 +19,7 @@ sneezy comes preloaded with some datasets from the [multi-challenge dataset](htt
 
 ``` r
 library(ggplot2)
+library(gganimate)
 library(sneezy)
 tworings <- subset(multi, key == "C")
 tworings
@@ -58,12 +59,20 @@ ggplot(as.data.frame(coords$Y), aes(V1, V2)) +
 
 <img src="man/figures/README-unnamed-chunk-2-1.png" width="100%" />
 
-We can also tour around a data space, and see how the nearest neighbours graph (for the point near the edge of a ring) in t-SNE space moves in high dimensional space:
+We can also tour around a data space, and see how the nearest neighbours graph from t-SNE space is preserved in high-dimensional space. We can take subsets of the nn graph to see how the t-SNE preserves local topology (i.e. the point that are on the outer part of the first ring on the right, are closest to points on the opposite ring)
 
 ``` r
-library(gganimate)
 view_tour(as.matrix(tworings[, c(3,4,5)]), coords, .subset = 131)
-#> Using half_range 2.5
+#> Using half_range 0.6
 ```
 
 <img src="man/figures/README-unnamed-chunk-3-1.gif" width="100%" />
+
+We can also look at the t-SNE output in data space by taking the centroids of nearest neighbour graph with respect to the data:
+
+``` r
+view_tour_nn_centroids(as.matrix(tworings[, c(3,4,5)]), coords)
+#> Using half_range 0.6
+```
+
+<img src="man/figures/README-unnamed-chunk-4-1.gif" width="100%" />
