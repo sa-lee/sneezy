@@ -4,12 +4,14 @@
 \alias{basic_tsne}
 \title{Simplified running of t-SNE}
 \usage{
-basic_tsne(data, perplexity)
+basic_tsne(data, perplexity, alpha = nrow(data)/10)
 }
 \arguments{
 \item{data}{a data.frame or matrix to compute t-SNE on}
 
-\item{perplexity}{the perpelxity paramater to t-SNE algorithm (see \code{Rtsne::Rtsne()})}
+\item{perplexity}{the perpelxity paramater to t-SNE algorithm (see \code{\link[Rtsne:Rtsne]{Rtsne::Rtsne()}})}
+
+\item{alpha}{the exaggeration factor for the intial part of the optimsation}
 }
 \description{
 Simplified running of t-SNE
@@ -18,4 +20,7 @@ Simplified running of t-SNE
 This a very minimal wrapper to \code{Rtsne::Rtsne()}
 that computes exact t-SNE for a given dataset, withouth
 normalising the input data or running PCA beforehand.
+}
+\seealso{
+\code{\link[Rtsne:Rtsne]{Rtsne::Rtsne()}}
 }
