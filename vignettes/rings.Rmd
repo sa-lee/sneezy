@@ -1,0 +1,66 @@
+---
+title: "Vignette Title"
+author: "Vignette Author"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Interlocking rings
+
+Next let's look at interesting example where the data are intertwined rings in 
+three-dimensions.
+
+Again we can use PCA to look at the structure:
+
+```{r}
+tworings <- subset(multi, key == "C")
+tworings <- as.matrix(tworings[, c(3,4,5)])
+
+pc <- prcomp(tworings)
+asp <- sqrt(pc$sdev[2] / pc$sdev[1])
+ggplot(as.data.frame(pc$x), aes(PC1, PC2)) +
+  geom_point() +
+  coord_fixed(asp)
+```
+
+We can run the equivalent t-SNE, with our simplified wrapper which computes
+exact t-SNE for a given perplexity. In this case t-SNE has broken the rings but
+has not preserved the topology.
+```{r}
+set.seed(1999)
+coords <- basic_tsne(tworings, perplexity = 30)
+
+ggplot(as.data.frame(coords$Y), aes(V1, V2)) +
+  geom_point() +
+  coord_fixed(asp)
+
+```
+
+We can also tour around a data space, and see how the nearest neighbours
+graph from t-SNE space is preserved in high-dimensional space. We can take
+subsets of the nn graph to see how the t-SNE preserves local topology 
+(i.e. the point that are on the outer part of the first ring on the right, are
+closest to points on the opposite ring)
+
+```{r}
+sneezy_neighbours(as.matrix(tworings[, c(3,4,5)]), coords, .subset = 131)
+```
+
+We can also look at the t-SNE output in data space by taking the centroids
+of nearest neighbour graph with respect to the data:
+
+```{r}
+sneezy_centroids(as.matrix(tworings[, c(3,4,5)]), coords)
+```
+
