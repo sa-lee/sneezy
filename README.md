@@ -48,10 +48,11 @@ In this case it looks as though t-SNE has worked well: it has identified the thr
 ``` r
 set.seed(1010010)
 coords <- basic_tsne(spheres, perplexity = 30)
-ggplot(as.data.frame(coords$Y), aes(V1, V2)) +
+pl <- ggplot(as.data.frame(coords$Y), aes(V1, V2)) +
   geom_point(aes(colour = labels)) +
   coord_fixed(asp) +
   scale_color_brewer(palette = "Dark2")
+pl
 ```
 
 <img src="man/figures/README-unnamed-chunk-2-1.png" width="100%" />
@@ -66,14 +67,27 @@ sneezy_neighbours(spheres, coords, .subset = 171, col = pal)
 
 <img src="man/figures/README-unnamed-chunk-3-1.gif" width="100%" />
 
-We can also triangulate the points in t-SNE space
+We can also triangulate the points in t-SNE space, and see how that moves via the grand tour.
+
+``` r
+tri <- get_triangles(coords)
+Y_df <- as.data.frame(coords$Y)
+mesh <- data.frame(x = Y_df[tri[,1], 1],
+                   y = Y_df[tri[, 1], 2],
+                   xend = Y_df[tri[,2], 1],
+                   yend = Y_df[tri[,2], 2])
+
+pl +  geom_segment(data = mesh, aes(x =x, xend = xend, y = y, yend =yend))
+```
+
+<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
 
 ``` r
 sneezy_triangles(spheres, coords, col = pal)
 #> Using half_range 1.2
 ```
 
-<img src="man/figures/README-unnamed-chunk-4-1.gif" width="100%" />
+<img src="man/figures/README-unnamed-chunk-5-1.gif" width="100%" />
 
 And look at the centroids in the original space of the nearest neighbours graph in t-SNE space:
 
@@ -82,4 +96,4 @@ sneezy_centroids(spheres, coords)
 #> Using half_range 1.2
 ```
 
-<img src="man/figures/README-unnamed-chunk-5-1.gif" width="100%" />
+<img src="man/figures/README-unnamed-chunk-6-1.gif" width="100%" />

@@ -64,10 +64,11 @@ and seperated the two 10-d clusters.
 ```{r}
 set.seed(1010010)
 coords <- basic_tsne(spheres, perplexity = 30)
-ggplot(as.data.frame(coords$Y), aes(V1, V2)) +
+pl <- ggplot(as.data.frame(coords$Y), aes(V1, V2)) +
   geom_point(aes(colour = labels)) +
   coord_fixed(asp) +
   scale_color_brewer(palette = "Dark2")
+pl
 ```
 
 
@@ -82,7 +83,20 @@ pal <- c("#1B9E77", "#D95F02")[as.integer(as.factor(labels))]
 sneezy_neighbours(spheres, coords, .subset = 171, col = pal)
 ```
 
-We can also triangulate the points in t-SNE space
+We can also triangulate the points in t-SNE space, and see how that moves
+via the grand tour.
+
+```{r}
+tri <- get_triangles(coords)
+Y_df <- as.data.frame(coords$Y)
+mesh <- data.frame(x = Y_df[tri[,1], 1],
+                   y = Y_df[tri[, 1], 2],
+                   xend = Y_df[tri[,2], 1],
+                   yend = Y_df[tri[,2], 2])
+
+pl +  geom_segment(data = mesh, aes(x =x, xend = xend, y = y, yend =yend))
+```
+
 
 ```{r}
 sneezy_triangles(spheres, coords, col = pal)

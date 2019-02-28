@@ -2,6 +2,7 @@
 #' 
 #' @param coords output from [Rtsne::Rtsne()]
 #' 
+#' @export
 get_triangles <- function(coords) {
   tri <- geometry::delaunayn(coords$Y)
   rbind(
