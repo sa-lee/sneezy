@@ -15,64 +15,71 @@ remotes::install_github("sa-lee/sneezy")
 Quick start
 ===========
 
-sneezy comes preloaded with some datasets from the [multi-challenge dataset](http://ifs.tuwien.ac.at/dm/dataSets.html), to start we will subset the data to only consider intertwined rings in three-dimensions.
+sneezy comes preloaded with some datasets from the [multi-challenge dataset](http://ifs.tuwien.ac.at/dm/dataSets.html). Let's look at a example, consisting two well sepearted Gaussian clusters in 10 dimensional space (with same covariance matrix), and two 3-dimensional Gaussian clusters embeded in 10 dimensional space. One of the clusters has more granular structure and consists of three sub clusters. From the multichallenge dataset page this subset is described as follows
+
+> The first subset consists of a Gaussian cluster and another cluster that is itself divided into three Gaussian clusters, all of them living in a three-dimensional space. This subset is used to demonstrate how an algorithm deals with different levels of granularity in cluster structures. The distance between the centers of the two main clusters, i.e. the the big cluster and the cluster that consists of the three smaller ones, is 5 times the standard deviation d of the first main cluster. The three smaller clusters are arranged around the center of the second cluster, which they themselves form, on a circle of radius 5-d equidistant from each other. The three 3 small cluster centers and the center of the large cluster lie in the same plane. The small clusters each have a standard deviation of d and one third of the number of 3 data points of the large cluster.
+
+Making shapes
+-------------
+
+We can get a view of the structure using principal components:
 
 ``` r
 library(ggplot2)
-library(gganimate)
+library(gganimate) # required for printing tours
 library(sneezy)
-tworings <- subset(multi, key == "C")
-tworings
-#> # A tibble: 200 x 12
-#>    key   index      X1    X2    X3    X4    X5    X6    X7    X8    X9
-#>    <chr> <int>   <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
-#>  1 C         1 -1.06    21.5 0.213     0     0     0     0     0     0
-#>  2 C         2 -1.99    20.6 0.213     0     0     0     0     0     0
-#>  3 C         3 -1.26    21.4 0.213     0     0     0     0     0     0
-#>  4 C         4 -1.71    19.9 0.213     0     0     0     0     0     0
-#>  5 C         5  0.309   21.7 0.213     0     0     0     0     0     0
-#>  6 C         6  1.75    20.1 0.213     0     0     0     0     0     0
-#>  7 C         7  0.671   21.6 0.213     0     0     0     0     0     0
-#>  8 C         8  0.396   19.4 0.213     0     0     0     0     0     0
-#>  9 C         9 -0.0681  19.4 0.213     0     0     0     0     0     0
-#> 10 C        10 -1.92    20.2 0.213     0     0     0     0     0     0
-#> # … with 190 more rows, and 1 more variable: X10 <dbl>
+spheres <- subset(multi, key %in% c("A", "D"))
+labels <- ifelse(spheres$key == "A", "sub-gaussian", "10-d 2x cluster")
+spheres <- as.matrix(spheres[, -c(1,2)])
 
-pc <- prcomp(tworings[, -c(1,2)])
+pc <- prcomp(spheres)
+asp <- sqrt(pc$sdev[1] / pc$sdev[2])
 ggplot(as.data.frame(pc$x), aes(PC1, PC2)) +
-  geom_point() +
-  coord_fixed(sqrt(pc$sdev[2] / pc$sdev[1]))
+  geom_point(aes(colour = labels)) +
+  coord_fixed(asp)
 ```
 
 <img src="man/figures/README-unnamed-chunk-1-1.png" width="100%" />
 
-We can run the equivalent t-SNE, with our simplified wrapper which computes exact t-SNE for a given perplexity. In this case t-SNE has broken the rings but has not preserved the topology.
+And the equivalent t-SNE, with our simplified wrapper which computes exact t-SNE for a given perplexity and exaggeration factor alpha.
+
+In this case it looks as though t-SNE has worked well: it has identified the three subclusters of the second cluster embededded in 3-dimensions, and seperated the two 10-d clusters.
 
 ``` r
-set.seed(1999)
-coords <- basic_tsne(tworings[, -c(1,2)], perplexity = 30)
-
+set.seed(1010010)
+coords <- basic_tsne(spheres, perplexity = 30)
 ggplot(as.data.frame(coords$Y), aes(V1, V2)) +
-  geom_point() +
-  coord_fixed(sqrt(pc$sdev[2] / pc$sdev[1]))
+  geom_point(aes(colour = labels)) +
+  coord_fixed(asp) +
+  scale_color_brewer(palette = "Dark2")
 ```
 
 <img src="man/figures/README-unnamed-chunk-2-1.png" width="100%" />
 
-We can also tour around a data space, and see how the nearest neighbours graph from t-SNE space is preserved in high-dimensional space. We can take subsets of the nn graph to see how the t-SNE preserves local topology (i.e. the point that are on the outer part of the first ring on the right, are closest to points on the opposite ring)
+We can also tour around a data space, and see how the nearest neighbours graph from t-SNE space is preserved in high-dimensional space. We can take subsets of the nn graph to see how the t-SNE preserves local topology, for example the points on the outside of the subcluster on the right hand side:
 
 ``` r
-view_tour(as.matrix(tworings[, c(3,4,5)]), coords, .subset = 131)
-#> Using half_range 0.6
+pal <- c("#1B9E77", "#D95F02")[as.integer(as.factor(labels))]
+sneezy_neighbours(spheres, coords, .subset = 171, col = pal)
+#> Using half_range 1.2
 ```
 
 <img src="man/figures/README-unnamed-chunk-3-1.gif" width="100%" />
 
-We can also look at the t-SNE output in data space by taking the centroids of nearest neighbour graph with respect to the data:
+We can also triangulate the points in t-SNE space
 
 ``` r
-view_tour_nn_centroids(as.matrix(tworings[, c(3,4,5)]), coords)
-#> Using half_range 0.6
+sneezy_triangles(spheres, coords, col = pal)
+#> Using half_range 1.2
 ```
 
 <img src="man/figures/README-unnamed-chunk-4-1.gif" width="100%" />
+
+And look at the centroids in the original space of the nearest neighbours graph in t-SNE space:
+
+``` r
+sneezy_centroids(spheres, coords)
+#> Using half_range 1.2
+```
+
+<img src="man/figures/README-unnamed-chunk-5-1.gif" width="100%" />
