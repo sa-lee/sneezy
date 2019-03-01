@@ -1,4 +1,5 @@
-spec_tour <- function(dim_chart) {
+spec_tour <- function(dim_chart, half_range) {
+  domain <- c(-half_range, half_range)
   vegawidget::as_vegaspec(
     list(
       `$schema` = vegawidget::vega_schema(),
@@ -10,15 +11,15 @@ spec_tour <- function(dim_chart) {
         x = list(
           field = "V1",
           type = "quantitative",
-          axis = list(title = NULL)
+          scale = list(domain = domain),
+          axis = NULL
         ),
         y = list(
           field = "V2",
           type = "quantitative",
-          axis = list(title = NULL),
-          scale = list(
-            domain = c()      
-          )
+          scale = list(domain = domain),
+          axis = NULL
+
         )
       )
     )
@@ -55,14 +56,15 @@ ui_tour <- function(history) {
 
 shiny_tour <- function(data, tsne_coords, .subset) {
   history <- basic_tour_path(data)
-  nn_graph <- get_neighbourhood_graph(tsne_coords, .subset)
-  nn_index <- c(nn_graph[1,1], unique(nn_graph[,2]))
-  spec <- spec_tour(400)
+  tour_data <- tourr::rescale(data)
+  tour_data <- scale(tour_data, center = TRUE, scale = FALSE)
+  half_range  <- max(sqrt(rowSums(tour_data^2)))
+  spec <- spec_tour(400, half_range)
   server <- function(input, output) {
     # reactives
     
     current_projection <- shiny::reactive({
-      source <- as.data.frame(data %*% history[,,input$slider])
+      source <- as.data.frame(tour_data %*% history[,,input$slider] / half_range)
       source$group <- NA
       source
       # nn_source <- source[nn_graph, ]
