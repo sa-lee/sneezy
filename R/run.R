@@ -75,7 +75,8 @@ gif_tour <- function(data, edges, ...) {
                                             ...),
                 dev = "png",
                 png_path,
-                frames = 100
+                frames = 100,
+                rescale = TRUE
   )
   png_files <- sprintf(png_path, 1:100)
   gif_file <- tempfile(fileext = ".gif")
