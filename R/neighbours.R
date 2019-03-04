@@ -55,6 +55,7 @@ get_centroids_from_nn <- function(data, tsne_coords) {
   
 }
 
+
 norm_args_nn <- function(tsne_coords) {
   list(
     coords =  tsne_coords$Y,
@@ -75,4 +76,17 @@ flatten_edges <- function(edges, args, .subset) {
   edges <- cbind(rep(.subset, each = args$K), edges)
   colnames(edges) <- c("from", "to")
   edges 
+}
+
+
+#' @export
+sneezy_shep <- function(data, coords) {
+  
+  distances <- data.frame(D = as.numeric(stats::dist(data)),
+                          d = as.numeric(stats::dist(coords$Y)))
+  
+  ggplot2::ggplot(data = distances, ggplot2::aes(x = d, y = D)) +
+    ggplot2::geom_point() +
+    ggplot2::labs(x = "Embedding distance", y = "Original distance")
+  
 }
