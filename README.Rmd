@@ -101,3 +101,11 @@ graph in t-SNE space:
 ```{r}
 sneezy_centroids(spheres, coords)
 ```
+
+
+Finally, we can also produce a 'Shephard's plot' comparing distances
+in the embedding space against the original high-dimensional space"
+
+```{r}
+sneezy_shep(spheres, coords)
+```
