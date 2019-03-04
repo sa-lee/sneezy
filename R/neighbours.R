@@ -37,6 +37,7 @@ get_centroids_from_nn <- function(data, tsne_coords) {
   # centroids for each neighbour
   seen <- integer(nrow(edges))
   centroids <- matrix(nrow = nrow(edges), ncol = ncol(data))
+  colnames(centroids) <- colnames(data)
   for (i in seq_len(nrow(edges))) {
     if (i %in% seen) {
       next

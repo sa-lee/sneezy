@@ -20,6 +20,15 @@ basic_tsne <- function(data, perplexity, alpha = nrow(data) / 10) {
                normalize = TRUE)
 }
 
+sneezy_tsne <- function(data, perplexity, alpha = nrow(data) / 10, theta = 0.5,  n_dims = min(3, ncol(data))) {
+  Rtsne::Rtsne(data,
+               perplexity = perplexity,
+               exaggeration_factor = alpha,
+               theta = theta,
+               dims = n_dims,
+               normalize = TRUE)
+}
+
 #' Animate grand tour with t-SNE neighbourhood graph
 #' 
 #' 
