@@ -87,14 +87,7 @@ We can also triangulate the points in t-SNE space, and see how that moves
 via the grand tour.
 
 ```{r}
-tri <- get_triangles(coords)
-Y_df <- as.data.frame(coords$Y)
-mesh <- data.frame(x = Y_df[tri[,1], 1],
-                   y = Y_df[tri[, 1], 2],
-                   xend = Y_df[tri[,2], 1],
-                   yend = Y_df[tri[,2], 2])
-
-pl +  geom_segment(data = mesh, aes(x =x, xend = xend, y = y, yend =yend))
+pl +  add_triangles(coords)
 ```
 
 
