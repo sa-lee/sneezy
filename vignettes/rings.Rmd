@@ -24,6 +24,10 @@ three-dimensions.
 Again we can use PCA to look at the structure:
 
 ```{r}
+library(sneezy)
+library(ggplot2)
+library(gganimate)
+
 tworings <- subset(multi, key == "C")
 tworings <- as.matrix(tworings[, c(3,4,5)])
 
@@ -39,11 +43,12 @@ exact t-SNE for a given perplexity. In this case t-SNE has broken the rings but
 has not preserved the topology.
 ```{r}
 set.seed(1999)
-coords <- basic_tsne(tworings, perplexity = 30)
+coords <- sneezy_tsne(tworings, perplexity = 45, theta = 0, n_dims = 2)
 
 ggplot(as.data.frame(coords$Y), aes(V1, V2)) +
   geom_point() +
-  coord_fixed(asp)
+  coord_fixed(asp) +
+  add_triangles(coords)
 
 ```
 

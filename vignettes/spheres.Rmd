@@ -24,7 +24,8 @@ colnames(big_sphere) <- 1:10
 
 #labels <- c(rep("A", 200), rep("B", 1000))
 
-coords <- basic_tsne(big_sphere, perplexity = 40)
+coords <- basic_tsne(big_sphere, perplexity = 1)
+coords$Y <- tourr::center(tourr::rescale(coords$Y))
 
 pl <- ggplot(as.data.frame(coords$Y), aes(V1, V2)) +
   geom_point()
@@ -32,7 +33,20 @@ pl
 
 pl +  add_triangles(coords)
 
-sneezy_triangles(big_sphere, coords)
+sneezy_centroids(big_sphere, coords)
+
+coords2 <- basic_tsne(big_sphere, perplexity = 10)
+coords2$Y <- tourr::center(tourr::rescale(coords2$Y))
+
+
+pl2 <- ggplot(as.data.frame(coords2$Y), aes(V1, V2)) +
+  geom_point()
+pl2
+
+pl2 +  add_triangles(coords2)
+
+
+sneezy_centroids(big_sphere, coords2)
 
 ```
 
