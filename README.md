@@ -28,6 +28,7 @@ We can get a view of the structure using principal components:
 library(ggplot2)
 library(gganimate) # required for printing tours
 library(sneezy)
+theme_set(theme_bw())
 spheres <- subset(multi, key %in% c("A", "D"))
 labels <- ifelse(spheres$key == "A", "sub-gaussian", "10-d 2x cluster")
 spheres <- as.matrix(spheres[, -c(1,2)])
@@ -50,8 +51,12 @@ set.seed(1010010)
 coords <- basic_tsne(spheres, perplexity = 30)
 pl <- ggplot(as.data.frame(coords$Y), aes(V1, V2)) +
   geom_point(aes(colour = labels)) +
-  coord_fixed(asp) +
-  scale_color_brewer(palette = "Dark2")
+  coord_equal() +
+  scale_color_brewer(palette = "Dark2") +
+  theme(axis.title = element_blank(), 
+        axis.ticks = element_blank(), 
+        axis.text = element_blank(),
+        panel.grid = element_blank())
 pl
 ```
 
@@ -70,7 +75,7 @@ sneezy_neighbours(spheres, coords, .subset = 171, col = pal)
 We can also triangulate the points in t-SNE space, and see how that moves via the grand tour.
 
 ``` r
-pl +  add_triangles(coords)
+pl +  add_triangles(coords) 
 ```
 
 <img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
@@ -91,7 +96,7 @@ sneezy_centroids(spheres, coords)
 
 <img src="man/figures/README-unnamed-chunk-6-1.gif" width="100%" />
 
-Finally, we can also produce a 'Shephard's plot' comparing distances in the embedding space against the original high-dimensional space"
+Finally, we can also produce a "Shephard's plot" comparing distances in the embedding space against the original high-dimensional space"
 
 ``` r
 sneezy_shep(spheres, coords)
