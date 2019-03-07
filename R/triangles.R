@@ -24,7 +24,14 @@ add_triangles <- function(coords) {
                      y = Y_df[tri[, 1], 2],
                      xend = Y_df[tri[,2], 1],
                      yend = Y_df[tri[,2], 2])
+  n_tri <- nrow(tri)
+  alpha <- 1/ n_tri^(1/3)
   
   ggplot2::geom_segment(data = mesh, 
-                        ggplot2::aes(x = x, xend = xend, y = y, yend = yend))
+                        ggplot2::aes(x = x, 
+                                     xend = xend, 
+                                     y = y, 
+                                     yend = yend),
+                        alpha = alpha
+  )
 }

@@ -48,7 +48,9 @@ sneezy_neighbours <- function(data, tsne_coords, .subset = NULL, ...) {
 #' @export
 sneezy_triangles <- function(data,  tsne_coords, ...) {
   edges <- get_triangles(tsne_coords)
-  gif_tour(data, edges, ...)
+  alpha <- 1/ nrow(edges)^(1/3)
+  edges.col <- scales::alpha("black", alpha)
+  gif_tour(data, edges, ..., edges.col = edges.col)
 }
 
 
