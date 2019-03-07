@@ -73,7 +73,7 @@ basic_tour_path <- function(data) {
 
 
 
-gif_tour <- function(data, edges, ...) {
+gif_tour <- function(data, edges, ... ) {
   dir <- tempdir()
   png_path <- file.path(dir, "frame%03d.png")
   
@@ -84,7 +84,7 @@ gif_tour <- function(data, edges, ...) {
                                             ...),
                 dev = "png",
                 png_path,
-                frames = 100,
+                frames = as.integer(ncol(data)^sqrt(ncol(data) / 2)),
                 rescale = TRUE
   )
   png_files <- sprintf(png_path, 1:100)
