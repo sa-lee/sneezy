@@ -44,7 +44,7 @@ get_centroids_from_nn <- function(data, tsne_coords) {
     } 
     inx <- edges[i,]
     seen <- c(i, inx, seen)
-    centroids[i, ] <- colMeans(data[inx,])
+    centroids[i, ] <- colMeans(data[inx,,drop = FALSE])
   }
   
   centroids[!is.na(centroids[,1]), ]
