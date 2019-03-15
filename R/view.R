@@ -1,176 +1,48 @@
 spec_tour <- function(data, half_range, dim_chart) {
   domain <- c(-half_range, half_range)
-  vegawidget::as_vegaspec(
-    list(
-      `$schema` = vegawidget::vega_schema("vega"),
-      width = dim_chart,
-      height = dim_chart,
-      data = list(
-        list(name = "projections", values = data),
-        list(
-          name = "thisKey",
-          source =  "projections",
-          transform = list(list(
-            type = "filter",
-            expr = "datum.key == currentKey"
-          ))
-        ),
-        list(
-          name= "prevKey",
-          source = "projections",
-          transform = list(list(
-            type= "filter",
-            expr = "datum.key == currentKey - stepKey"
-          ))
-        ),
-        list(
-          name= "nextKey",
-          source= "projections",
-          transform = list(list(
-            type= "filter",
-            expr= "datum.key == currentKey + stepKey"
-          ))
-        ),
-        list(
-          name = "points",
-          source = "projections",
-          transform = list( list(
-            type= "aggregate",
-            groupby= list("index")
-          ))
-        ),
-        list(
-          name= "interpolate",
-          source= "points",
-          transform= list(
-            list(
-              type= "lookup",
-              from= "thisKey",
-              key= "index",
-              fields= list("index"),
-              as= list("this"),
-              default= NULL
-            ),
-            list(
-              type= "lookup",
-              from= "prevKey",
-              key= "index",
-              fields = list("index"),
-              as= list("prev"),
-              default=NULL
-            ),
-            list(
-              type= "lookup",
-              from= "nextKey",
-              key= "index",
-              fields= list("index"),
-              as= list("next"),
-              default= NULL
-            ),
-            list(
-              type= "formula",
-              as = "target_V2",
-              expr = "interKey > currentKey ? datum.next.V2 : (datum.prev.V2||datum.this.V2)"
-            ),
-            list(
-              type = "formula",
-              as = "target_V1",
-              expr =  "interKey > currentKey ? datum.next.V1 : (datum.prev.V1||datum.this.V1)"
-            )
-          )
+  
+  tour_layer <- list(
+    `$schema` = vegawidget::vega_schema("vega_lite"),
+    width = dim_chart,
+    height = dim_chart,
+    data = list(name = "projections", values = data),
+    transform = list(
+      list(filter =list(selection = "path"))
+    ),
+    selection = list(
+      path = list(
+        type = "single",
+        fields = list("key"),
+        bind = list("key" = 
+                      list(input = "range", 
+                           min = min(data$key), 
+                           max = max(data$key), 
+                           step = 1)
+                    )
         )
-      ),
-      signals = list(
-        list(
-          name = "minKey",
-          value= 1
-        ),
-        list(
-          name = "maxKey",
-          value = 100
-        ),
-        list(
-          name= "stepKey",
-          value= 1
-        ),
-        list(
-          name= "interKey",
-          value= 1,
-          on= list(list(
-            events= "timer{1000}",
-            update= "min(maxKey, currentKey + stepKey)"
-          )
-        )),
-        list(
-          name= "currentKey",
-          value= 1,
-          on= list(list(
-            events = "timer{500}",
-            update = "currentKey < maxKey ? currentKey + stepKey : minKey"
-          ))
-        )
-      ),
-      scales= list(
-        list(
-          name = "x",
-          type= "linear",
-          nice= TRUE,
-          domain= domain,
-          range= "width"
-        ),
-        list(
-          name = "y",
-          type= "linear",
-          nice = TRUE,
-          zero= FALSE,
-          domain= domain,
-          range = "height"
-        )
-      ),
-      axes= list(
-        list(
-          title= "V1",
-          orient= "bottom",
-          scale= "x",
-          grid= FALSE,
-          tickCount = 5
-        ),
-        list(
-          title= "V2",
-          orient= "left",
-          scale= "y",
-          grid= FALSE,
-          tickCount= 5
-        )
-      ),
-      marks= list(
-        list(
-          name= "point",
-          type= "symbol",
-          from= list(
-            data= "interpolate"
-          ),
-          encode= list(
-            update= list(
-              x= list(
-                scale= "x",
-                field= "target_V1"
-              ),
-              y= list(
-                scale= "y",
-                field= "target_V2"
-              ),
-              fillOpacity= 
-                list(
-                  value= 0.5
-                ),
-              fill= list(value= "black")
-            )
-          )
-        )
-      )
+    ),
+    mark = list(type = "circle", clip = TRUE),
+    encoding = list(
+      x = list(field = "V1", type = "quantitative", 
+               scale = list(domain = domain),
+               axis = list(title = NULL, 
+                           grid = FALSE, 
+                           ticks = FALSE,
+                           labels = FALSE)
+               ),
+      y = list(field = "V2", type = "quantitative",
+               scale = list(domain = domain),
+               axis = list(title = NULL, 
+                           grid = FALSE, 
+                           ticks = FALSE,
+                           labels = FALSE)
+               ),
+      color = list(value = "black")
     )
   )
+    
+  vegawidget::as_vegaspec(tour_layer)
+    
 }
 
 setup_frames <- function(data) {
