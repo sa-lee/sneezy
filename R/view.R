@@ -1,10 +1,7 @@
-spec_tour <- function(data, half_range, dim_chart) {
+spec_tour <- function(data, half_range) {
   domain <- c(-half_range, half_range)
   
   tour_layer <- list(
-    `$schema` = vegawidget::vega_schema("vega_lite"),
-    width = dim_chart,
-    height = dim_chart,
     data = list(name = "projections", values = data),
     transform = list(
       list(filter =list(selection = "path"))
@@ -40,9 +37,36 @@ spec_tour <- function(data, half_range, dim_chart) {
       color = list(value = "black")
     )
   )
-    
-  vegawidget::as_vegaspec(tour_layer)
-    
+
+  tour_layer
+}
+
+spec_projection <- function(coords) {
+  half_range <- max(sqrt(rowSums(coords$Y^2)))
+  values <- data.frame(x = coords$Y[,1], y = coords$Y[,2])
+  domain <- c(-half_range, half_range)
+  nl_layer <- list(
+    data = list(name = "nl", values = values),
+    mark = list(type = "circle", clip = TRUE),
+    encoding = list(
+      x = list(field = "x", type = "quantitative", 
+               scale = list(domain = domain),
+               axis = list(title = NULL, 
+                           grid = FALSE, 
+                           ticks = FALSE,
+                           labels = FALSE)
+      ),
+      y = list(field = "y", type = "quantitative",
+               scale = list(domain = domain),
+               axis = list(title = NULL, 
+                           grid = FALSE, 
+                           ticks = FALSE,
+                           labels = FALSE)
+      ),
+      color = list(value = "black")
+    )
+  )
+  nl_layer
 }
 
 setup_frames <- function(data) {
@@ -57,61 +81,15 @@ setup_frames <- function(data) {
   list(data = projections, half_range = half_range)
 }
 
-vw_tour <- function(data) {
+sneezy <- function(data, coords, dim_chart) {
   input <- setup_frames(data)
-  spec_tour(input$data, input$half_range,  400)
+  panel_tour <- spec_tour(input$data, input$half_range)
+  panel_tsne <- spec_projection(coords)
+  spec <- list(
+    `$schema` = vegawidget::vega_schema(),
+    width = 2*dim_chart,
+    height = dim_chart,
+    hconcat = list(panel_tour, panel_tsne)
+  )
+  vegawidget::as_vegaspec(spec)
 }
-
-# ui_tour <- function(history) {
-#   d <- dim(history)
-#   
-#   ui_slider <-
-#     shiny::sliderInput(
-#       "slider",
-#       label = "basis",
-#       min = 1L,
-#       max = d[3],
-#       step = 1L,
-#       value = 1L,
-#       sep = "",
-#       animate = shiny::animationOptions(interval = 500, loop = TRUE)
-#     )
-#   
-#   shiny::fluidPage(
-#     shiny::titlePanel("Tourring"),
-#     shiny::sidebarLayout(
-#       shiny::sidebarPanel(
-#         ui_slider
-#       ),
-#       shiny::mainPanel(
-#         vegawidget::vegawidgetOutput("chart")
-#       )
-#     )
-#   )
-# }
-
-# shiny_tour <- function(data, tsne_coords, .subset) {
-# 
-#   server <- function(input, output) {
-#     # reactives
-#     
-#     current_projection <- shiny::reactive({
-#       source <- as.data.frame(tour_data %*% history[,,input$slider] / half_range)
-#       source$group <- NA
-#       source
-#       # nn_source <- source[nn_graph, ]
-#       # nn_source$group <- rep(seq_len(nrow(nn_graph)), 2)
-#       # nn_exclude <- source[-nn_index, ]
-#       # nn_exclude$group <- NA
-#       # rbind(nn_exclude, nn_source)
-#     })
-#     
-#     vegawidget::vw_shiny_set_data("chart", "projection", current_projection())
-#     
-#     output$chart <- vegawidget::renderVegawidget(spec)
-#   }
-#   
-#   ui <- ui_tour(history)
-#   shiny::shinyApp(ui, server)
-# }
-
