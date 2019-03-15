@@ -75,12 +75,12 @@ basic_tour_path <- function(data) {
 
 
 
-gif_tour <- function(data, edges, ... ) {
+gif_tour <- function(data, tour_path = tourr::grand_tour(), edges = NULL, ... ) {
   dir <- tempdir()
   png_path <- file.path(dir, "frame%03d.png")
   
   tourr::render(data,
-                tour_path = tourr::grand_tour(),
+                tour_path = tour_path,
                 display = tourr::display_xy(axes = "bottomleft", 
                                             edges = edges,
                                             ...),

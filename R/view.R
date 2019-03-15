@@ -41,6 +41,11 @@ spec_tour <- function(data, half_range) {
   tour_layer
 }
 
+
+# Generates a vegaspec for a t-SNE/non-linear embedding layout
+# - enable linked brushing between panels
+# - toggle triangulation on/off
+# - toggle centroids on/off
 spec_projection <- function(coords) {
   half_range <- max(sqrt(rowSums(coords$Y^2)))
   values <- data.frame(x = coords$Y[,1], y = coords$Y[,2])
