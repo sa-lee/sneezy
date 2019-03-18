@@ -73,7 +73,33 @@ spec_projection <- function(coords) {
 
 
 
-
+spec_axes <- function(half_range) {
+  domain <- c(-half_range, half_range)
+  axes_layer <- list(
+    `$schema` = vegawidget::vega_schema(),
+    data = list(name = "rotations"),
+    mark = list(type = "line", clip = TRUE),
+    encoding = list(
+      x = list(field = "x", type = "quantitative", 
+               scale = list(domain = domain),
+               axis = list(title = NULL, 
+                           grid = FALSE, 
+                           ticks = FALSE,
+                           labels = FALSE)
+      ),
+      y = list(field = "y", type = "quantitative",
+               scale = list(domain = domain),
+               axis = list(title = NULL, 
+                           grid = FALSE, 
+                           ticks = FALSE,
+                           labels = FALSE)
+      ),
+      order = list(field = "group", type = "nominal"),
+      color = list(value = "black")
+    )
+  )
+  vegawidget::as_vegaspec(axes_layer)
+}
 
 
 sneezy <- function(data, max_bases, coords) {
@@ -103,13 +129,21 @@ sneezy_ui <- function(max_bases) {
   
   
   shiny::fluidPage(
-    shiny::sidebarLayout(
-      shiny::mainPanel(
-        vegawidget::vegawidgetOutput("chart")
-      ),
-      shiny::sidebarPanel(tour_slider)
+    shiny::fluidRow(
+      shiny::column(width = 12,
+                   vegawidget::vegawidgetOutput("chart"),
+                   shiny::fluidRow(
+                     shiny::column(width = 6, 
+                                   vegawidget::vegawidgetOutput("axes")
+                     ),
+                     shiny::column(width = 6,
+                                   tour_slider
+                     )
+                   )
+      )
     )
   )
+  
 }
 
 sneezy_server <- function(data, max_bases, coords) {
@@ -124,23 +158,50 @@ sneezy_server <- function(data, max_bases, coords) {
                          tsne_y = coords$Y[,2])
   
   tbl_tour <- as.data.frame(tour_data %*% history[,,1])
+  # initalise tbl
   tbl_init <- cbind(tbl_tour, tbl_tsne)
+  
+  tbl_zeros <- matrix(0, nrow = nrow(history[,,1]), ncol = 3)
+  tbl_zeros[,3] <- seq_len(nrow(history[,,1]))
+  
   
   # set up panels
   panel_tour <- spec_tour(half_range)
   panel_tsne <- spec_projection(coords)
   
   
-  # final spec
+  # projections + tsne spec
   spec <- list(
     `$schema` = vegawidget::vega_schema(),
     data = list(name = "projections", values = tbl_init),
     hconcat = list(panel_tour, panel_tsne)
   )
   spec <- vegawidget::as_vegaspec(spec)
+  
+  spec_rotations <- spec_axes(half_range)
+  
   function(input, output) {
+    
+    cur_path <- shiny::reactive({
+      history[,,input$n_bases]
+    })
+    
+    rct_axes <- shiny::reactive({
+      path <- cur_path()
+      path <- rbind(
+        cbind(path, seq_len(nrow(path))),
+        tbl_zeros
+      )
+      colnames(path) <- c("x", "y", "group")
+      as.data.frame(path)
+    })
+    
+    vegawidget::vw_shiny_set_data("axes", "rotations", rct_axes())
+    
+    output$axes <- vegawidget::renderVegawidget(spec_rotations)
+    
     rct_data <- shiny::reactive({
-      tbl_init[, c(1,2)] <-tour_data %*% history[,,input$n_bases]
+      tbl_init[, c(1,2)] <-tour_data %*% cur_path()
       tbl_init
     })
     
