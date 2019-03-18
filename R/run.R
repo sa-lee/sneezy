@@ -66,8 +66,8 @@ sneezy_centroids <- function(data, tsne_coords) {
 #' Simplified grand tour history
 #' 
 #' @export
-basic_tour_path <- function(data) {
-  projections <- tourr::save_history(data, rescale = FALSE)
+basic_tour_path <- function(data, max_bases) {
+  projections <- tourr::save_history(data, max_bases = max_bases)
   attr(projections, "data") <- NULL
   class(projections) <- NULL
   projections
