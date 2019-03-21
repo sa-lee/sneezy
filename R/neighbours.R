@@ -79,6 +79,13 @@ flatten_edges <- function(edges, args, .subset) {
 }
 
 
+compute_flat_dist <- function(data, coords) {
+  data.frame(
+    original = as.numeric(stats::dist(Rtsne::normalize_input(data))),
+    embedding = as.numeric(stats::dist(Rtsne::normalize_input(coords$Y)))
+  )
+}
+
 #' @export
 sneezy_shep <- function(data, coords) {
   

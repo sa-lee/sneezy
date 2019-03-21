@@ -43,9 +43,11 @@ spec_projection <- function(coords) {
   half_range <- max(sqrt(rowSums(coords$Y^2)))
   domain <- c(-half_range, half_range)
   nl_layer <- list(
+    title = paste("t-SNE with perplexity", coords$perplexity),
     mark = list(type = "circle", clip = TRUE),
     selection = list(brush = list(type = "interval")),
     encoding = list(
+      
       x = list(field = "tsne_x", type = "quantitative", 
                scale = list(domain = domain),
                axis = list(title = NULL, 
@@ -101,6 +103,23 @@ spec_axes <- function(half_range) {
   vegawidget::as_vegaspec(axes_layer)
 }
 
+spec_shep <- function(dist) {
+  domain <- c(0, max(dist) + 0.1)
+  shep_layer <- list(
+    `$schema` = vegawidget::vega_schema(),
+    data = list(name = "shep", values = dist),
+    mark = list(type = "circle", clip = TRUE),
+    encoding = list(
+      x = list(field = "original", type = "quantitative",
+               scale = list(domain = domain)),
+      y = list(field = "embedding", type = "quantitative",
+               scale = list(domain = domain)),
+      color = list(value = "black"),
+      opacity = list(value = 1 / 10)
+    )
+  )
+  vegawidget::as_vegaspec(shep_layer)
+}
 
 sneezy <- function(data, max_bases, coords) {
   if (!requireNamespace("shiny", quietly = TRUE)) {
@@ -133,14 +152,15 @@ sneezy_ui <- function(max_bases) {
       shiny::column(width = 12,
                    vegawidget::vegawidgetOutput("chart"),
                    shiny::fluidRow(
-                     shiny::column(width = 6, 
+                     shiny::column(width = 4, 
                                    vegawidget::vegawidgetOutput("axes")
                      ),
-                     shiny::column(width = 6,
-                                   tour_slider
+                     shiny::column(width = 8,
+                                   vegawidget::vegawidgetOutput("dist")
                      )
                    )
-      )
+      ),
+      tour_slider
     )
   )
   
@@ -170,7 +190,7 @@ sneezy_server <- function(data, max_bases, coords) {
   panel_tsne <- spec_projection(coords)
   
   
-  # projections + tsne spec
+  # projections + tsne spec + pairwise distance plots
   spec <- list(
     `$schema` = vegawidget::vega_schema(),
     data = list(name = "projections", values = tbl_init),
@@ -180,7 +200,15 @@ sneezy_server <- function(data, max_bases, coords) {
   
   spec_rotations <- spec_axes(half_range)
   
+  spec_dist <- spec_shep(compute_flat_dist(data, coords))
+  
+  opt <- vegawidget::vega_embed(actions = FALSE)
+  
   function(input, output) {
+    
+    output$dist <- vegawidget::renderVegawidget(
+      vegawidget::vegawidget(spec_dist, embed = opt)
+    )
     
     cur_path <- shiny::reactive({
       history[,,input$n_bases]
@@ -198,7 +226,9 @@ sneezy_server <- function(data, max_bases, coords) {
     
     vegawidget::vw_shiny_set_data("axes", "rotations", rct_axes())
     
-    output$axes <- vegawidget::renderVegawidget(spec_rotations)
+    output$axes <- vegawidget::renderVegawidget(
+      vegawidget::vegawidget(spec_rotations, embed = opt)
+    )
     
     rct_data <- shiny::reactive({
       tbl_init[, c(1,2)] <-tour_data %*% cur_path()
@@ -210,26 +240,3 @@ sneezy_server <- function(data, max_bases, coords) {
   }
   
 }
-
-# sneezy <- function(data, coords, dim_chart) {
-#   input <- setup_frames(data)
-#   
-#   
-#   panel_tour <- spec_tour(input$data, input$half_range)
-#   panel_tsne <- spec_projection(coords)
-# 
-# }
-
-
-
-# setup_frames <- function(data) {
-#   history <- basic_tour_path(data)
-#   tour_data <- tourr::rescale(data)
-#   tour_data <- scale(tour_data, center = TRUE, scale = FALSE)
-#   half_range  <- max(sqrt(rowSums(tour_data^2)))
-#   projections <- apply(history, 2, function(.) `%*%`(tour_data, .) )
-#   projections <- as.data.frame(projections)
-#   projections$key <- rep(seq_len(100), each = nrow(tour_data))
-#   projections$index <- rep(seq_len(nrow(tour_data)), 100)
-#   list(data = projections, half_range = half_range)
-# }
