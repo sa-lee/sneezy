@@ -63,12 +63,13 @@ sneezy_ui <- function(max_bases) {
     shiny::sidebarLayout(
       shiny::sidebarPanel(
         tour_slider,
-        vegawidget::vegawidgetOutput("axes")
+        vegawidget::vegawidgetOutput("axes"),
+        vegawidget::vegawidgetOutput("dist")
       ),
       shiny::mainPanel(
         shiny::fluidRow(
-          shiny::column(width = 8, vegawidget::vegawidgetOutput("chart")),
-          vegawidget::vegawidgetOutput("dist"))
+          shiny::column(width = 8, vegawidget::vegawidgetOutput("chart"))
+          )
       )
     )
   )
@@ -101,19 +102,20 @@ sneezy_server <- function(data, embedding, max_bases) {
   panel_tour <- spec_tour(half_range)
   panel_tsne <- spec_projection(embedding)
   panel_dot <- spec_dot(colnames(tour_data))
+  spec_dist <- spec_shep(compute_flat_dist(data, embedding))
+  
   
   # projections + tsne spec + pairwise distance plots
   spec <- list(
     `$schema` = vegawidget::vega_schema(),
     data = list(name = "projections", values = tbl_init),
-    hconcat = list(panel_dot, panel_tour, panel_tsne)
+    hconcat = list(panel_tour, panel_tsne, panel_dot)
   )
   
   spec <- vegawidget::as_vegaspec(spec)
   
   spec_rotations <- spec_axes(half_range)
   
-  spec_dist <- spec_shep(compute_flat_dist(data, embedding))
   
   opt <- vegawidget::vega_embed(actions = FALSE)
   
