@@ -3,10 +3,6 @@ spec_tour <- function(half_range) {
   domain <- c(-half_range, half_range)
   
   tour_layer <- list(
-    # transform = list(
-    #   list(filter =list(selection = "path"))
-    # ),
-    #selection = list(),
     mark = list(type = "circle", clip = TRUE),
     encoding = list(
       x = list(field = "V1", type = "quantitative", 
@@ -25,7 +21,7 @@ spec_tour <- function(half_range) {
       ),
       color = list(
         condition = list(
-          selection = "brush",
+          selection = list(`or` = list("variableBrush", "embeddingBrush")),
           value = "black"
         ),
         value = "gray")
@@ -43,7 +39,7 @@ spec_projection <- function(coords) {
   nl_layer <- list(
     title = paste("t-SNE with perplexity", coords$perplexity),
     mark = list(type = "circle", clip = TRUE),
-    selection = list(brush = list(type = "interval")),
+    selection = list(embeddingBrush = list(type = "interval")),
     encoding = list(
       
       x = list(field = "tsne_x", type = "quantitative", 
@@ -62,7 +58,7 @@ spec_projection <- function(coords) {
       ),
       color = list(
         condition = list(
-          selection = "brush",
+          selection = "embeddingBrush",
           value = "black"
         ),
         value = "gray")
@@ -70,7 +66,6 @@ spec_projection <- function(coords) {
   )
   nl_layer
 }
-
 
 
 spec_axes <- function(half_range) {
@@ -101,6 +96,7 @@ spec_axes <- function(half_range) {
   vegawidget::as_vegaspec(axes_layer)
 }
 
+
 spec_shep <- function(dist) {
   domain <- c(0, max(dist) + 0.1)
   shep_layer <- list(
@@ -120,5 +116,26 @@ spec_shep <- function(dist) {
 }
 
 
+spec_dot <- function(vars) {
+  dot <- list(
+    height = 300,
+    # data = list(name = "source", values = tour_data),
+    `repeat` = list(row = vars),
+    spec = list(
+      selection = list("variableBrush" = list(type = "interval", resolve = "global")),
+      mark = list(type = "tick"),
+      encoding = list(
+        x = list(field = list(`repeat` = "row"), type = "quantitative"),
+        fill = list(
+          condition = list(
+            selection = list(`or` = list("variableBrush", "embeddingBrush")),
+            value = "black"
+          ),
+          value = "grey")
+      )
+    )
+  )
+  dot
+}
 
 

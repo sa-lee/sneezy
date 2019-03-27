@@ -39,7 +39,7 @@ sneezy <- function(data, embedding, max_bases) {
   }
   
   ui <- sneezy_ui(max_bases)
-  server <- sneezy_server(data, max_bases, coords)
+  server <- sneezy_server(data, embedding, max_bases)
   
   shiny::shinyApp(ui, server)
   
@@ -66,8 +66,9 @@ sneezy_ui <- function(max_bases) {
         vegawidget::vegawidgetOutput("axes")
       ),
       shiny::mainPanel(
-        shiny::column(width = 8, vegawidget::vegawidgetOutput("chart")),
-        shiny::column(width = 8, vegawidget::vegawidgetOutput("dist"))
+        shiny::fluidRow(
+          shiny::column(width = 8, vegawidget::vegawidgetOutput("chart")),
+          vegawidget::vegawidgetOutput("dist"))
       )
     )
   )
@@ -75,22 +76,22 @@ sneezy_ui <- function(max_bases) {
   
 }
 
-sneezy_server <- function(data, max_bases, coords) {
+sneezy_server <- function(data, embedding, max_bases) {
   history <- basic_tour_path(data, 
                              max_bases = max_bases)
   #path <- tourr::interpolate(history)
-  # readust data
+  # readjust data
   tour_data <- tourr::rescale(data)
   tour_data <- scale(tour_data, center = TRUE, scale = FALSE)
   half_range  <- max(sqrt(rowSums(tour_data^2)))
   
   # static tsne_projection
-  tbl_tsne <- data.frame(tsne_x = coords$Y[,1], 
-                         tsne_y = coords$Y[,2])
+  tbl_tsne <- data.frame(tsne_x = embedding$Y[,1], 
+                         tsne_y = embedding$Y[,2])
   
   tbl_tour <- as.data.frame(tour_data %*% history[,,1])
   # initalise tbl
-  tbl_init <- cbind(tbl_tour, tbl_tsne)
+  tbl_init <- cbind(tbl_tour, tbl_tsne, as.data.frame(tour_data))
   
   tbl_zeros <- matrix(0, nrow = nrow(history[,,1]), ncol = 3)
   tbl_zeros[,3] <- seq_len(nrow(history[,,1]))
@@ -98,20 +99,21 @@ sneezy_server <- function(data, max_bases, coords) {
   
   # set up panels
   panel_tour <- spec_tour(half_range)
-  panel_tsne <- spec_projection(coords)
-  
+  panel_tsne <- spec_projection(embedding)
+  panel_dot <- spec_dot(colnames(tour_data))
   
   # projections + tsne spec + pairwise distance plots
   spec <- list(
     `$schema` = vegawidget::vega_schema(),
     data = list(name = "projections", values = tbl_init),
-    hconcat = list(panel_tour, panel_tsne)
+    hconcat = list(panel_dot, panel_tour, panel_tsne)
   )
+  
   spec <- vegawidget::as_vegaspec(spec)
   
   spec_rotations <- spec_axes(half_range)
   
-  spec_dist <- spec_shep(compute_flat_dist(data, coords))
+  spec_dist <- spec_shep(compute_flat_dist(data, embedding))
   
   opt <- vegawidget::vega_embed(actions = FALSE)
   
