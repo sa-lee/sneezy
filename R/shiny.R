@@ -58,11 +58,14 @@ sneezy_ui <- function(max_bases) {
     animate = shiny::animationOptions(interval = 250, loop = TRUE)
   )
   
+  centroids_box <- shiny::checkboxInput("addGraph", 
+                                    label = "Add nearest neighbours graph?")
   
   shiny::fluidPage(
     shiny::sidebarLayout(
       shiny::sidebarPanel(
         tour_slider,
+        centroids_box,
         vegawidget::vegawidgetOutput("axes"),
         vegawidget::vegawidgetOutput("dist")
       ),
@@ -78,10 +81,14 @@ sneezy_ui <- function(max_bases) {
 }
 
 sneezy_server <- function(data, embedding, max_bases) {
-  history <- basic_tour_path(data, 
-                             max_bases = max_bases)
-  #path <- tourr::interpolate(history)
-  # readjust data
+  
+  history <- tourr::save_history(
+    data,
+    max_bases = max_bases 
+  )
+  
+  # history <- tourr::interpolate(history)
+  # rescale data
   tour_data <- tourr::rescale(data)
   tour_data <- scale(tour_data, center = TRUE, scale = FALSE)
   half_range  <- max(sqrt(rowSums(tour_data^2)))
@@ -90,7 +97,10 @@ sneezy_server <- function(data, embedding, max_bases) {
   tbl_tsne <- data.frame(tsne_x = embedding$Y[,1], 
                          tsne_y = embedding$Y[,2])
   
-  tbl_tour <- as.data.frame(tour_data %*% history[,,1])
+  tbl_tour <- as.data.frame(tour_data %*% matrix(history[,,1], 
+                                                 nrow = ncol(tour_data),
+                                                 ncol = 2L)
+  )
   # initalise tbl
   tbl_init <- cbind(tbl_tour, tbl_tsne, as.data.frame(tour_data))
   
@@ -108,8 +118,12 @@ sneezy_server <- function(data, embedding, max_bases) {
   # projections + tsne spec + pairwise distance plots
   spec <- list(
     `$schema` = vegawidget::vega_schema(),
+    hconcat = list(panel_tour, panel_tsne)
+  )
+  spec <- list(
+    `$schema` = vegawidget::vega_schema(),
     data = list(name = "projections", values = tbl_init),
-    hconcat = list(panel_tour, panel_tsne, panel_dot)
+    vconcat = list(spec, panel_dot)
   )
   
   spec <- vegawidget::as_vegaspec(spec)
@@ -126,7 +140,10 @@ sneezy_server <- function(data, embedding, max_bases) {
     )
     
     cur_path <- shiny::reactive({
-      history[,,input$n_bases]
+      matrix(history[,,input$n_bases], 
+             nrow = ncol(data), 
+             ncol = 2L, 
+             byrow = TRUE)
     })
     
     rct_axes <- shiny::reactive({
@@ -136,7 +153,9 @@ sneezy_server <- function(data, embedding, max_bases) {
         tbl_zeros
       )
       colnames(path) <- c("x", "y", "group")
-      as.data.frame(path)
+      path <- as.data.frame(path)
+      path$axis_name <- c(colnames(tour_data), rep("", nrow(tbl_zeros)))
+      path
     })
     
     vegawidget::vw_shiny_set_data("axes", "rotations", rct_axes())

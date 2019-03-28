@@ -73,7 +73,6 @@ spec_axes <- function(half_range) {
   axes_layer <- list(
     `$schema` = vegawidget::vega_schema(),
     data = list(name = "rotations"),
-    mark = list(type = "line", clip = TRUE),
     encoding = list(
       x = list(field = "x", type = "quantitative", 
                scale = list(domain = domain),
@@ -88,12 +87,26 @@ spec_axes <- function(half_range) {
                            grid = FALSE, 
                            ticks = FALSE,
                            labels = FALSE)
+      )
+    ),
+    layer = list(
+      list(
+        mark = list(type = "line", clip = TRUE),
+        encoding = list(
+          order = list(field = "group", type = "nominal"),
+          color = list(value = "black")
+        )
       ),
-      order = list(field = "group", type = "nominal"),
-      color = list(value = "black")
+      list(
+        # transform = list(list(filter = list(field = "axis_name", valid = TRUE))),
+        mark = list(type = "text", align = "left", dy = -3),
+        encoding = list(
+          text = list(field = "axis_name", type = "nominal")
+        )
+      )
     )
   )
-  vegawidget::as_vegaspec(axes_layer)
+vegawidget::as_vegaspec(axes_layer)
 }
 
 
