@@ -1,4 +1,19 @@
 # everything here should produce it's own valid specs
+spec_slider <- function(data) {
+  slider <- list(
+    `$schema` = vegawidget::vega_schema(),
+    data = list(name = "slider", values = data),
+    transform = list(list(window = list(list(op = "row_number", as = "index")))
+                     ),
+    mark = list(type = "tick", clip = TRUE),
+    encoding = list(
+      x = list(field = "index", type = "quantitative"),
+      fill = list(field = "is_anchor", type = "nominal")
+    )
+  )
+  vegawidget::as_vegaspec(slider)
+}
+
 spec_tour <- function(half_range) {
   domain <- c(-half_range, half_range)
   
