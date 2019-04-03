@@ -27,5 +27,6 @@ Suggests:
     gganimate,
     knitr,
     rmarkdown,
-    ggplot2
+    ggplot2,
+    irlba
 VignetteBuilder: knitr
