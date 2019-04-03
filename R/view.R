@@ -14,7 +14,30 @@ spec_slider <- function(data) {
   vegawidget::as_vegaspec(slider)
 }
 
-spec_tour <- function(half_range) {
+encoding_color <- function(colour = NULL) {
+  if (!is.null(colour)) {
+    return(
+      list(condition = 
+             list(
+               selection = list(`or` = list("variableBrush", "embeddingBrush")),
+               field = colour, 
+               type = "nominal"
+             ),
+           value = "grey"
+      )
+    )
+  }
+  
+  list(
+    condition = list(
+      selection = list(`or` = list("variableBrush", "embeddingBrush")),
+      value = "black"
+    ),
+    value = "grey"
+  )
+}
+
+spec_tour <- function(half_range, colour = NULL) {
   domain <- c(-half_range, half_range)
   
   tour_layer <- list(
@@ -34,12 +57,7 @@ spec_tour <- function(half_range) {
                            ticks = FALSE,
                            labels = FALSE)
       ),
-      color = list(
-        condition = list(
-          selection = list(`or` = list("variableBrush", "embeddingBrush")),
-          value = "black"
-        ),
-        value = "gray")
+      color = encoding_color(colour)
     )
   )
   
@@ -48,7 +66,7 @@ spec_tour <- function(half_range) {
 
 
 
-spec_projection <- function(coords) {
+spec_projection <- function(coords, colour = NULL) {
   half_range <- max(sqrt(rowSums(coords$Y^2)))
   domain <- c(-half_range, half_range)
   nl_layer <- list(
@@ -71,12 +89,7 @@ spec_projection <- function(coords) {
                            ticks = FALSE,
                            labels = FALSE)
       ),
-      color = list(
-        condition = list(
-          selection = "embeddingBrush",
-          value = "black"
-        ),
-        value = "gray")
+      color = encoding_color(colour)
     )
   )
   nl_layer
@@ -144,7 +157,7 @@ spec_shep <- function(dist) {
 }
 
 
-spec_dot <- function(vars) {
+spec_dot <- function(vars, colour = NULL) {
   dot <- list(
     height = 300,
     # data = list(name = "source", values = tour_data),
@@ -154,12 +167,7 @@ spec_dot <- function(vars) {
       mark = list(type = "tick"),
       encoding = list(
         x = list(field = list(`repeat` = "row"), type = "quantitative"),
-        fill = list(
-          condition = list(
-            selection = list(`or` = list("variableBrush", "embeddingBrush")),
-            value = "black"
-          ),
-          value = "grey")
+        fill = encoding_color(colour)
       )
     )
   )

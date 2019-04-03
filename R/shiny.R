@@ -2,6 +2,7 @@
 #' 
 #' @param data a data.frame or matrix
 #' @param embedding list output from `Rtsne::Rtsne()`
+#' @param colour a column name in `data` corresponding to categorical variable
 #' @param max_bases number of bases for grand tour (see `tourr::save_history()`)
 #' @param ... other stuff I want to include. 
 #' 
@@ -33,13 +34,14 @@
 #'           
 #' 
 #' @return a shiny app
-sneezy <- function(data, embedding, max_bases) {
+sneezy <- function(data, embedding, colour = NULL, max_bases) {
+  
   if (!requireNamespace("shiny", quietly = TRUE)) {
     stop("Please install shiny", call. = FALSE)
   }
   
   ui <- sneezy_ui(max_bases)
-  server <- sneezy_server(data, embedding, max_bases)
+  server <- sneezy_server(data, embedding, colour, max_bases)
   
   shiny::shinyApp(ui, server)
   
@@ -80,11 +82,11 @@ sneezy_ui <- function(max_bases) {
   
 }
 
-sneezy_server <- function(data, embedding, max_bases) {
+sneezy_server <- function(data, embedding, colour, max_bases) {
   
   history <- tourr::save_history(
     data,
-    max_bases = max_bases 
+    max_bases = max_bases
   )
   
   # history <- tourr::interpolate(history)
@@ -102,7 +104,11 @@ sneezy_server <- function(data, embedding, max_bases) {
                                                  ncol = 2L)
   )
   # initalise tbl
-  tbl_init <- cbind(tbl_tour, tbl_tsne, as.data.frame(tour_data))
+  if (!is.null(colour)) {
+    tbl_init <- data[, colour, drop = FALSE]
+  }
+  
+  tbl_init <- cbind(tbl_tour, tbl_tsne, as.data.frame(tour_data), tbl_init)
   
   tbl_zeros <- matrix(0, nrow = nrow(history[,,1]), ncol = 3)
   tbl_zeros[,3] <- seq_len(nrow(history[,,1]))
