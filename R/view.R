@@ -35,6 +35,14 @@ encoding_color <- function(colour = NULL) {
     ),
     value = "grey"
   )
+  
+  list(
+    condition = list(
+      selection = list(`or` = list("variableBrush", "embeddingBrush")),
+      value = "black"
+    ),
+    value = "grey")
+  
 }
 
 spec_tour <- function(half_range, colour = NULL) {

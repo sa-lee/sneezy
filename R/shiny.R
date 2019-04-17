@@ -84,58 +84,73 @@ sneezy_ui <- function(max_bases) {
 
 sneezy_server <- function(data, embedding, colour, max_bases) {
   
+  if (is.matrix(data)) {
+    valid_cols <- apply(data, 2, is.numeric)
+  } else {
+    valid_cols <- vapply(data, is.numeric, logical(1))
+  }
+  
+  
+  colnames(data) <- gsub(pattern = "\\.", "_", colnames(data))
+  
   history <- tourr::save_history(
-    data,
+    data[, valid_cols, drop = FALSE],
     max_bases = max_bases
   )
   
-  # history <- tourr::interpolate(history)
   # rescale data
-  tour_data <- tourr::rescale(data)
+  tour_data <- tourr::rescale(data[, valid_cols])
   tour_data <- scale(tour_data, center = TRUE, scale = FALSE)
   half_range  <- max(sqrt(rowSums(tour_data^2)))
+  
+  
+  #history <- tourr::interpolate(history)
+  # initalise projections, colour variables
+  if (!is.null(colour)) {
+    tbl_colour <- cbind(as.data.frame(data[, valid_cols]), data[, colour, drop = FALSE])
+  } else {
+    tbl_colour <- as.data.frame(data[, valid_cols])
+  }
   
   # static tsne_projection
   tbl_tsne <- data.frame(tsne_x = embedding$Y[,1], 
                          tsne_y = embedding$Y[,2])
   
+  # first basis 
   tbl_tour <- as.data.frame(tour_data %*% matrix(history[,,1], 
                                                  nrow = ncol(tour_data),
                                                  ncol = 2L)
   )
-  # initalise tbl
-  if (!is.null(colour)) {
-    tbl_init <- data[, colour, drop = FALSE]
-  }
   
-  tbl_init <- cbind(tbl_tour, tbl_tsne, as.data.frame(tour_data), tbl_init)
+  # all data going to specs
+  tbl_init <- cbind(tbl_tour, tbl_tsne, tbl_colour)
   
+  # for drawing axis
   tbl_zeros <- matrix(0, nrow = nrow(history[,,1]), ncol = 3)
   tbl_zeros[,3] <- seq_len(nrow(history[,,1]))
-  
+  spec_rotations <- spec_axes(half_range)
   
   # set up panels
-  panel_tour <- spec_tour(half_range)
-  panel_tsne <- spec_projection(embedding)
-  panel_dot <- spec_dot(colnames(tour_data))
-  spec_dist <- spec_shep(compute_flat_dist(data, embedding))
+  panel_tour <- spec_tour(half_range, colour = colour)
+  panel_tsne <- spec_projection(embedding, colour = colour)
+  panel_dot <- spec_dot(colnames(tour_data), colour = colour)
+  spec_dist <- spec_shep(compute_flat_dist(tour_data, embedding))
   
   
   # projections + tsne spec + pairwise distance plots
   spec <- list(
-    `$schema` = vegawidget::vega_schema(),
     hconcat = list(panel_tour, panel_tsne)
   )
+  
   spec <- list(
     `$schema` = vegawidget::vega_schema(),
     data = list(name = "projections", values = tbl_init),
     vconcat = list(spec, panel_dot)
   )
   
+  jsonlite::write_json(spec, "spec_example.json", auto_unbox = TRUE, pretty = TRUE)
+  
   spec <- vegawidget::as_vegaspec(spec)
-  
-  spec_rotations <- spec_axes(half_range)
-  
   
   opt <- vegawidget::vega_embed(actions = FALSE)
   
@@ -147,7 +162,7 @@ sneezy_server <- function(data, embedding, colour, max_bases) {
     
     cur_path <- shiny::reactive({
       matrix(history[,,input$n_bases], 
-             nrow = ncol(data), 
+             nrow = ncol(tour_data), 
              ncol = 2L, 
              byrow = TRUE)
     })
