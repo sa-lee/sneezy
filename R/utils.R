@@ -11,6 +11,6 @@ fsphere_data <- function(data, k) {
   if (!requireNamespace("irlba", quietly = TRUE)) {
     stop("Fast sphering requires the irlba package to be installed.")
   }
-  dr <- irlba::prcomp_irlba(data, k)
+  dr <- irlba::prcomp_irlba(data, n = k)
   scale(stats::predict(dr))
 }
