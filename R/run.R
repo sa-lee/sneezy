@@ -41,7 +41,7 @@ sneezy_tsne <- function(data, perplexity, alpha = nrow(data) / 10, theta = 0.5, 
 #' @export
 sneezy_neighbours <- function(data, tsne_coords, .subset = NULL, ...) {
   nn_graph <- get_neighbourhood_graph(tsne_coords, .subset)
-  gif_tour(data, nn_graph, ...)
+  gif_tour(data, edges = nn_graph, ...)
   
 }
 
