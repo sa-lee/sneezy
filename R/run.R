@@ -56,11 +56,11 @@ sneezy_triangles <- function(data,  tsne_coords, ...) {
 
 
 #' @export
-sneezy_centroids <- function(data, tsne_coords) {
+sneezy_centroids <- function(data, tsne_coords, col, ...) {
   centroids <- get_centroids_from_nn(data, tsne_coords)
-  col <- c(rep("black", nrow(data)), rep("red", nrow(centroids)))
+  col <- scales::alpha(c(col, rep("red", nrow(centroids))))
   data <- rbind(data, centroids)
-  gif_tour(data, edges = NULL, col = col)
+  gif_tour(data, tour_path = tourr::grand_tour(), edges = NULL, col = col)
   
 }
 #' Simplified grand tour history
@@ -86,12 +86,12 @@ gif_tour <- function(data, tour_path = tourr::grand_tour(), edges = NULL, ... ) 
                                             ...),
                 dev = "png",
                 png_path,
-                frames = as.integer(ncol(data)^sqrt(ncol(data) / 2)),
+                frames = 200,
                 rescale = TRUE
   )
-  png_files <- sprintf(png_path, 1:100)
+  png_files <- sprintf(png_path, 1:200)
   gif_file <- tempfile(fileext = ".gif")
-  gifski::gifski(png_files, gif_file, delay = 0.25, progress = FALSE)
+  gifski::gifski(png_files, gif_file, delay = 0.25, progress = TRUE)
   on.exit(unlink(png_files))
   gganimate::gif_file(gif_file)
 }
