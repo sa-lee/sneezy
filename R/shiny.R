@@ -134,7 +134,7 @@ sneezy_server <- function(data, embedding, colour, max_bases) {
   panel_tour <- spec_tour(half_range, colour = colour)
   panel_tsne <- spec_projection(embedding, colour = colour)
   panel_dot <- spec_dot(colnames(tour_data), colour = colour)
-  spec_dist <- spec_shep(compute_flat_dist(tour_data, embedding))
+  spec_dist <- NULL
   
   
   # projections + tsne spec + pairwise distance plots
