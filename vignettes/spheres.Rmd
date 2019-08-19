@@ -24,7 +24,7 @@ colnames(big_sphere) <- 1:10
 
 #labels <- c(rep("A", 200), rep("B", 1000))
 
-coords <- basic_tsne(big_sphere, perplexity = 1)
+coords <- basic_tsne(big_sphere, perplexity = 30)
 coords$Y <- tourr::center(tourr::rescale(coords$Y))
 
 pl <- ggplot(as.data.frame(coords$Y), aes(V1, V2)) +
