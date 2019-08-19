@@ -19,7 +19,9 @@ Imports:
     stats,
     BiocNeighbors,
     geometry,
-    shiny
+    shiny,
+    methods,
+    SingleCellExperiment
 URL: https://github.com/sa-lee/sneezy
 BugReports: https://github.com/sa-lee/sneezy/issues
 Suggests: 
