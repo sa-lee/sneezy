@@ -14,7 +14,7 @@ multi <- read_tsv("http://ifs.tuwien.ac.at/dm/download/multiChallenge-matrix.txt
   select(key, index, X1:X10)
 
 # turn it into a SightSE object
-mutli <- as_sightse(multi, 
+multi <- as_sightse(multi, 
                     traveller = tourr::grand_tour(), 
                     X1:X10)
 
