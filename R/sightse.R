@@ -104,7 +104,9 @@ setMethod("as_sightse",
             }
             mat_part <- as(mat_part, view_as)
             
-            row_part <- .data[,!(colnames(.data) %in% colnames(mat_part))]
+            row_part <- .data[,
+                              !(colnames(.data) %in% colnames(mat_part)), 
+                              drop = FALSE]
             se <- SingleCellExperiment::SingleCellExperiment(
               assays = list(view = mat_part),
               rowData = row_part
