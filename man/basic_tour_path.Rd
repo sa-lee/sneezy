@@ -4,7 +4,7 @@
 \alias{basic_tour_path}
 \title{Simplified grand tour history}
 \usage{
-basic_tour_path(data)
+basic_tour_path(data, max_bases)
 }
 \description{
 Simplified grand tour history

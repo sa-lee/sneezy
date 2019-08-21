@@ -16,3 +16,6 @@ generate_sphere(n, p, mean, sd)
 \description{
 Sample from a p-dimensional solid sphere
 }
+\examples{
+generate_sphere(1000, 10, mean =  5, sd = 2)
+}
