@@ -96,7 +96,14 @@ setMethod("as_sightse",
               stop("Please install dplyr", call. = FALSE)
             }
             
-            mat_part <- as(dplyr::select(.data, ...), view_as)
+            mat_part <- dplyr::select(.data, ...)
+            all_num <- all(vapply(mat_part, is.numeric, logical(1)))
+            if(!all_num) {
+              stop("selection must only contain numeric variables",
+                   .call = FALSE)
+            }
+            mat_part <- as(mat_part, view_as)
+            
             row_part <- .data[,!(colnames(.data) %in% colnames(mat_part))]
             se <- SingleCellExperiment::SingleCellExperiment(
               assays = list(view = mat_part),
