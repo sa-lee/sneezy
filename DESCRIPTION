@@ -31,7 +31,6 @@ Suggests:
     knitr,
     rmarkdown,
     ggplot2,
-    irlba,
     testthat (>= 2.1.0),
     dplyr
 VignetteBuilder: knitr
