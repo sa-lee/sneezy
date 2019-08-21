@@ -25,6 +25,18 @@ setOldClass("tour_path")
 #' @importFrom methods setClass setOldClass setGeneric
 #' @export
 #' 
+#' @examples 
+#' sphere <- generate_sphere(1000, 10, mean =  5, sd = 2)
+#' se_sphere <- as_sightse(sphere, traveller = tourr::grand_tour())
+#' se_sphere
+#' 
+#' # convert a data.frame to a SightSE object
+#' # this allows you to select columns that will form the assay data
+#' se_olive <- as_sightse(tourr::olive, 
+#'                        traveller = tourr::guided_tour(tourr::holes()),
+#'                        palmitic:eicosenoic)
+#' se_olive
+#' 
 #' @name SightSE
 #' @rdname SightSE-class     
 setClass("SightSE",
@@ -41,7 +53,7 @@ SightSE <- function(se, traveller = tourr::grand_tour()) {
 #' @name SightSE
 #' @rdname SightSE-class 
 #' @export    
-setGeneric("as_sightse", function(.data, traveller = tourr::grand_tour(), ...) {
+setGeneric("as_sightse", function(.data, traveller, ...) {
   standardGeneric("as_sightse")
 })
 
@@ -85,10 +97,20 @@ setMethod("as_sightse",
             }
             
             mat_part <- as(dplyr::select(.data, ...), view_as)
-            row_part <- dplyr::select(.data, -rlang::enquos(...))
+            row_part <- .data[,!(colnames(.data) %in% colnames(mat_part))]
             se <- SingleCellExperiment::SingleCellExperiment(
               assays = list(view = mat_part),
               rowData = row_part
             )
             SightSE(se, traveller)
           })
+
+#' @name SightSE
+#' @rdname SightSE-class 
+#' @export
+setMethod("show", "SightSE", function(object) {
+  cat(
+    callNextMethod(object),
+    print(object@traveller)
+  )
+})
