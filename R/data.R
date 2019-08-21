@@ -36,8 +36,9 @@
 #' @param p number of dimensions
 #' @param mean,sd passed to `stats::rnorm`
 #' 
-#' 
 #' @export
+#' @examples 
+#' generate_sphere(1000, 10, mean =  5, sd = 2)
 generate_sphere <- function(n, p, mean, sd) {
   # hollow
   sphere <- matrix(
