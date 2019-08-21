@@ -21,7 +21,8 @@ Imports:
     geometry,
     shiny,
     methods,
-    SingleCellExperiment
+    SingleCellExperiment,
+    BiocSingular
 URL: https://github.com/sa-lee/sneezy
 BugReports: https://github.com/sa-lee/sneezy/issues
 Suggests: 
@@ -30,5 +31,7 @@ Suggests:
     knitr,
     rmarkdown,
     ggplot2,
-    irlba
+    irlba,
+    testthat (>= 2.1.0),
+    dplyr
 VignetteBuilder: knitr
