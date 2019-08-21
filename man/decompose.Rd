@@ -4,7 +4,7 @@
 \alias{decompose}
 \title{Preprocess a SightSE via dimension reduction}
 \usage{
-decompose(.data, num_comp, center, scale,
+decompose(.data, num_comp, center = TRUE, scale = FALSE,
   .parallel = BiocParallel::SerialParam(), .method)
 }
 \arguments{

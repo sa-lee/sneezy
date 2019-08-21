@@ -23,7 +23,7 @@ pca_random <- BiocSingular::RandomParam
 #' @export 
 setGeneric("decompose", 
            signature = c(".method"),
-           function(.data, num_comp, center, scale, .parallel = BiocParallel::SerialParam(), .method) {
+           function(.data, num_comp, center = TRUE, scale = FALSE, .parallel = BiocParallel::SerialParam(), .method) {
              standardGeneric("decompose")
            })
 
@@ -45,8 +45,6 @@ setMethod("decompose", "BiocSingularParam",
             )
             
             .name <- as.character(substitute(.method))[1]
-            
-            print(.name)
             reducedDim(.data, .name) <- LinearEmbeddingMatrix(
               sampleFactors = res$rotation,
               featureLoadings = res$x,
