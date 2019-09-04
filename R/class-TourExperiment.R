@@ -12,12 +12,13 @@
 #' which is a `SimpleList` that represents nearest 
 #' neighbour indexes and distances. 
 #' 
-#' @param se a `SingleCellExperiment::SingleCellExperiment()` object
-#' @param traveller a function of class `tour_path` (usually tourr::grand_tour())
+
 #' @param .data object to convert to a `TourExperiment` object
+#' @param basisSets a SimpleList object containing tour bases
+#' @param neighborSets a SimpleList conatining nearest neighbours
 #' @param ... if `.data` is a data.frame the columns to convert to a matrix,
 #' every other column not included in `...` will become rowData
-#' @param view_as the type of matrix if `.data` is a data.frame (default is numeric matrix).
+#' @param viewAs the type of matrix if `.data` is a data.frame (default is numeric matrix).
 #' 
 #' @importFrom SingleCellExperiment SingleCellExperiment
 #' @importFrom methods setClass setOldClass setGeneric
@@ -37,18 +38,49 @@
 #' @name TourExperiment
 #' @rdname TourExperiment-class     
 setClass("TourExperiment",
-         slots = c("basisSet" = "SimpleList", "neighborSet" = "SimpleList"),
+         slots = c("basisSets" = "SimpleList", "neighborSets" = "SimpleList"),
          contains = "SingleCellExperiment"
 )
 
-.te  <- function(sce, basisSet, neighborSet) {
-  new("TourExperiment", basisSet = basisSet, neighborSet = neighborSet)
+
+.valid_te <- function(object) {
+  msg <- character()
+  if (length(object@basisSets) != 0) {
+    # check all elements in basisSets have rows = to number of variables
+    dim_eq <- vapply(object@basisSets, function(.) nrow(.) != ncol(object))
+    if (any(dim_eq)) {
+      msg <- c(msg, paste("basisSet(s)", 
+                          which(dim_eq), 
+                          "have mismatched dimensions."))
+    }
+  }
+  
+  if (length(object@neighborSets) !=  0) {
+    # check all elements in neighborSets have rows = to number of columns
+    dim_eq <- vapply(object@neighborSets, function(.) nrow(.) != ncol(object))
+    if (any(dim_eq)) {
+      msg <- c(msg, paste("neighborSet(s", which(dim_eq),
+               "have mismatched dimensions."))
+    }
+  }
+  if (length(msg) != 0) msg 
+  else TRUE
+}
+
+# --- Validity checker ---
+setValidity("TourExperiment", .valid_te)
+
+
+
+# --- Constructor ---
+.te  <- function(sce, basisSets, neighborSets) {
+  new("TourExperiment", sce, basisSets = basisSets, neighborSets = neighborSets)
 }
 
 #' @name TourExperiment
 #' @rdname TourExperiment-class 
 #' @export    
-setGeneric("TourExperiment", function(.data, basisSet = S4Vectors::SimpleList(), neighborSet = S4Vectors::SimpleList(), ...) {
+setGeneric("TourExperiment", signature = ".data", function(.data, basisSets = S4Vectors::SimpleList(), neighborSets = S4Vectors::SimpleList(), ...) {
   standardGeneric("TourExperiment")
 })
 
@@ -57,8 +89,8 @@ setGeneric("TourExperiment", function(.data, basisSet = S4Vectors::SimpleList(),
 #' @export    
 setMethod("TourExperiment", 
           c("SingleCellExperiment"), 
-          function(.data, basisSet, neighborSet, ...) {
-            .te(.data, basisSet, neighborSet)
+          function(.data, basisSets, neighborSets, ...) {
+            .te(.data, basisSets, neighborSets)
           })
 
 #' @name TourExperiment
@@ -66,8 +98,8 @@ setMethod("TourExperiment",
 #' @export    
 setMethod("TourExperiment", 
           c("SummarizedExperiment"), 
-          function(.data, basisSet, neighborSet, ...) {
-            .te(as(.data, "SingleCellExperiment"), basisSet, neighborSet)
+          function(.data, basisSets, neighborSets, ...) {
+            .te(as(.data, "SingleCellExperiment"), basisSets, neighborSets)
           })
 
 #' @name TourExperiment
@@ -75,17 +107,17 @@ setMethod("TourExperiment",
 #' @export    
 setMethod("TourExperiment", 
           c("matrix"), 
-          function(.data, basisSet, neighborSet, ...) {
-            se <- SingleCellExperiment::SingleCellExperiment(list(view = .data))
-            .te(se, basisSet, neighborSet)
+          function(.data, basisSets, neighborSets, ...) {
+            sce <- SingleCellExperiment::SingleCellExperiment(list(view = .data))
+            .te(sce, basisSets, neighborSets)
           })
 
 #' @name TourExperiment
 #' @rdname TourExperiment-class 
 #' @export    
-setMethod("as_TourExperiment", 
-          c("data.frame", "tour_path"), 
-          function(.data,  basisSet, neighborSet, ..., view_as = "matrix") {
+setMethod("TourExperiment", 
+          c("data.frame"), 
+          function(.data,  basisSets, neighborSets, ..., viewAs = "matrix") {
             # select the matrix part
             if (!requireNamespace("dplyr", quietly = TRUE)) {
               stop("Please install dplyr", call. = FALSE)
@@ -95,9 +127,9 @@ setMethod("as_TourExperiment",
             all_num <- all(vapply(mat_part, is.numeric, logical(1)))
             if(!all_num) {
               stop("selection must only contain numeric variables",
-                   .call = FALSE)
+                   call. = FALSE)
             }
-            mat_part <- as(mat_part, view_as)
+            mat_part <- as(mat_part, viewAs)
             
             row_part <- .data[,
                               !(colnames(.data) %in% colnames(mat_part)), 
@@ -106,7 +138,7 @@ setMethod("as_TourExperiment",
               assays = list(view = mat_part),
               rowData = row_part
             )
-            .te(se, basisSet, neighborSet)
+            .te(se, basisSets, neighborSets)
           })
 
 #' @name TourExperiment
@@ -114,8 +146,6 @@ setMethod("as_TourExperiment",
 #' @export
 setMethod("show", "TourExperiment", function(object) {
   cat(
-    callNextMethod(object),
-    callNextMethod(object@basisSet),
-    callNextMethod(object@neighborSet)
+    callNextMethod(object)
   )
 })
