@@ -39,7 +39,7 @@ pca_random <- BiocSingular::RandomParam
 #' @export 
 setGeneric("embed_linear", 
            signature = c(".engine"),
-           function(.data, num_comp, center = TRUE, scale = FALSE, .parallel = BiocParallel::SerialParam(), .method) {
+           function(.data, num_comp, center = TRUE, scale = FALSE, .parallel = BiocParallel::SerialParam(), .engine) {
              standardGeneric("embed_linear")
            })
 
