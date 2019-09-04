@@ -39,7 +39,7 @@ pca_random <- BiocSingular::RandomParam
 #' @export 
 setGeneric("embed_linear", 
            signature = c(".engine"),
-           function(.data, num_comp, center = TRUE, scale = FALSE, .parallel = BiocParallel::SerialParam(), .engine) {
+           function(.data, num_comp, center = TRUE, scale = FALSE, .parallel = BiocParallel::SerialParam(), .engine = pca_exact()) {
              standardGeneric("embed_linear")
            })
 
@@ -57,10 +57,10 @@ setMethod("embed_linear", "BiocSingularParam",
                           center = center, 
                           scale = scale,
                           BPPARAM = .parallel,
-                          BSPARAM = .method
+                          BSPARAM = .engine
             )
             
-            .name <- as.character(substitute(.method))[1]
+            .name <- as.character(substitute(.engine))[1]
             reducedDim(.data, .name) <- LinearEmbeddingMatrix(
               sampleFactors = res$rotation,
               featureLoadings = res$x,
