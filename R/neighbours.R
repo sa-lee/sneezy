@@ -1,28 +1,64 @@
-#' Generate nearest neighbours graph in t-SNE space
+#' Esiimate k-nearest neighbours graph from a TourExperiment object
 #' 
-#' @param tnse_coords the list obtained from running `Rtsne::Rtsne()`
-#' @param .subset a vector of indices to find nearest neighbours, by default
-#' all nearest neighbours will be used. 
+#' @param .data a `TourExperiment` object 
+#' @param num_neighbors An integer scalar for number of neighbors
+#' @param from a character scalar, indicating the part of `.data` to
+#' estimate nearest neighbors. If missing the first assay will be used. 
+#' @param .engine A `BiocNeighbor::BiocNeighborParam()` object that
+#' reperesents the algorithm used to compute nearest neighbors. 
 #' 
-#' @return an integer matrix with columns from and to
 #' 
+#' @details The representation of the nearest neighbors is a list with
+#' two elements, one called `index` containing a matrix of the nearest
+#' neighbor indexes and another `distance` containing the distance
+#' to each neighbor. 
+#' 
+#' 
+#' 
+#' @return A `TourExperiment` object with the `neighborSets` slot
+#' filled. 
 #' @importFrom BiocNeighbors findKNN
 #' 
 #' @export
-get_neighbourhood_graph <- function(tsne_coords, .subset = NULL) {
-  # find nearest neighbours based on perplexity
-  args <- norm_args_nn(tsne_coords)
+estimate_neighbors <- function(.data, num_neighbors, from = NULL, .engine) {
   
-  nn <- BiocNeighbors::findKNN(args$coords, 
-                               k = args$K, 
-                               subset = .subset, 
+  if (!is(.data, "TourExperiment")) {
+    stop(".data is not a TourExperiment object")
+  }
+  
+  if (is(from, "character") || is.null(from)) {
+    stop("from must be a character(1) or NULL")
+  }
+  
+  val <- .retrieve_mat(.data, from)
+  nn <- BiocNeighbors::findKNN(val, 
+                               k = num_neighbors, 
                                get.index = TRUE,
-                               get.distance = FALSE)
+                               get.distance = TRUE,
+                               BNPARAM = .engine)
   # flatten as an adjancey matrix
-  flatten_edges(nn$index, args, .subset)
-
+  neighborSet(.data, from) <- nn
+  .data
 }
 
+
+.retrieve_mat <- function(.data, from = NULL) {
+  if (is.null(from)) {
+    message("`from` argument is NULL, trying first assay...")
+    assay(.data)
+  }
+  # check available data
+  a_selector <- intersect(from, SummarizedExperiment::assayNames(.data))
+  if (length(a_selector) == 0) {
+    rd_selector <- intersect(from, SingleCellExperiment::reducedDimNames(.data))
+    if (length(rd_selector) == 0) {
+      stop(paste("`from`:", from, "is not available in object."))
+    }
+    SingleCellExperiment::reducedDim(.data, rd_selector)
+  } else {
+    SummarizedExperiment::assay(.data, a_selector)
+  } 
+}
 
 get_centroids_from_nn <- function(data, tsne_coords) {
   args <- norm_args_nn(tsne_coords)
