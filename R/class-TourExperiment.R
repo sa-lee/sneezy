@@ -225,18 +225,20 @@ setGeneric("neighborSets", function(x) standardGeneric("neighborSets"))
 
 setMethod("neighborSets", "TourExperiment", function(x) x@neighborSets)
 
-setGeneric("neighborSets<-",
-           function(x, value) standardGeneric("neighborSets<-"))
-
 setGeneric("neighborSetNames", 
            function(x) standardGeneric("neighborSetNames"))
 
 setMethod("neighborSetNames", "TourExperiment", 
           function(x) names(neighborSets(x)))
 
-
 setGeneric("neighborSetNames<-", 
-           function(x) standardGeneric("neighborSetNames<-"))
+           function(x, value) standardGeneric("neighborSetNames<-"))
+
+setReplaceMethod("neighborSetNames", "TourExperiment", 
+                 function(x, value) { 
+                   names(neighborSets(x)) <- value
+                   x
+                 })
 
 
 
