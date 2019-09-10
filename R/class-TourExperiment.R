@@ -153,21 +153,45 @@ setMethod("TourExperiment",
 
 
 # --- Setters  and Getters ---
-.getters <- c("neighborSet", "neighborSets", "neighborSetNames",
-              "basisSet", "basisSets", "basisSetNames")
 
-for (fn in .getters) {
-  setGeneric(fn, function(x, type, ...) standardGeneric(fn))
-}
 
-.setters <- c("neighborSet<-", "neighborSetNames<-", 
-              "basisSet<-", "basisSetNames<-")
+#' Access or set the neighborSets of a TourExperiment
+#' 
+#' @param x an object (a TourExperiment)
+#' @param type the name or a number of the list to access
+#' @param value a matrix to assign to an element of basisSets
+#' 
+#' @return a `TourExperiment` object
+#' 
+#' @name neighborSets
+#' @rdname neighborSets
+#' @export
+setGeneric("neighborSet", function(x, type, ...) standardGeneric("neighborSet"))
 
-for (fn in .setters) {
-  setGeneric(fn, function(x, type, ..., value) standardGeneric(fn))
-}
+#' @name neighborSets
+#' @rdname neighborSets
+#' @export
+setGeneric("neighborSet<-", function(x, type, ..., value) standardGeneric("neighborSet<-"))
+
+#' @name neighborSets
+#' @rdname neighborSets
+#' @export
+setGeneric("neighborSets", function(x, type, ...) standardGeneric("neighborSets"))
+
+#' @name neighborSets
+#' @rdname neighborSets
+#' @export
+setGeneric("neighborSetNames", function(x, type, ...) standardGeneric("neighborSetNames"))
+
+#' @name neighborSets
+#' @rdname neighborSets
+#' @export
+setGeneric("neighborSetNames<-", function(x, type, ..., value) standardGeneric("neighborSetNames<-"))
 
 # --- neighborSet, neighborSets, neighborSetNames ---
+#' @name neighborSets
+#' @rdname neighborSets
+#' @export
 setMethod("neighborSet", 
           c("TourExperiment", "missing"),
           function(x, type) {
@@ -177,6 +201,9 @@ setMethod("neighborSet",
           }
 )
 
+#' @name neighborSets
+#' @rdname neighborSets
+#' @export
 setMethod("neighborSet", 
           c("TourExperiment", "numeric"), 
           function(x, type) {
@@ -194,6 +221,9 @@ setMethod("neighborSet",
           }
 )
 
+#' @name neighborSets
+#' @rdname neighborSets
+#' @export
 setMethod("neighborSet", 
           c("TourExperiment", "character"), 
           function(x, type) {
@@ -210,6 +240,9 @@ setMethod("neighborSet",
           }
 )
 
+#' @name neighborSets
+#' @rdname neighborSets
+#' @export
 setReplaceMethod("neighborSet", 
                  c("TourExperiment", "missing"),
                  function(x, type, ..., value) {
@@ -223,6 +256,9 @@ setReplaceMethod("neighborSet",
                  }
 )
 
+#' @name neighborSets
+#' @rdname neighborSets
+#' @export
 setReplaceMethod("neighborSet", 
                  c("TourExperiment", "numeric"),
                  function(x, type, ..., value) {
@@ -236,6 +272,9 @@ setReplaceMethod("neighborSet",
                  }
 )
 
+#' @name neighborSets
+#' @rdname neighborSets
+#' @export
 setReplaceMethod("neighborSet", 
                  c("TourExperiment", "character"),
                  function(x, type, ..., value) {
@@ -245,29 +284,75 @@ setReplaceMethod("neighborSet",
                  }
 )
 
+#' @name neighborSets
+#' @rdname neighborSets
+#' @export
 setMethod("neighborSets", "TourExperiment", function(x) x@neighborSets)
 
-
+#' @name neighborSets
+#' @rdname neighborSets
+#' @export
 setMethod("neighborSetNames", "TourExperiment", 
           function(x) names(neighborSets(x)))
 
+#' @name neighborSets
+#' @rdname neighborSets
+#' @export
 setReplaceMethod("neighborSetNames", "TourExperiment", 
                  function(x, value) { 
                    names(neighborSets(x)) <- value
                    x
                  })
 
-# --- basisSets ---
-# "basisSet", "basisSets", "basisSetNames"
+
+#' Access or set the basisSets  of a TourExperiment
+#' 
+#' @param x an object (a TourExperiment)
+#' @param type the name or a number of the list to access
+#' @param value a matrix to assign to an element of basisSets
+#' 
+#' @return a `TourExperiment` object
+#' 
+#' @name basisSets
+#' @rdname basisSets
+#' @export
+setGeneric("basisSet", function(x, type, ...) standardGeneric("basisSet"))
+
+#' @name basisSets
+#' @rdname basisSets
+#' @export
+setGeneric("basisSet<-", function(x, type, ..., value) standardGeneric("basisSet<-"))
+
+#' @name basisSets
+#' @rdname basisSets
+#' @export
+setGeneric("basisSets", function(x, type, ...) standardGeneric("basisSets"))
+
+#' @name basisSets
+#' @rdname basisSets
+#' @export
+setGeneric("basisSetNames", function(x, type, ...) standardGeneric("basisSetNames"))
+
+#' @name basisSets
+#' @rdname basisSets
+#' @export
+setGeneric("basisSetNames<-", function(x, type, ..., value) standardGeneric("basisSetNames<-"))
+
+#' @name basisSets
+#' @rdname basisSets
+#' @export
 setMethod("basisSet", 
           c("TourExperiment", "missing"),
           function(x, type) {
             bset <- x@basisSets
-            if (length(nset) == 0) bset
+            if (length(bset) == 0) return(bset)
             basisSet(x, 1)
           }
 )
 
+#' @name basisSets
+#' @rdname basisSets
+#' @export
 setMethod("basisSet", 
           c("TourExperiment", "numeric"), 
           function(x, type) {
@@ -285,6 +370,9 @@ setMethod("basisSet",
           }
 )
 
+#' @name basisSets
+#' @rdname basisSets
+#' @export
 setMethod("basisSet", 
           c("TourExperiment", "character"), 
           function(x, type) {
@@ -301,7 +389,9 @@ setMethod("basisSet",
           }
 )
 
-
+#' @name basisSets
+#' @rdname basisSets
+#' @export
 setReplaceMethod("basisSet", 
                  c("TourExperiment", "missing"),
                  function(x, type, ..., value) {
@@ -315,7 +405,10 @@ setReplaceMethod("basisSet",
                  }
 )
 
-setReplaceMethod("neighborSet", 
+#' @name basisSets
+#' @rdname basisSets
+#' @export
+setReplaceMethod("basisSet", 
                  c("TourExperiment", "numeric"),
                  function(x, type, ..., value) {
                    bset <- basisSets(x)
@@ -328,6 +421,9 @@ setReplaceMethod("neighborSet",
                  }
 )
 
+#' @name basisSets
+#' @rdname basisSets
+#' @export
 setReplaceMethod("basisSet", 
                  c("TourExperiment", "character"),
                  function(x, type, ..., value) {
@@ -337,11 +433,20 @@ setReplaceMethod("basisSet",
                  }
 )
 
+#' @name basisSets
+#' @rdname basisSets
+#' @export
 setMethod("basisSets", "TourExperiment", function(x) x@basisSets)
 
 
+#' @name basisSets
+#' @rdname basisSets
+#' @export
 setMethod("basisSetNames", "TourExperiment", function(x) names(basisSets(x)))
 
+#' @name basisSets
+#' @rdname basisSets
+#' @export
 setReplaceMethod("basisSetNames", "TourExperiment", 
                  function(x, value) { 
                    names(neighborSets(x)) <- value
@@ -352,9 +457,17 @@ setReplaceMethod("basisSetNames", "TourExperiment",
 #' @rdname TourExperiment-class 
 #' @export
 setMethod("show", "TourExperiment", function(object) {
+  .bs_name <- basisSetNames(object)
+  .ns_name <- neighborSetNames(object)
+  .bn <- length(.bs_name)
+  .nn <- length(.ns_name)
+  
+  if (.bn == 0) .bs_name <- ""
+  if (.nn == 0) .ns_name <- ""
+  
   cat(
     callNextMethod(object),
-    sprintf("neighborSetNames(%d): %s\n", neighborSetNames(object)),
-    sprintf("basisSetNames(%d): %s\n", basisSetNames(object))
+    sprintf("neighborSetNames(%d): %s\n", .nn, .ns_name),
+    sprintf("basisSetNames(%d): %s\n", .bn, .bs_name)
   )
 })

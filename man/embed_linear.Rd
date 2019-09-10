@@ -5,7 +5,7 @@
 \title{Compute a linear embedding on a \code{SightSE} object.}
 \usage{
 embed_linear(.data, num_comp, center = TRUE, scale = FALSE,
-  .parallel = BiocParallel::SerialParam(), .engine)
+  .parallel = BiocParallel::SerialParam(), .engine = pca_exact())
 }
 \arguments{
 \item{.data}{A \code{sneezy::SightSE()} object}
