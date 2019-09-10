@@ -46,22 +46,31 @@ setClass("TourExperiment",
 .valid_te <- function(object) {
   msg <- character()
   if (length(object@basisSets) != 0) {
-    # check all elements in basisSets have rows = to number of variables
-    dim_eq <- vapply(object@basisSets, function(.) nrow(.) != ncol(object))
-    if (any(dim_eq)) {
-      msg <- c(msg, paste("basisSet(s)", 
-                          which(dim_eq), 
-                          "have mismatched dimensions."))
+    
+    if (length(names(object@basisSets)) == 0) {
+      msg <- c(msg, "basisSets must be a named list.")
     }
+    
+    # # check all elements in basisSets have rows = to number of variables
+    # dim_eq <- vapply(object@basisSets, function(.) nrow(.) != ncol(object))
+    # if (any(dim_eq)) {
+    #   msg <- c(msg, paste("basisSet(s)", 
+    #                       which(dim_eq), 
+    #                       "have mismatched dimensions."))
+    # }
   }
   
   if (length(object@neighborSets) !=  0) {
-    # check all elements in neighborSets have rows = to number of columns
-    dim_eq <- vapply(object@neighborSets, function(.) nrow(.) != ncol(object))
-    if (any(dim_eq)) {
-      msg <- c(msg, paste("neighborSet(s", which(dim_eq),
-               "have mismatched dimensions."))
+    
+    if (length(names(object@neighborSets)) == 0) {
+      msg <- c(msg, "neighborSets must be a named list.")
     }
+    # # check all elements in neighborSets have rows = to number of columns
+    # dim_eq <- vapply(object@neighborSets, function(.) nrow(.) != ncol(object))
+    # if (any(dim_eq)) {
+    #   msg <- c(msg, paste("neighborSet(s)", which(dim_eq),
+    #            "have mismatched dimensions."))
+    # }
   }
   if (length(msg) != 0) msg 
   else TRUE
@@ -79,9 +88,11 @@ setValidity("TourExperiment", .valid_te)
 #' @name TourExperiment
 #' @rdname TourExperiment-class 
 #' @export    
-setGeneric("TourExperiment", signature = ".data", function(.data, basisSets = S4Vectors::SimpleList(), neighborSets = S4Vectors::SimpleList(), ...) {
-  standardGeneric("TourExperiment")
-})
+setGeneric("TourExperiment", 
+           signature = ".data", 
+           function(.data, basisSets = S4Vectors::SimpleList(), neighborSets = S4Vectors::SimpleList(), ...) {
+             standardGeneric("TourExperiment")
+           })
 
 #' @name TourExperiment
 #' @rdname TourExperiment-class 
@@ -142,15 +153,29 @@ setMethod("TourExperiment",
 
 
 # --- Setters  and Getters ---
-setGeneric("neighborSet", 
-           function(x, type, ...) standardGeneric("neighborSet"))
+.getters <- c("neighborSet", "neighborSets", "neighborSetNames",
+              "basisSet", "basisSets", "basisSetNames")
 
-setMethod("neighborSet", c("TourExperiment", "missing"),
+for (fn in .getters) {
+  setGeneric(fn, function(x, type, ...) standardGeneric(fn))
+}
+
+.setters <- c("neighborSet<-", "neighborSetNames<-", 
+              "basisSet<-", "basisSetNames<-")
+
+for (fn in .setters) {
+  setGeneric(fn, function(x, type, ..., value) standardGeneric(fn))
+}
+
+# --- neighborSet, neighborSets, neighborSetNames ---
+setMethod("neighborSet", 
+          c("TourExperiment", "missing"),
           function(x, type) {
             nset <- x@neighborSets
             if (length(nset) == 0) nset
             neighborSet(x, 1)
-            })
+          }
+)
 
 setMethod("neighborSet", 
           c("TourExperiment", "numeric"), 
@@ -167,7 +192,7 @@ setMethod("neighborSet",
             })
             out
           }
-  )
+)
 
 setMethod("neighborSet", 
           c("TourExperiment", "character"), 
@@ -185,9 +210,6 @@ setMethod("neighborSet",
           }
 )
 
-setGeneric("neighborSet<-", 
-          function(x, type, ..., value) standardGeneric("neighborSet<-"))
-
 setReplaceMethod("neighborSet", 
                  c("TourExperiment", "missing"),
                  function(x, type, ..., value) {
@@ -198,7 +220,8 @@ setReplaceMethod("neighborSet",
                    }
                    neighborSet(x, type) <- value
                    x
-                 })
+                 }
+)
 
 setReplaceMethod("neighborSet", 
                  c("TourExperiment", "numeric"),
@@ -210,7 +233,8 @@ setReplaceMethod("neighborSet",
                    # checks on values
                    neighborSets(x)[[type]] <- value
                    x
-                 })
+                 }
+)
 
 setReplaceMethod("neighborSet", 
                  c("TourExperiment", "character"),
@@ -221,18 +245,11 @@ setReplaceMethod("neighborSet",
                  }
 )
 
-setGeneric("neighborSets", function(x) standardGeneric("neighborSets"))
-
 setMethod("neighborSets", "TourExperiment", function(x) x@neighborSets)
 
-setGeneric("neighborSetNames", 
-           function(x) standardGeneric("neighborSetNames"))
 
 setMethod("neighborSetNames", "TourExperiment", 
           function(x) names(neighborSets(x)))
-
-setGeneric("neighborSetNames<-", 
-           function(x, value) standardGeneric("neighborSetNames<-"))
 
 setReplaceMethod("neighborSetNames", "TourExperiment", 
                  function(x, value) { 
@@ -240,14 +257,104 @@ setReplaceMethod("neighborSetNames", "TourExperiment",
                    x
                  })
 
+# --- basisSets ---
+# "basisSet", "basisSets", "basisSetNames"
+setMethod("basisSet", 
+          c("TourExperiment", "missing"),
+          function(x, type) {
+            bset <- x@basisSets
+            if (length(nset) == 0) bset
+            basisSet(x, 1)
+          }
+)
+
+setMethod("basisSet", 
+          c("TourExperiment", "numeric"), 
+          function(x, type) {
+            bset <- x@basisSets
+            out <- tryCatch({
+              bset[[type]]
+            },
+            error = function(err) {
+              stop("invalid subscript 'type' in  basisSet(<", 
+                   class(x), 
+                   ">, type=\"numeric\", ...)'\n",
+                   conditionMessage(err))
+            })
+            out
+          }
+)
+
+setMethod("basisSet", 
+          c("TourExperiment", "character"), 
+          function(x, type) {
+            bset <- x@basisSets
+            out <- tryCatch({
+              bset[[type]]
+            },
+            error = function(err) {
+              stop("invalid subscript 'type' in 
+                   'basisSet(<", class(x), ">, type=\"character\", ...)'\n",
+                   "'", type, "' not in 'basisSetNames(<", class(x), ">)'")
+            })
+            out
+          }
+)
 
 
+setReplaceMethod("basisSet", 
+                 c("TourExperiment", "missing"),
+                 function(x, type, ..., value) {
+                   if (length(basisSetNames(x)) == 0L) {
+                     type <- ".unnamed"
+                   } else {
+                     type <- 1
+                   }
+                   basisSet(x, type) <- value
+                   x
+                 }
+)
+
+setReplaceMethod("neighborSet", 
+                 c("TourExperiment", "numeric"),
+                 function(x, type, ..., value) {
+                   bset <- basisSets(x)
+                   if (type[1] > length(bset)) {
+                     stop("subscript is out of bounds")
+                   }
+                   # checks on values
+                   basisSets(x)[[type]] <- value
+                   x
+                 }
+)
+
+setReplaceMethod("basisSet", 
+                 c("TourExperiment", "character"),
+                 function(x, type, ..., value) {
+                   # checks on values
+                   basisSets(x)[[type]] <- value
+                   x
+                 }
+)
+
+setMethod("basisSets", "TourExperiment", function(x) x@basisSets)
+
+
+setMethod("basisSetNames", "TourExperiment", function(x) names(basisSets(x)))
+
+setReplaceMethod("basisSetNames", "TourExperiment", 
+                 function(x, value) { 
+                   names(neighborSets(x)) <- value
+                   x
+                 })
 
 #' @name TourExperiment
 #' @rdname TourExperiment-class 
 #' @export
 setMethod("show", "TourExperiment", function(object) {
   cat(
-    callNextMethod(object)
+    callNextMethod(object),
+    sprintf("neighborSetNames(%d): %s\n", neighborSetNames(object)),
+    sprintf("basisSetNames(%d): %s\n", basisSetNames(object))
   )
 })
