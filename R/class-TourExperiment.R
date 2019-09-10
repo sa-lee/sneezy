@@ -3,10 +3,11 @@
 #' @details A `TourExperiment` object inherits from the 
 #' `SingleCellExperiment::SingleCellExperiment()` class. However, we feel
 #' that is more general/useful than just for biological data sets. 
-#' Briefly, it represents a matrix of homegenous types (n rows by p columns) 
-#' alongside `SummarizedExperiment::rowData()` which represents data about 
+#' Briefly, it represents a matrix of homegenous types (n rows 'features' by 
+#' p columns 'samples'). Each 'feature' is aligned to 
+#' `SummarizedExperiment::rowData()` slot which represents data about 
 #' the rows and `SummarizedExperiment::colData()` which represents data about the
-#' columns. The `TourExperiment` object  adds two additional slots. The first
+#' samples. The `TourExperiment` object  includes two additional slots. The first
 #' is a slot called `basisSets` is a `SimpleList`, which represents the 
 #' anchor bases from computing a tour. The second is a slot called `neighborSets`
 #' which is a `SimpleList` that represents nearest 
@@ -22,8 +23,9 @@
 #' 
 #' @importFrom SingleCellExperiment SingleCellExperiment
 #' @importFrom methods setClass setOldClass setGeneric
-#' @export
 #' 
+#' @seealso `basisSets()`, `neighborSets()`
+#' @export
 #' @examples 
 #' sphere <- generate_sphere(1000, 10, mean =  5, sd = 2)
 #' te_sphere <- TourExperiment(sphere)
@@ -41,6 +43,27 @@ setClass("TourExperiment",
          slots = c("basisSets" = "SimpleList", "neighborSets" = "SimpleList"),
          contains = "SingleCellExperiment"
 )
+
+
+#' @name TourExperiment
+#' @rdname TourExperiment-class 
+#' @export
+setMethod("show", "TourExperiment", function(object) {
+  .bs_name <- basisSetNames(object)
+  .ns_name <- neighborSetNames(object)
+  .bn <- length(.bs_name)
+  .nn <- length(.ns_name)
+  
+  if (.bn == 0) .bs_name <- ""
+  if (.nn == 0) .ns_name <- ""
+  
+  cat(
+    callNextMethod(object),
+    sprintf("neighborSetNames(%d): %s\n", .nn, .ns_name),
+    sprintf("basisSetNames(%d): %s\n", .bn, .bs_name)
+  )
+})
+
 
 
 .valid_te <- function(object) {
@@ -150,324 +173,3 @@ setMethod("TourExperiment",
             )
             .te(se, basisSets, neighborSets)
           })
-
-
-# --- Setters  and Getters ---
-
-
-#' Access or set the neighborSets of a TourExperiment
-#' 
-#' @param x an object (a TourExperiment)
-#' @param type the name or a number of the list to access
-#' @param value a matrix to assign to an element of basisSets
-#' 
-#' @return a `TourExperiment` object
-#' 
-#' @name neighborSets
-#' @rdname neighborSets
-#' @export
-setGeneric("neighborSet", function(x, type, ...) standardGeneric("neighborSet"))
-
-#' @name neighborSets
-#' @rdname neighborSets
-#' @export
-setGeneric("neighborSet<-", function(x, type, ..., value) standardGeneric("neighborSet<-"))
-
-#' @name neighborSets
-#' @rdname neighborSets
-#' @export
-setGeneric("neighborSets", function(x, type, ...) standardGeneric("neighborSets"))
-
-#' @name neighborSets
-#' @rdname neighborSets
-#' @export
-setGeneric("neighborSetNames", function(x, type, ...) standardGeneric("neighborSetNames"))
-
-#' @name neighborSets
-#' @rdname neighborSets
-#' @export
-setGeneric("neighborSetNames<-", function(x, type, ..., value) standardGeneric("neighborSetNames<-"))
-
-# --- neighborSet, neighborSets, neighborSetNames ---
-#' @name neighborSets
-#' @rdname neighborSets
-#' @export
-setMethod("neighborSet", 
-          c("TourExperiment", "missing"),
-          function(x, type) {
-            nset <- x@neighborSets
-            if (length(nset) == 0) nset
-            neighborSet(x, 1)
-          }
-)
-
-#' @name neighborSets
-#' @rdname neighborSets
-#' @export
-setMethod("neighborSet", 
-          c("TourExperiment", "numeric"), 
-          function(x, type) {
-            nset <- x@neighborSets
-            out <- tryCatch({
-              nset[[type]]
-            },
-            error = function(err) {
-              stop("invalid subscript 'type' in  neighborSet(<", 
-                   class(x), 
-                   ">, type=\"numeric\", ...)'\n",
-                   conditionMessage(err))
-            })
-            out
-          }
-)
-
-#' @name neighborSets
-#' @rdname neighborSets
-#' @export
-setMethod("neighborSet", 
-          c("TourExperiment", "character"), 
-          function(x, type) {
-            nset <- x@neighborSets
-            out <- tryCatch({
-              nset[[type]]
-            },
-            error = function(err) {
-              stop("invalid subscript 'type' in 
-                   'neighborSet(<", class(x), ">, type=\"character\", ...)'\n",
-                   "'", type, "' not in 'neighborSetNames(<", class(x), ">)'")
-            })
-            out
-          }
-)
-
-#' @name neighborSets
-#' @rdname neighborSets
-#' @export
-setReplaceMethod("neighborSet", 
-                 c("TourExperiment", "missing"),
-                 function(x, type, ..., value) {
-                   if (length(neighborSetNames(x)) == 0L) {
-                     type <- ".unnamed"
-                   } else {
-                     type <- 1
-                   }
-                   neighborSet(x, type) <- value
-                   x
-                 }
-)
-
-#' @name neighborSets
-#' @rdname neighborSets
-#' @export
-setReplaceMethod("neighborSet", 
-                 c("TourExperiment", "numeric"),
-                 function(x, type, ..., value) {
-                   nset <- neighborSets(x)
-                   if (type[1] > length(nset)) {
-                     stop("subscript is out of bounds")
-                   }
-                   # checks on values
-                   neighborSets(x)[[type]] <- value
-                   x
-                 }
-)
-
-#' @name neighborSets
-#' @rdname neighborSets
-#' @export
-setReplaceMethod("neighborSet", 
-                 c("TourExperiment", "character"),
-                 function(x, type, ..., value) {
-                   # checks on values
-                   neighborSets(x)[[type]] <- value
-                   x
-                 }
-)
-
-#' @name neighborSets
-#' @rdname neighborSets
-#' @export
-setMethod("neighborSets", "TourExperiment", function(x) x@neighborSets)
-
-#' @name neighborSets
-#' @rdname neighborSets
-#' @export
-setMethod("neighborSetNames", "TourExperiment", 
-          function(x) names(neighborSets(x)))
-
-#' @name neighborSets
-#' @rdname neighborSets
-#' @export
-setReplaceMethod("neighborSetNames", "TourExperiment", 
-                 function(x, value) { 
-                   names(neighborSets(x)) <- value
-                   x
-                 })
-
-
-#' Access or set the basisSets  of a TourExperiment
-#' 
-#' @param x an object (a TourExperiment)
-#' @param type the name or a number of the list to access
-#' @param value a matrix to assign to an element of basisSets
-#' 
-#' @return a `TourExperiment` object
-#' 
-#' @name basisSets
-#' @rdname basisSets
-#' @export
-setGeneric("basisSet", function(x, type, ...) standardGeneric("basisSet"))
-
-#' @name basisSets
-#' @rdname basisSets
-#' @export
-setGeneric("basisSet<-", function(x, type, ..., value) standardGeneric("basisSet<-"))
-
-#' @name basisSets
-#' @rdname basisSets
-#' @export
-setGeneric("basisSets", function(x, type, ...) standardGeneric("basisSets"))
-
-#' @name basisSets
-#' @rdname basisSets
-#' @export
-setGeneric("basisSetNames", function(x, type, ...) standardGeneric("basisSetNames"))
-
-#' @name basisSets
-#' @rdname basisSets
-#' @export
-setGeneric("basisSetNames<-", function(x, type, ..., value) standardGeneric("basisSetNames<-"))
-
-#' @name basisSets
-#' @rdname basisSets
-#' @export
-setMethod("basisSet", 
-          c("TourExperiment", "missing"),
-          function(x, type) {
-            bset <- x@basisSets
-            if (length(bset) == 0) return(bset)
-            basisSet(x, 1)
-          }
-)
-
-#' @name basisSets
-#' @rdname basisSets
-#' @export
-setMethod("basisSet", 
-          c("TourExperiment", "numeric"), 
-          function(x, type) {
-            bset <- x@basisSets
-            out <- tryCatch({
-              bset[[type]]
-            },
-            error = function(err) {
-              stop("invalid subscript 'type' in  basisSet(<", 
-                   class(x), 
-                   ">, type=\"numeric\", ...)'\n",
-                   conditionMessage(err))
-            })
-            out
-          }
-)
-
-#' @name basisSets
-#' @rdname basisSets
-#' @export
-setMethod("basisSet", 
-          c("TourExperiment", "character"), 
-          function(x, type) {
-            bset <- x@basisSets
-            out <- tryCatch({
-              bset[[type]]
-            },
-            error = function(err) {
-              stop("invalid subscript 'type' in 
-                   'basisSet(<", class(x), ">, type=\"character\", ...)'\n",
-                   "'", type, "' not in 'basisSetNames(<", class(x), ">)'")
-            })
-            out
-          }
-)
-
-#' @name basisSets
-#' @rdname basisSets
-#' @export
-setReplaceMethod("basisSet", 
-                 c("TourExperiment", "missing"),
-                 function(x, type, ..., value) {
-                   if (length(basisSetNames(x)) == 0L) {
-                     type <- ".unnamed"
-                   } else {
-                     type <- 1
-                   }
-                   basisSet(x, type) <- value
-                   x
-                 }
-)
-
-#' @name basisSets
-#' @rdname basisSets
-#' @export
-setReplaceMethod("basisSet", 
-                 c("TourExperiment", "numeric"),
-                 function(x, type, ..., value) {
-                   bset <- basisSets(x)
-                   if (type[1] > length(bset)) {
-                     stop("subscript is out of bounds")
-                   }
-                   # checks on values
-                   basisSets(x)[[type]] <- value
-                   x
-                 }
-)
-
-#' @name basisSets
-#' @rdname basisSets
-#' @export
-setReplaceMethod("basisSet", 
-                 c("TourExperiment", "character"),
-                 function(x, type, ..., value) {
-                   # checks on values
-                   basisSets(x)[[type]] <- value
-                   x
-                 }
-)
-
-#' @name basisSets
-#' @rdname basisSets
-#' @export
-setMethod("basisSets", "TourExperiment", function(x) x@basisSets)
-
-
-#' @name basisSets
-#' @rdname basisSets
-#' @export
-setMethod("basisSetNames", "TourExperiment", function(x) names(basisSets(x)))
-
-#' @name basisSets
-#' @rdname basisSets
-#' @export
-setReplaceMethod("basisSetNames", "TourExperiment", 
-                 function(x, value) { 
-                   names(neighborSets(x)) <- value
-                   x
-                 })
-
-#' @name TourExperiment
-#' @rdname TourExperiment-class 
-#' @export
-setMethod("show", "TourExperiment", function(object) {
-  .bs_name <- basisSetNames(object)
-  .ns_name <- neighborSetNames(object)
-  .bn <- length(.bs_name)
-  .nn <- length(.ns_name)
-  
-  if (.bn == 0) .bs_name <- ""
-  if (.nn == 0) .ns_name <- ""
-  
-  cat(
-    callNextMethod(object),
-    sprintf("neighborSetNames(%d): %s\n", .nn, .ns_name),
-    sprintf("basisSetNames(%d): %s\n", .bn, .bs_name)
-  )
-})
