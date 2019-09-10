@@ -57,11 +57,10 @@ setMethod("show", "TourExperiment", function(object) {
   if (.bn == 0) .bs_name <- ""
   if (.nn == 0) .ns_name <- ""
   
-  cat(
-    callNextMethod(object),
-    sprintf("neighborSetNames(%d): %s\n", .nn, .ns_name),
-    sprintf("basisSetNames(%d): %s\n", .bn, .bs_name)
-  )
+  cat(callNextMethod(object))
+  cat(sprintf("neighborSetNames(%d): %s\n", .nn, .ns_name))
+  cat(sprintf("basisSetNames(%d): %s\n", .bn, .bs_name))
+
 })
 
 
