@@ -34,3 +34,16 @@ Suggests:
     testthat (>= 2.1.0),
     dplyr
 VignetteBuilder: knitr
+Collate: 
+    'class-TourExperiment.R'
+    'basisSets.R'
+    'data.R'
+    'embed-linear.R'
+    'embed-nonlinear.R'
+    'guides.R'
+    'neighborSets.R'
+    'neighbours.R'
+    'run.R'
+    'shiny.R'
+    'triangles.R'
+    'view.R'

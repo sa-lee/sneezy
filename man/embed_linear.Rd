@@ -2,25 +2,35 @@
 % Please edit documentation in R/embed-linear.R
 \name{embed_linear}
 \alias{embed_linear}
-\title{Compute a linear embedding on a \code{SightSE} object.}
+\title{Compute a linear embedding over a \code{TourExperiment} object.}
 \usage{
-embed_linear(.data, num_comp, center = TRUE, scale = FALSE,
-  .parallel = BiocParallel::SerialParam(), .engine = pca_exact())
+embed_linear(.data, num_comp, .on = NULL, center = TRUE,
+  scale = FALSE, .parallel = BiocParallel::SerialParam(),
+  .engine = pca_exact())
 }
 \arguments{
-\item{.data}{A \code{sneezy::SightSE()} object}
+\item{.data}{A \code{TourExperiment()} object}
 
 \item{num_comp}{Number of components to retain}
 
+\item{.on}{The named element in \code{.data} to compute the PCA (default is NULL which
+is the first assay in \code{.data}.}
+
 \item{center}{Should columns be centered? Default = TRUE}
 
-\item{scale}{Should  columns be scaled to unit variance?}
+\item{scale}{Should columns be scaled to unit variance?}
 
-\item{.parallel}{A BiocParallel::BPPARAM() object}
+\item{.parallel}{A `BiocParallel::BPPARAM()`` object, default is to compute in serial.}
 
-\item{.engine}{A BiocSingular::BiocSingular() object
-used to compute the embedding. Deafults to \code{pca_exact()}}
+\item{.engine}{How to compute the embedding. Deafults to \code{pca_exact()}.}
 }
 \description{
-Compute a linear embedding on a \code{SightSE} object.
+Compute a linear embedding over a \code{TourExperiment} object.
+}
+\details{
+This function is a wrapper to \code{BiocSingular::runPCA()}, with
+additions for computing on parts of \code{TourExperiment} object. This function
+always returns a \code{TourExperiment} with the \code{reducedDim} slot updated
+with \code{SingleCellExperiment::LinearEmbeddingMatrix} containing the
+sample factors, loadings, and factor data from the principal components.
 }

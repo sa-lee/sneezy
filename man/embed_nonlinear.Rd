@@ -4,7 +4,7 @@
 \alias{embed_nonlinear}
 \title{Compute a non-linear embedding on a \code{SightSE} object.}
 \usage{
-embed_nonlinear(.data, num_comp, .on, center = TRUE, scale = FALSE,
+embed_nonlinear(.data, num_comp, .on, normalize = TRUE,
   .parallel = BiocParallel::SerialParam(), .engine)
 }
 \arguments{
@@ -14,14 +14,14 @@ embed_nonlinear(.data, num_comp, .on, center = TRUE, scale = FALSE,
 
 \item{.on}{Where to compute the non-linear embedding?}
 
-\item{center}{Should columns be centered? Default = TRUE}
-
-\item{scale}{Should  columns be scaled to unit variance?}
-
 \item{.parallel}{A BiocParallel::BPPARAM() object}
 
 \item{.engine}{A BiocSingular::BiocSingular() object
 used to compute the embedding. Deafults to \code{tsne_exact()}}
+
+\item{center}{Should columns be centered? Default = TRUE}
+
+\item{scale}{Should  columns be scaled to unit variance?}
 }
 \description{
 Compute a non-linear embedding on a \code{SightSE} object.

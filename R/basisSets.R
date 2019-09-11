@@ -113,6 +113,7 @@ setReplaceMethod("basisSet",
                    x
                  }
 )
+#' @include class-TourExperiment.R
 
 #' @name basisSets
 #' @rdname basisSets

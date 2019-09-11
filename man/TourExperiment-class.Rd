@@ -5,6 +5,8 @@
 \alias{TourExperiment}
 \title{Represent a data.frame or matrix as a `TourExperiment``}
 \usage{
+\S4method{show}{TourExperiment}(object)
+
 TourExperiment(.data, basisSets = S4Vectors::SimpleList(),
   neighborSets = S4Vectors::SimpleList(), ...)
 
@@ -22,8 +24,6 @@ TourExperiment(.data, basisSets = S4Vectors::SimpleList(),
 
 \S4method{TourExperiment}{data.frame}(.data, basisSets, neighborSets, ...,
   viewAs = "matrix")
-
-\S4method{show}{TourExperiment}(object)
 }
 \arguments{
 \item{.data}{object to convert to a \code{TourExperiment} object}
@@ -44,10 +44,11 @@ Represent a data.frame or matrix as a `TourExperiment``
 A \code{TourExperiment} object inherits from the
 \code{SingleCellExperiment::SingleCellExperiment()} class. However, we feel
 that is more general/useful than just for biological data sets.
-Briefly, it represents a matrix of homegenous types (n rows by p columns)
-alongside \code{SummarizedExperiment::rowData()} which represents data about
+Briefly, it represents a matrix of homegenous types (n rows 'features' by
+p columns 'samples'). Each 'feature' is aligned to
+\code{SummarizedExperiment::rowData()} slot which represents data about
 the rows and \code{SummarizedExperiment::colData()} which represents data about the
-columns. The \code{TourExperiment} object  adds two additional slots. The first
+samples. The \code{TourExperiment} object  includes two additional slots. The first
 is a slot called \code{basisSets} is a \code{SimpleList}, which represents the
 anchor bases from computing a tour. The second is a slot called \code{neighborSets}
 which is a \code{SimpleList} that represents nearest
@@ -63,4 +64,7 @@ te_sphere
 te_olive <- TourExperiment(tourr::olive, palmitic:eicosenoic)
 te_olive
 
+}
+\seealso{
+\code{basisSets()}, \code{neighborSets()}
 }
