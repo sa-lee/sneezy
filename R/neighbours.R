@@ -44,8 +44,7 @@ estimate_neighbors <- function(.data, num_neighbors, from = NULL, .engine) {
 
 .retrieve_mat <- function(.data, from = NULL) {
   if (is.null(from)) {
-    message("`from` argument is NULL, trying first assay...")
-    assay(.data)
+    return(t(assay(.data)))
   }
   # check available data
   a_selector <- intersect(from, SummarizedExperiment::assayNames(.data))
@@ -54,9 +53,9 @@ estimate_neighbors <- function(.data, num_neighbors, from = NULL, .engine) {
     if (length(rd_selector) == 0) {
       stop(paste("`from`:", from, "is not available in object."))
     }
-    SingleCellExperiment::reducedDim(.data, rd_selector)
+    return(SingleCellExperiment::reducedDim(.data, rd_selector))
   } else {
-    t(SummarizedExperiment::assay(.data, a_selector))
+    return(t(SummarizedExperiment::assay(.data, a_selector)))
   } 
 }
 

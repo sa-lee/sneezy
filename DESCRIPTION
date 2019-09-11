@@ -22,7 +22,8 @@ Imports:
     shiny,
     methods,
     SingleCellExperiment,
-    BiocSingular
+    BiocSingular,
+    utils
 URL: https://github.com/sa-lee/sneezy
 BugReports: https://github.com/sa-lee/sneezy/issues
 Suggests: 
