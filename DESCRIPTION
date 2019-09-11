@@ -44,7 +44,5 @@ Collate:
     'guides.R'
     'neighborSets.R'
     'neighbours.R'
-    'run.R'
     'shiny.R'
-    'triangles.R'
     'view.R'
