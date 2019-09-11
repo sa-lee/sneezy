@@ -1,0 +1,21 @@
+---
+title: "pdfsense"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{pdfsense}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+Comparison of embedding procedures for the pdfsense data.
+```{r setup}
+library(sneezy)
+```

@@ -1,0 +1,23 @@
+---
+title: "pbmc3k"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{pbmc3k}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+This vignette is based on 
+[Chapter 25 of Orchestrating Single Cell Analysis with R](https://osca.bioconductor.org/pbmc-3k-10x-dataset-filtered.html), we 
+reproduce part of that vignette below. 
+
+```{r setup}
+library(sneezy)
+```
