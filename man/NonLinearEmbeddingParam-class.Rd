@@ -3,7 +3,45 @@
 \docType{class}
 \name{NonLinearEmbeddingParam-class}
 \alias{NonLinearEmbeddingParam-class}
-\title{Non-linear embedding drivers}
+\alias{nleArgs}
+\alias{nleArgs,NonLinearEmbeddingParam-method}
+\alias{tsneParam-class}
+\alias{tnseNeighborsParam-class}
+\alias{tsne_exact}
+\alias{tsne_approx}
+\title{Non-linear Embedding Drivers}
+\usage{
+nleArgs(object)
+
+\S4method{nleArgs}{NonLinearEmbeddingParam}(object)
+
+tsne_exact(perplexity, alpha, ...)
+
+tsne_approx(perplexity, alpha, theta, ...)
+}
+\arguments{
+\item{perplexity}{The perplexity paramter for t-SNE}
+
+\item{alpha}{The exaggeration factor parameter for t-SNE}
+
+\item{...}{additional arguments forwarded to other methods}
+
+\item{theta}{The speed/accuracy trade-off parameter.}
+}
 \description{
-Non-linear embedding drivers
+Non-linear Embedding Drivers
+}
+\details{
+A virtual class for representing parameter inputs to
+non-linear embedding algorithms. At the moment we have only created
+two concrete classes, \code{tsneParam} and \code{tsneNeighborsParam}. The
+interfaces to created these functions.
+}
+\examples{
+
+tsne_exact()
+
+}
+\seealso{
+\code{embed_nonlinear()}
 }

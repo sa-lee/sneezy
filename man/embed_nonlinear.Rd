@@ -2,27 +2,36 @@
 % Please edit documentation in R/embed-nonlinear.R
 \name{embed_nonlinear}
 \alias{embed_nonlinear}
-\title{Compute a non-linear embedding on a \code{SightSE} object.}
+\title{Compute a non-linear embedding on a \code{TourExperiment} object.}
 \usage{
-embed_nonlinear(.data, num_comp, .on, normalize = TRUE,
-  .parallel = BiocParallel::SerialParam(), .engine)
+embed_nonlinear(.data, num_comp, .on = NULL, normalize = TRUE,
+  .parallel = BiocParallel::SerialParam(), .engine = tsne_approx(30,
+  12, 0.5))
 }
 \arguments{
-\item{.data}{A \code{sneezy::SightSE()} object}
+\item{.data}{A \code{TourExperiment()} object}
 
 \item{num_comp}{Number of components/dimensions to retain}
 
-\item{.on}{Where to compute the non-linear embedding?}
+\item{.on}{Where to compute the non-linear embedding? If NULL,
+the first assay is computed.}
 
-\item{.parallel}{A BiocParallel::BPPARAM() object}
+\item{normalize}{Avoid numerical precision issues by centering and scaling the
+input data. (Default = TRUE).}
 
-\item{.engine}{A BiocSingular::BiocSingular() object
-used to compute the embedding. Deafults to \code{tsne_exact()}}
+\item{.parallel}{Register a parallel backend, only used if computing
+nearest-neighbors prior to perfoming a non-linear embedding.}
 
-\item{center}{Should columns be centered? Default = TRUE}
-
-\item{scale}{Should  columns be scaled to unit variance?}
+\item{.engine}{A \code{NonLinearEmbeddingParam`` object used to define the  arguments and algorithm for non-linear embedding. Deafults to }tsne_approx()`}
 }
 \description{
-Compute a non-linear embedding on a \code{SightSE} object.
+Compute a non-linear embedding on a \code{TourExperiment} object.
+}
+\details{
+This function computes a non-linear embedding over the parameters
+for a non-linear embedding algorithm and adjusts the reducedDim slot with
+the embedding coordinates.
+}
+\seealso{
+\code{Rtsne::Rtsne()}
 }
