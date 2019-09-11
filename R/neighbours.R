@@ -56,7 +56,7 @@ estimate_neighbors <- function(.data, num_neighbors, from = NULL, .engine) {
     }
     SingleCellExperiment::reducedDim(.data, rd_selector)
   } else {
-    SummarizedExperiment::assay(.data, a_selector)
+    t(SummarizedExperiment::assay(.data, a_selector))
   } 
 }
 
