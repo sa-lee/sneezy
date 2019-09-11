@@ -18,7 +18,6 @@ Imports:
     Rtsne,
     stats,
     BiocNeighbors,
-    geometry,
     shiny,
     methods,
     SingleCellExperiment,
