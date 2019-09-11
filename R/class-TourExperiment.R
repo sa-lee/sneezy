@@ -161,14 +161,14 @@ setMethod("TourExperiment",
               stop("selection must only contain numeric variables",
                    call. = FALSE)
             }
-            mat_part <- as(mat_part, viewAs)
+            mat_part <- t(as(mat_part, viewAs))
             
-            row_part <- .data[,
+            col_part <- .data[,
                               !(colnames(.data) %in% colnames(mat_part)), 
                               drop = FALSE]
             se <- SingleCellExperiment::SingleCellExperiment(
               assays = list(view = mat_part),
-              rowData = row_part
+              colData = col_part
             )
             .te(se, basisSets, neighborSets)
           })
