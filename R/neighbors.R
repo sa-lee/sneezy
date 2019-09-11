@@ -132,3 +132,29 @@ sneezy_shep <- function(data, coords) {
     ggplot2::labs(x = "Embedding distance", y = "Original distance")
   
 }
+
+
+#' Animate grand tour with t-SNE neighbourhood graph
+#' 
+#' 
+#' @param data a numeric dataset
+#' @param tsne_coords a list from running `Rtsne::Rtsne()`
+#' @param .subset a vector of indices to find nearest neighbours, by default
+#' all nearest neighbours will be used.
+#' @param ... other control options passed to [tourr::display_xy()]
+#' 
+#' @export
+sneezy_neighbours <- function(data, tsne_coords, .subset = NULL, ...) {
+  nn_graph <- get_neighbourhood_graph(tsne_coords, .subset)
+  gif_tour(data, edges = nn_graph, ...)
+  
+}
+
+#' @export
+sneezy_centroids <- function(data, tsne_coords, col, ...) {
+  centroids <- get_centroids_from_nn(data, tsne_coords)
+  col <- scales::alpha(c(col, rep("red", nrow(centroids))))
+  data <- rbind(data, centroids)
+  gif_tour(data, tour_path = tourr::grand_tour(), edges = NULL, col = col)
+  
+}
