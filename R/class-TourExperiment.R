@@ -1,4 +1,4 @@
-#' Represent a data.frame or matrix as a `TourExperiment``
+#' Represent a data.frame or matrix as a `TourExperiment`
 #' 
 #' @details A `TourExperiment` object inherits from the 
 #' `SingleCellExperiment::SingleCellExperiment()` class. However, we feel

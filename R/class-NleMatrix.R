@@ -1,6 +1,4 @@
 #' @include class-NleParam.R
-
-
  
 #' @title NonLinearEmbeddingMatrix class
 #' 
