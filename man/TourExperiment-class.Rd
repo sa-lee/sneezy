@@ -3,7 +3,7 @@
 \docType{class}
 \name{TourExperiment}
 \alias{TourExperiment}
-\title{Represent a data.frame or matrix as a `TourExperiment``}
+\title{Represent a data.frame or matrix as a \code{TourExperiment}}
 \usage{
 \S4method{show}{TourExperiment}(object)
 
@@ -38,7 +38,7 @@ every other column not included in \code{...} will become rowData}
 \item{viewAs}{the type of matrix if \code{.data} is a data.frame (default is numeric matrix).}
 }
 \description{
-Represent a data.frame or matrix as a `TourExperiment``
+Represent a data.frame or matrix as a \code{TourExperiment}
 }
 \details{
 A \code{TourExperiment} object inherits from the
