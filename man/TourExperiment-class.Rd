@@ -22,8 +22,9 @@ TourExperiment(.data, basisSets = S4Vectors::SimpleList(),
   basisSets = S4Vectors::SimpleList(),
   neighborSets = S4Vectors::SimpleList(), ...)
 
-\S4method{TourExperiment}{data.frame}(.data, basisSets, neighborSets, ...,
-  viewAs = "matrix")
+\S4method{TourExperiment}{data.frame}(.data,
+  basisSets = S4Vectors::SimpleList(),
+  neighborSets = S4Vectors::SimpleList(), ..., viewAs = "matrix")
 }
 \arguments{
 \item{.data}{object to convert to a \code{TourExperiment} object}
@@ -33,7 +34,9 @@ TourExperiment(.data, basisSets = S4Vectors::SimpleList(),
 \item{neighborSets}{a SimpleList conatining nearest neighbours}
 
 \item{...}{if \code{.data} is a data.frame the columns to convert to a matrix,
-every other column not included in \code{...} will become rowData}
+every other column not included in \code{...} will become colData, the names
+of the columns selected with \code{...} will be become row names in the resulting
+object.}
 
 \item{viewAs}{the type of matrix if \code{.data} is a data.frame (default is numeric matrix).}
 }

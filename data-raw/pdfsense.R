@@ -20,11 +20,11 @@ meta <- read_tsv(
 
 together <- cbind(meta, mat)
 
-library(sneezy)
-pdfsense <- as_sightse(together, 
-           traveller = tourr::grand_tour(),
-           X1:X56)
-
-usethis::use_data(pdfsense)
+pdfsense <- TourExperiment(together, 
+                       SimpleList(),
+                       SimpleList(),
+                       X1:X56)
 
 unlink(dir)
+
+usethis::use_data(pdfsense, overwrite = TRUE)

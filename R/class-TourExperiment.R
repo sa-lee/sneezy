@@ -18,7 +18,9 @@
 #' @param basisSets a SimpleList object containing tour bases
 #' @param neighborSets a SimpleList conatining nearest neighbours
 #' @param ... if `.data` is a data.frame the columns to convert to a matrix,
-#' every other column not included in `...` will become rowData
+#' every other column not included in `...` will become colData, the names
+#' of the columns selected with `...` will be become row names in the resulting
+#' object.
 #' @param viewAs the type of matrix if `.data` is a data.frame (default is numeric matrix).
 #' 
 #' @importFrom SingleCellExperiment SingleCellExperiment
@@ -130,7 +132,7 @@ setMethod("TourExperiment",
 #' @export    
 setMethod("TourExperiment", 
           c("SummarizedExperiment"), 
-          function(.data, basisSets, neighborSets, ...) {
+          function(.data, basisSets = S4Vectors::SimpleList(), neighborSets = S4Vectors::SimpleList(), ...) {
             .te(as(.data, "SingleCellExperiment"), basisSets, neighborSets)
           })
 
@@ -139,7 +141,7 @@ setMethod("TourExperiment",
 #' @export    
 setMethod("TourExperiment", 
           c("matrix"), 
-          function(.data, basisSets, neighborSets, ...) {
+          function(.data, basisSets = S4Vectors::SimpleList(), neighborSets = S4Vectors::SimpleList(), ...) {
             sce <- SingleCellExperiment::SingleCellExperiment(list(view = .data))
             .te(sce, basisSets, neighborSets)
           })
@@ -149,23 +151,27 @@ setMethod("TourExperiment",
 #' @export    
 setMethod("TourExperiment", 
           c("data.frame"), 
-          function(.data,  basisSets, neighborSets, ..., viewAs = "matrix") {
+          function(.data,  basisSets = S4Vectors::SimpleList(), neighborSets = S4Vectors::SimpleList(), ..., viewAs = "matrix") {
             # select the matrix part
             if (!requireNamespace("dplyr", quietly = TRUE)) {
               stop("Please install dplyr", call. = FALSE)
             }
             
             mat_part <- dplyr::select(.data, ...)
+            drop_cols <- names(mat_part)
             all_num <- all(vapply(mat_part, is.numeric, logical(1)))
             if(!all_num) {
               stop("selection must only contain numeric variables",
                    call. = FALSE)
             }
-            mat_part <- t(as(mat_part, viewAs))
+            mat_part <- as(mat_part, viewAs)
             
             col_part <- .data[,
-                              !(colnames(.data) %in% colnames(mat_part)), 
+                              !(names(.data) %in% drop_cols), 
                               drop = FALSE]
+            # reorient, and rownames are now variable identfiers
+            mat_part <- t(mat_part)
+
             se <- SingleCellExperiment::SingleCellExperiment(
               assays = list(view = mat_part),
               colData = col_part
