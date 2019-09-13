@@ -42,7 +42,6 @@ Collate:
     'data.R'
     'embed-linear.R'
     'embed-nonlinear.R'
-    'guides.R'
     'neighborSets.R'
     'neighbors.R'
     'shiny.R'
