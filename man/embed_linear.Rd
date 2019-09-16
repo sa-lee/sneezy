@@ -5,8 +5,8 @@
 \title{Compute a linear embedding over a \code{TourExperiment} object.}
 \usage{
 embed_linear(.data, num_comp, .on = NULL, center = TRUE,
-  scale = FALSE, .parallel = BiocParallel::SerialParam(),
-  .engine = pca_exact())
+  scale = FALSE, .subset = NULL,
+  .parallel = BiocParallel::SerialParam(), .engine)
 }
 \arguments{
 \item{.data}{A \code{TourExperiment()} object}
@@ -20,9 +20,11 @@ is the first assay in \code{.data}.}
 
 \item{scale}{Should columns be scaled to unit variance?}
 
+\item{.subset}{Restrict linear embedding to run on a subset of rows. (Default = NULL).}
+
 \item{.parallel}{A `BiocParallel::BPPARAM()`` object, default is to compute in serial.}
 
-\item{.engine}{How to compute the embedding. Deafults to \code{pca_exact()}.}
+\item{.engine}{How to compute the embedding. If missing, defaults to \code{pca_exact()}.}
 }
 \description{
 Compute a linear embedding over a \code{TourExperiment} object.

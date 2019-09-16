@@ -42,21 +42,32 @@ estimate_neighbors <- function(.data, num_neighbors, from = NULL, .engine) {
 }
 
 
-.retrieve_mat <- function(.data, from = NULL) {
+.retrieve_mat <- function(.data, from = NULL, .subset = NULL) {
+  
   if (is.null(from)) {
-    return(t(assay(.data)))
-  }
-  # check available data
-  a_selector <- intersect(from, SummarizedExperiment::assayNames(.data))
-  if (length(a_selector) == 0) {
-    rd_selector <- intersect(from, SingleCellExperiment::reducedDimNames(.data))
-    if (length(rd_selector) == 0) {
-      stop(paste("`from`:", from, "is not available in object."))
-    }
-    return(SingleCellExperiment::reducedDim(.data, rd_selector))
+    res <- t(assay(.data))
   } else {
-    return(t(SummarizedExperiment::assay(.data, a_selector)))
-  } 
+    # check slots
+    # idea is to get named assay unless there's a reducedDim slot
+    # if there isn't then throw an error
+    a_selector <- intersect(from, SummarizedExperiment::assayNames(.data))
+    if (length(a_selector) == 0) {
+      rd_selector <- intersect(from, SingleCellExperiment::reducedDimNames(.data))
+      if (length(rd_selector) == 0) {
+        stop(paste("`from`:", from, "is not available in object."))
+      }
+      # subset is ignored if returning a reducedDim slot
+      return(SingleCellExperiment::reducedDim(.data, rd_selector))
+    } else {
+      
+      res <- t(SummarizedExperiment::assay(.data, a_selector))
+    }
+  }
+  
+  if (!is.null(.subset)) {
+    return(res[, .subset])
+  }
+  res
 }
 
 get_centroids_from_nn <- function(data, tsne_coords) {

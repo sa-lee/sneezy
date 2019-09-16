@@ -14,8 +14,9 @@
     .name <- as.character(substitute(.engine))[1]
     res <- do.call(fun, args)
     
-    # todo keep the callback param to rerun tsne
-    reducedDim(.data,  .name) <- res$Y
+        
+    reducedDim(.data,  .name) <- NonLinearEmbeddingMatrix(res$Y,
+                                                          param = .engine) 
     
     .data
   
