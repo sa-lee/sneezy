@@ -1,52 +1,3 @@
-#' Represent a data.frame or matrix as a `TourExperiment`
-#' 
-#' @details A `TourExperiment` object inherits from the 
-#' `SingleCellExperiment::SingleCellExperiment()` class. However, we feel
-#' that is more general/useful than just for biological data sets. 
-#' Briefly, it represents a matrix of homegenous types (n rows 'features' by 
-#' p columns 'samples'). Each 'feature' is aligned to 
-#' `SummarizedExperiment::rowData()` slot which represents data about 
-#' the rows and `SummarizedExperiment::colData()` which represents data about the
-#' samples. The `TourExperiment` object  includes two additional slots. The first
-#' is a slot called `basisSets` is a `SimpleList`, which represents the 
-#' anchor bases from computing a tour. The second is a slot called `neighborSets`
-#' which is a `SimpleList` that represents nearest 
-#' neighbour indexes and distances. 
-#' 
-
-#' @param .data object to convert to a `TourExperiment` object
-#' @param basisSets a SimpleList object containing tour bases
-#' @param neighborSets a SimpleList conatining nearest neighbours
-#' @param ... if `.data` is a data.frame the columns to convert to a matrix,
-#' every other column not included in `...` will become colData, the names
-#' of the columns selected with `...` will be become row names in the resulting
-#' object.
-#' @param viewAs the type of matrix if `.data` is a data.frame (default is numeric matrix).
-#' 
-#' @importFrom SingleCellExperiment SingleCellExperiment
-#' @importFrom methods setClass setOldClass setGeneric
-#' 
-#' @seealso `basisSets()`, `neighborSets()`
-#' @export
-#' @examples 
-#' sphere <- generate_sphere(1000, 10, mean =  5, sd = 2)
-#' te_sphere <- TourExperiment(sphere)
-#' te_sphere
-#' 
-#' # convert a data.frame to a TourExperiment object
-#' # this allows you to select columns that will form the assay data
-#' te_olive <- TourExperiment(tourr::olive, palmitic:eicosenoic)
-#' te_olive
-#' 
-#' @importFrom  S4Vectors SimpleList
-#' @name TourExperiment
-#' @rdname TourExperiment-class     
-setClass("TourExperiment",
-         slots = c("basisSets" = "SimpleList", "neighborSets" = "SimpleList"),
-         contains = "SingleCellExperiment"
-)
-
-
 #' @name TourExperiment
 #' @rdname TourExperiment-class 
 #' @export
@@ -64,8 +15,6 @@ setMethod("show", "TourExperiment", function(object) {
   cat(sprintf("basisSetNames(%d): %s\n", .bn, .bs_name))
 
 })
-
-
 
 .valid_te <- function(object) {
   msg <- character()
@@ -108,15 +57,6 @@ setValidity("TourExperiment", .valid_te)
 .te  <- function(sce, basisSets, neighborSets) {
   new("TourExperiment", sce, basisSets = basisSets, neighborSets = neighborSets)
 }
-
-#' @name TourExperiment
-#' @rdname TourExperiment-class 
-#' @export    
-setGeneric("TourExperiment", 
-           signature = ".data", 
-           function(.data, basisSets = S4Vectors::SimpleList(), neighborSets = S4Vectors::SimpleList(), ...) {
-             standardGeneric("TourExperiment")
-           })
 
 #' @name TourExperiment
 #' @rdname TourExperiment-class 

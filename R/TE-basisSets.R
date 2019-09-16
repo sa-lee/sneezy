@@ -1,36 +1,3 @@
-#' Access or set the basisSets  of a TourExperiment
-#' 
-#' @param x an object (a TourExperiment)
-#' @param type the name or a number of the list to access
-#' @param value a matrix to assign to an element of basisSets
-#' 
-#' @return a `TourExperiment` object
-#' 
-#' @name basisSets
-#' @rdname basisSets
-#' @export
-setGeneric("basisSet", function(x, type, ...) standardGeneric("basisSet"))
-
-#' @name basisSets
-#' @rdname basisSets
-#' @export
-setGeneric("basisSet<-", function(x, type, ..., value) standardGeneric("basisSet<-"))
-
-#' @name basisSets
-#' @rdname basisSets
-#' @export
-setGeneric("basisSets", function(x, type, ...) standardGeneric("basisSets"))
-
-#' @name basisSets
-#' @rdname basisSets
-#' @export
-setGeneric("basisSetNames", function(x, type, ...) standardGeneric("basisSetNames"))
-
-#' @name basisSets
-#' @rdname basisSets
-#' @export
-setGeneric("basisSetNames<-", function(x, type, ..., value) standardGeneric("basisSetNames<-"))
-
 #' @name basisSets
 #' @rdname basisSets
 #' @export
@@ -113,7 +80,6 @@ setReplaceMethod("basisSet",
                    x
                  }
 )
-#' @include class-TourExperiment.R
 
 #' @name basisSets
 #' @rdname basisSets

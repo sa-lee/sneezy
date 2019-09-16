@@ -32,17 +32,7 @@ Suggests:
     rmarkdown,
     ggplot2,
     testthat (>= 2.1.0),
-    dplyr
+    dplyr,
+    scater,
+    scran
 VignetteBuilder: knitr
-Collate: 
-    'class-TourExperiment.R'
-    'basisSets.R'
-    'class-NleParam.R'
-    'class-NleMatrix.R'
-    'data.R'
-    'embed-linear.R'
-    'embed-nonlinear.R'
-    'neighborSets.R'
-    'neighbors.R'
-    'shiny.R'
-    'view.R'

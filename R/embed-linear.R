@@ -26,34 +26,6 @@ pca_random <- BiocSingular::RandomParam
   stopifnot(is(.parallel, "BiocParallelParam"))
 }
 
-#' Compute a linear embedding over a `TourExperiment` object. 
-#' 
-#' @param .data A `TourExperiment()` object
-#' @param num_comp Number of components to retain
-#' @param .on The named element in `.data` to compute the PCA (default is NULL which
-#' is the first assay in `.data`.
-#' @param center Should columns be centered? Default = TRUE
-#' @param scale Should columns be scaled to unit variance?
-#' @param .subset Restrict linear embedding to run on a subset of rows. (Default = NULL).
-#' @param .parallel A `BiocParallel::BPPARAM()`` object, default is to compute in serial.
-#' @param .engine How to compute the embedding. If missing, defaults to `pca_exact()`.  
-#' 
-#' @details This function is a wrapper to `BiocSingular::runPCA()`, with
-#' additions for computing on parts of `TourExperiment` object. This function
-#' always returns a `TourExperiment` with the `reducedDim` slot updated
-#' with `SingleCellExperiment::LinearEmbeddingMatrix` containing the
-#' sample factors, loadings, and factor data from the principal components. 
-#' 
-#' 
-#' 
-#' @export 
-setGeneric("embed_linear", 
-           signature = ".engine",
-           function(.data, num_comp, .on = NULL, center = TRUE, scale = FALSE, .subset = NULL, .parallel = BiocParallel::SerialParam(), .engine) {
-             standardGeneric("embed_linear")
-           })
-
-
 #' @export
 setMethod("embed_linear", 
           "missing", 

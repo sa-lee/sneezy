@@ -1,36 +1,3 @@
-#' Access or set the neighborSets of a TourExperiment
-#' 
-#' @param x an object (a TourExperiment)
-#' @param type the name or a number of the list to access
-#' @param value a matrix to assign to an element of basisSets
-#' 
-#' @return a `TourExperiment` object
-#' 
-#' @name neighborSets
-#' @rdname neighborSets
-#' @export
-setGeneric("neighborSet", function(x, type, ...) standardGeneric("neighborSet"))
-
-#' @name neighborSets
-#' @rdname neighborSets
-#' @export
-setGeneric("neighborSet<-", function(x, type, ..., value) standardGeneric("neighborSet<-"))
-
-#' @name neighborSets
-#' @rdname neighborSets
-#' @export
-setGeneric("neighborSets", function(x, type, ...) standardGeneric("neighborSets"))
-
-#' @name neighborSets
-#' @rdname neighborSets
-#' @export
-setGeneric("neighborSetNames", function(x, type, ...) standardGeneric("neighborSetNames"))
-
-#' @name neighborSets
-#' @rdname neighborSets
-#' @export
-setGeneric("neighborSetNames<-", function(x, type, ..., value) standardGeneric("neighborSetNames<-"))
-
 # --- neighborSet, neighborSets, neighborSetNames ---
 #' @name neighborSets
 #' @rdname neighborSets
