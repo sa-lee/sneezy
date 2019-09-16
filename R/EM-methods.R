@@ -18,32 +18,3 @@ NonLinearEmbeddingMatrix <- function(
     metadata)
   new("NonLinearEmbeddingMatrix", param = param, lem)
 }
-
-
-
-setMethod("view_xy", 
-          signature = "matrix", 
-          function(.data, .on = NULL, .x, .y, .color, ...) {
-            stopifnot(is.null(.on)) 
-            x <- .data[, .x]
-            y <- .data[, .y]
-            
-            if (missing(.color)) {
-              .color <- I("black")
-            } else {
-              .color <- .data[, .color]
-            }
-            
-            p <- plotly::plot_ly(type = "scatter", mode = "markers")
-            
-            
-            p <- plotly::add_markers(p, 
-                                   x = x, 
-                                   y = y, 
-                                   color = .color)
-            
-            p <- plotly::layout(p, dragmode = "lasso", showlegend = FALSE)
-            p <- plotly::toWebGL(p)
-            p
-            
-})

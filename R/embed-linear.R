@@ -26,6 +26,7 @@ pca_random <- BiocSingular::RandomParam
   stopifnot(is(.parallel, "BiocParallelParam"))
 }
 
+
 #' @export
 setMethod("embed_linear", 
           "missing", 
@@ -62,11 +63,16 @@ setMethod("embed_linear",
                           BSPARAM = .engine
             )
             
-            .name <- as.character(substitute(.engine))[1]
-            reducedDim(.data, .name) <- LinearEmbeddingMatrix(
+            # coerce to an LEM object
+            lem <- LinearEmbeddingMatrix(
               sampleFactors = res$x,
               featureLoadings = res$rotation,
               factorData = as(data.frame(sdev = res$sdev), "DataFrame")
-            ) 
+            )
+            colnames(lem) <- colnames(res$x)
+            rownames(lem) <- rownames(res$x)
+            
+            .name <- as.character(substitute(.engine))[1]
+            reducedDim(.data, .name) <- lem
             .data
           })
