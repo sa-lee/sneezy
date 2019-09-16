@@ -160,5 +160,12 @@ setGeneric(
 
 
 # --- Visualisation ---
+#' @export
+setGeneric("view_xy", 
+           signature = ".data",
+           function(.data, .on = NULL, .x, .y, .color, ...) {
+             standardGeneric("view_xy")
+           })
+
 
 

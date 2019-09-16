@@ -13,7 +13,6 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.1.1
 Imports: 
-    vegawidget,
     tourr,
     Rtsne,
     stats,
@@ -22,7 +21,8 @@ Imports:
     methods,
     SingleCellExperiment,
     BiocSingular,
-    utils
+    utils,
+    plotly
 URL: https://github.com/sa-lee/sneezy
 BugReports: https://github.com/sa-lee/sneezy/issues
 Suggests: 
