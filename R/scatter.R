@@ -6,10 +6,31 @@
 #' @param .y The y aesthetic (a character or integer)
 #' @param .color The colour aesthetic (either a vector or dimensions from `.on`)
 #' 
+#' @importFrom SummarizedExperiment colData
 #' @export
 setMethod("view_xy", "TourExperiment",
           function(.data, .on = NULL, .x, .y, .color, ...) {
             vals <- .retrieve_mat(.data, from = .on)
+            
+            if (!missing(.color)) {
+              # try and rextract color 
+              if (is.character(.color) && length(.color) == 1) {
+                # assume .color is rownames, in which case
+                # grab the rows of the assay
+                inx <- which(rownames(.data) == .color) 
+                if (length(inx)) {
+                  .color <- assay(.data, ...)[inx, ]
+                } else {
+                  # otherwise see if it's in colData
+                  inx <- which(names(colData(.data)) == .color)
+                  if (length(inx)) {
+                    .color <- colData(.data)[[.color]]
+                  }
+                }
+              }
+              
+            }
+            
             view_xy(vals, .x = .x, .y = .y, .color = .color, ...)
           })
 
