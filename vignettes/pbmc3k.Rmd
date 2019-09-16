@@ -113,7 +113,7 @@ view_xy(pbmc3k_te,
 )
 ```
 
-We can also estimate a basis set - and tour that using `view_planes`:
+We can also estimate a basis set via a grand tour: 
 
 ```{r, eval = FALSE}
 pbmc3k_te <- generate_bases(
@@ -124,3 +124,6 @@ pbmc3k_te <- generate_bases(
   .engine = tourr::grand_tour(),
 )
 ```
+
+We can then animate our tour using the 
+
