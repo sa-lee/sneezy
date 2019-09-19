@@ -76,8 +76,8 @@ setReplaceMethod("basisSet",
                      stop("subscript is out of bounds")
                    }
                    # checks on values
-                   basisSets(x)[[type]] <- value
-                   x
+                   bset[[type]] <- value
+                   x@basisSets <- bset
                  }
 )
 
@@ -87,8 +87,9 @@ setReplaceMethod("basisSet",
 setReplaceMethod("basisSet", 
                  c("TourExperiment", "character"),
                  function(x, type, ..., value) {
+                   bset <- basisSets(x)
                    # checks on values
-                   basisSets(x)[[type]] <- value
+                   bset[[type]] <- value
                    x
                  }
 )
@@ -97,6 +98,7 @@ setReplaceMethod("basisSet",
 #' @rdname basisSets
 #' @export
 setMethod("basisSets", "TourExperiment", function(x) x@basisSets)
+
 
 
 #' @name basisSets
