@@ -32,7 +32,7 @@ setGeneric("basisSet<-", function(x, type, ..., value) standardGeneric("basisSet
 #' @name basisSets
 #' @rdname basisSets
 #' @export
-setGeneric("basisSets", function(x, type, ...) standardGeneric("basisSets"))
+setGeneric("basisSets", function(x, ...) standardGeneric("basisSets"))
 
 #' @name basisSets
 #' @rdname basisSets
@@ -157,7 +157,22 @@ setGeneric(
 
 
 # --- Bases ---
-
+#' Generate a new basis set via a tour
+#' 
+#' @param .data a TourExperiment object or matrix-like object 
+#' @param .on Which part of `.data` to tour
+#' @param clamp Should the columns of toured data be clamped to lie in [0,1]?
+#' @param max_bases Maximum number of bases to generate
+#' @param start Optional starting projection for tour
+#' @param step_size Distance between each step, set to `Inf` which forces new basis generation
+#' @param .engine A tour path generator (defaults to [tourr::grand_tour()])
+#' @export
+setGeneric("generate_bases",
+           signature = ".data",
+           function(.data, .on = NULL, clamp = FALSE, max_bases = 100, start = NULL, step_size = Inf, .engine = tourr::grand_tour()) {
+             standardGeneric("generate_bases")
+           })
+             
 
 # --- Visualisation ---
 #' @export
