@@ -65,7 +65,12 @@ setGeneric("neighborSet<-", function(x, type, ..., value) standardGeneric("neigh
 #' @name neighborSets
 #' @rdname neighborSets
 #' @export
-setGeneric("neighborSets", function(x, type, ...) standardGeneric("neighborSets"))
+setGeneric("neighborSets", function(x, ...) standardGeneric("neighborSets"))
+
+#' @name neighborSets
+#' @rdname neighborSets
+#' @export
+setGeneric("neighborSets<-", function(x, type, ...) standardGeneric("neighborSets<-"))
 
 #' @name neighborSets
 #' @rdname neighborSets

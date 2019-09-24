@@ -42,12 +42,11 @@
 #' @importFrom  S4Vectors SimpleList
 #' @name TourExperiment
 #' @rdname TourExperiment-class     
-setClass("TourExperiment",
-         slots = c("basisSets" = "SimpleList", "neighborSets" = "SimpleList"),
-         contains = "SingleCellExperiment"
-)
+setClass("TourExperiment", contains = "SingleCellExperiment")
 
-
+# internal fields
+.neighbor_key <- "neighborSets"
+.basis_key <- "basisSets"
 
 #' Non-linear Embedding Drivers
 #'

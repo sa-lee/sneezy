@@ -2,49 +2,22 @@
 #' @rdname TourExperiment-class 
 #' @export
 setMethod("show", "TourExperiment", function(object) {
-  .bs_name <- basisSetNames(object)
+  # #.bs_name <- basisSetNames(object)
   .ns_name <- neighborSetNames(object)
-  .bn <- length(.bs_name)
+  # #.bn <- length(.bs_name)
   .nn <- length(.ns_name)
-  
-  if (.bn == 0) .bs_name <- ""
+  # 
+  # if (.bn == 0) .bs_name <- ""
   if (.nn == 0) .ns_name <- ""
-  
+  # 
   cat(callNextMethod(object))
   cat(sprintf("neighborSetNames(%d): %s\n", .nn, .ns_name))
-  cat(sprintf("basisSetNames(%d): %s\n", .bn, .bs_name))
+  # cat(sprintf("basisSetNames(%d): %s\n", .bn, .bs_name))
 
 })
 
 .valid_te <- function(object) {
   msg <- character()
-  if (length(object@basisSets) != 0) {
-    
-    if (length(names(object@basisSets)) == 0) {
-      msg <- c(msg, "basisSets must be a named list.")
-    }
-    
-    # # check all elements in basisSets have rows = to number of variables
-    # dim_eq <- vapply(object@basisSets, function(.) nrow(.) != ncol(object))
-    # if (any(dim_eq)) {
-    #   msg <- c(msg, paste("basisSet(s)", 
-    #                       which(dim_eq), 
-    #                       "have mismatched dimensions."))
-    # }
-  }
-  
-  if (length(object@neighborSets) !=  0) {
-    
-    if (length(names(object@neighborSets)) == 0) {
-      msg <- c(msg, "neighborSets must be a named list.")
-    }
-    # # check all elements in neighborSets have rows = to number of columns
-    # dim_eq <- vapply(object@neighborSets, function(.) nrow(.) != ncol(object))
-    # if (any(dim_eq)) {
-    #   msg <- c(msg, paste("neighborSet(s)", which(dim_eq),
-    #            "have mismatched dimensions."))
-    # }
-  }
   if (length(msg) != 0) msg 
   else TRUE
 }
@@ -52,10 +25,12 @@ setMethod("show", "TourExperiment", function(object) {
 # --- Validity checker ---
 setValidity("TourExperiment", .valid_te)
 
-
 # --- Constructor ---
 .te  <- function(sce, basisSets, neighborSets) {
-  new("TourExperiment", sce, basisSets = basisSets, neighborSets = neighborSets)
+  
+  te <- new("TourExperiment", sce)
+  neighborSets(te) <- neighborSets
+  te
 }
 
 #' @name TourExperiment
