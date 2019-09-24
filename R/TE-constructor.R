@@ -2,17 +2,17 @@
 #' @rdname TourExperiment-class 
 #' @export
 setMethod("show", "TourExperiment", function(object) {
-  # #.bs_name <- basisSetNames(object)
+  .bs_name <- basisSetNames(object)
   .ns_name <- neighborSetNames(object)
-  # #.bn <- length(.bs_name)
+  .bn <- length(.bs_name)
   .nn <- length(.ns_name)
-  # 
-  # if (.bn == 0) .bs_name <- ""
+   
+  if (.bn == 0) .bs_name <- ""
   if (.nn == 0) .ns_name <- ""
-  # 
+ 
   cat(callNextMethod(object))
   cat(sprintf("neighborSetNames(%d): %s\n", .nn, .ns_name))
-  # cat(sprintf("basisSetNames(%d): %s\n", .bn, .bs_name))
+  cat(sprintf("basisSetNames(%d): %s\n", .bn, .bs_name))
 
 })
 
@@ -30,6 +30,7 @@ setValidity("TourExperiment", .valid_te)
   
   te <- new("TourExperiment", sce)
   neighborSets(te) <- neighborSets
+  basisSets(te) <- basisSets
   te
 }
 

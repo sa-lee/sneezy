@@ -31,6 +31,7 @@
   projs
 }
 
+
 #' @export
 setMethod("generate_bases",
           signature = "ANY",
@@ -42,6 +43,7 @@ setMethod("generate_bases",
               .tour_path(.data, .engine, start, max_bases, step_size)
           })
 
+#' @export
 setMethod("generate_bases",
           signature = "TourExperiment",
           function(.data, .on = NULL, clamp = FALSE, max_bases = 100, start = NULL, step_size = Inf, .engine = tourr::grand_tour()) {
@@ -49,6 +51,7 @@ setMethod("generate_bases",
             path <- generate_bases(vals, .on, clamp, max_bases, start, step_size, .engine)
             
             basisSet(.data, .on) <- path
+            .data
             
           })
 
