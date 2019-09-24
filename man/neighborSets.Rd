@@ -9,25 +9,30 @@ neighborSet(x, type, ...)
 
 neighborSet(x, type, ...) <- value
 
-neighborSets(x, type, ...)
+neighborSets(x, ...)
+
+neighborSets(x, type, ...) <- value
 
 neighborSetNames(x, type, ...)
 
 neighborSetNames(x, type, ...) <- value
 
-\S4method{neighborSet}{TourExperiment,missing}(x, type)
+\S4method{neighborSets}{TourExperiment}(x, withDimnames = TRUE)
 
-\S4method{neighborSet}{TourExperiment,numeric}(x, type)
+\S4method{neighborSet}{TourExperiment,missing}(x, type,
+  withDimnames = TRUE)
 
-\S4method{neighborSet}{TourExperiment,character}(x, type)
+\S4method{neighborSet}{TourExperiment,numeric}(x, type,
+  withDimnames = TRUE)
+
+\S4method{neighborSet}{TourExperiment,character}(x, type,
+  withDimnames = TRUE)
 
 \S4method{neighborSet}{TourExperiment,missing}(x, type, ...) <- value
 
 \S4method{neighborSet}{TourExperiment,numeric}(x, type, ...) <- value
 
 \S4method{neighborSet}{TourExperiment,character}(x, type, ...) <- value
-
-\S4method{neighborSets}{TourExperiment}(x)
 
 \S4method{neighborSetNames}{TourExperiment}(x)
 

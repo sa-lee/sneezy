@@ -9,7 +9,7 @@ basisSet(x, type, ...)
 
 basisSet(x, type, ...) <- value
 
-basisSets(x, type, ...)
+basisSets(x, ...)
 
 basisSetNames(x, type, ...)
 

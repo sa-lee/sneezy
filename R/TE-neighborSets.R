@@ -1,4 +1,4 @@
-#' @importFrom SingleCellExperiment int_colData intcolData<-
+#' @importFrom SingleCellExperiment int_colData int_colData<-
 #' @name neighborSets
 #' @rdname neighborSets
 #' @export
