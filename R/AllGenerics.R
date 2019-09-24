@@ -21,6 +21,7 @@ setGeneric("TourExperiment",
 #' 
 #' @name basisSets
 #' @rdname basisSets
+#' @importFrom SingleCellExperiment int_metadata int_metadata<-
 #' @export
 setGeneric("basisSet", function(x, type, ...) standardGeneric("basisSet"))
 
@@ -33,6 +34,11 @@ setGeneric("basisSet<-", function(x, type, ..., value) standardGeneric("basisSet
 #' @rdname basisSets
 #' @export
 setGeneric("basisSets", function(x, ...) standardGeneric("basisSets"))
+
+#' @name basisSets
+#' @rdname basisSets
+#' @export
+setGeneric("basisSets<-", function(x, ..., value) standardGeneric("basisSets<-"))
 
 #' @name basisSets
 #' @rdname basisSets

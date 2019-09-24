@@ -11,9 +11,13 @@ basisSet(x, type, ...) <- value
 
 basisSets(x, ...)
 
+basisSets(x, ...) <- value
+
 basisSetNames(x, type, ...)
 
 basisSetNames(x, type, ...) <- value
+
+\S4method{basisSets}{TourExperiment}(x)
 
 \S4method{basisSet}{TourExperiment,missing}(x, type)
 
@@ -26,8 +30,6 @@ basisSetNames(x, type, ...) <- value
 \S4method{basisSet}{TourExperiment,numeric}(x, type, ...) <- value
 
 \S4method{basisSet}{TourExperiment,character}(x, type, ...) <- value
-
-\S4method{basisSets}{TourExperiment}(x)
 
 \S4method{basisSetNames}{TourExperiment}(x)
 

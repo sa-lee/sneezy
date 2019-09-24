@@ -1,10 +1,39 @@
+# Basis set is stored as an internal metadata element as `data.frame``
+
+#' @name basisSets
+#' @rdname basisSets
+#' @export
+setMethod("basisSets", "TourExperiment", 
+          function(x) int_metadata(x)[[.basis_key]])
+
+is_arrayish <- function(x)  is(x, "array") || is(x, "DelayedArray")
+
+setReplaceMethod("basisSets",
+                 "TourExperiment",
+                 function(x, value) {
+                   if (length(value) == 0L) {
+                     .bset <- S4Vectors::SimpleList()
+                   } else {
+                     are_array <- vapply(value, is_arrayish, logical(1))
+                     stopifnot(all(are_array))
+                     .bset <- S4Vectors::SimpleList(lapply(value, I))
+                     if (is.null(names(value))) {
+                       names(.bset) <- paste0(".unnamed", seq_along(value))
+                     }
+                   }
+                    int_metadata(x)[[.basis_key]] <- .bset
+                    x
+                 })
+
+
+
 #' @name basisSets
 #' @rdname basisSets
 #' @export
 setMethod("basisSet", 
           c("TourExperiment", "missing"),
           function(x, type) {
-            bset <- x@basisSets
+            bset <- basisSets(x)
             if (length(bset) == 0) return(bset)
             basisSet(x, 1)
           }
@@ -16,7 +45,7 @@ setMethod("basisSet",
 setMethod("basisSet", 
           c("TourExperiment", "numeric"), 
           function(x, type) {
-            bset <- x@basisSets
+            bset <- int_metadata(x)[[.basis_key]]
             out <- tryCatch({
               bset[[type]]
             },
@@ -36,7 +65,7 @@ setMethod("basisSet",
 setMethod("basisSet", 
           c("TourExperiment", "character"), 
           function(x, type) {
-            bset <- x@basisSets
+            bset <- int_metadata(x)[[.basis_key]]
             out <- tryCatch({
               bset[[type]]
             },
@@ -71,13 +100,15 @@ setReplaceMethod("basisSet",
 setReplaceMethod("basisSet", 
                  c("TourExperiment", "numeric"),
                  function(x, type, ..., value) {
-                   bset <- basisSets(x)
+                   bset <- int_metadata(x)[[.basis_key]]
                    if (type[1] > length(bset)) {
                      stop("subscript is out of bounds")
                    }
                    # checks on values
+                   stopifnot(is_arrayish(value))
                    bset[[type]] <- value
-                   x@basisSets <- bset
+                   int_metadata(x)[[.basis_key]] <- bset
+                   x
                  }
 )
 
@@ -87,30 +118,28 @@ setReplaceMethod("basisSet",
 setReplaceMethod("basisSet", 
                  c("TourExperiment", "character"),
                  function(x, type, ..., value) {
-                   bset <- basisSets(x)
+                   bset <-  int_metadata(x)[[.basis_key]]
                    # checks on values
+                   stopifnot(is_arrayish(value))
                    bset[[type]] <- value
+                   int_metadata(x)[[.basis_key]] <- bset
                    x
                  }
 )
 
-#' @name basisSets
-#' @rdname basisSets
-#' @export
-setMethod("basisSets", "TourExperiment", function(x) x@basisSets)
-
 
 
 #' @name basisSets
 #' @rdname basisSets
 #' @export
-setMethod("basisSetNames", "TourExperiment", function(x) names(basisSets(x)))
+setMethod("basisSetNames", "TourExperiment", 
+          function(x) names(int_metadata(x)[[.basis_key]]))
 
 #' @name basisSets
 #' @rdname basisSets
 #' @export
 setReplaceMethod("basisSetNames", "TourExperiment", 
                  function(x, value) { 
-                   names(neighborSets(x)) <- value
+                   names(int_metadata(x)[[.basis_key]]) <- value
                    x
                  })
