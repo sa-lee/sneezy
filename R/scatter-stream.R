@@ -61,60 +61,65 @@ tour_server <- function(vals, projs) {
     
     # initial values
     half_range <- compute_half_range(vals)
-    init <- vals %*% matrix(projs[,,1], nrow = ncol(vals), ncol = 2L)
+    #init <- vals %*% matrix(projs[,,1], nrow = ncol(vals), ncol = 2L)
     # initalise axis
     ax <- pl_axis(half_range)
     
     # initiate graph with initial values
     output$plot <- plotly::renderPlotly({
-      plotly::toWebGL(
-        plotly::layout(
-          plotly::add_markers(
-            plotly::plot_ly(x = init[,1], y = init[,2])
-          ),
-          xaxis = ax,
-          yaxis = ax
-        )
+      plotly::layout(
+          plotly::plot_ly(type = "scattergl", mode = "markers"),
+        xaxis = ax,
+        yaxis = ax
       )
     })
     
     # # reactiveValues() act very much like input values, but may be used to 
     # # maintain state (e.g., are we currently streaming?)
-    # rv <- reactiveValues(
-    #   stream = FALSE,
-    #   yend = sum(yint), 
-    #   n = length(yint)
-    # )
+    rv <- shiny::reactiveValues(
+      stream = FALSE,
+      init = matrix(nrow = nrow(projs), ncol = ncol(projs)),
+      n = 1
+    )
     # 
     # # turn streaming on/off when the button is pressed
-    # observeEvent(input$stream, {
-    #   rv$stream <- if (rv$stream) FALSE else TRUE
-    # })
-    # 
-    # observe({
-    #   # if we're not streaming, don't do anything
-    #   if (!rv$stream) return()
-    #   
-    #   # re-execute this code block to every 100 milliseconds
-    #   invalidateLater(100, session)
-    #   # changing a reactive value "invalidates" it, so isolate() is needed 
-    #   # to avoid recursion
-    #   isolate({
-    #     rv$n <- rv$n + 1
-    #     rv$yend <- rv$yend + sample(c(-1, 1), 1)
-    #   })
-    #   
-    #   # add the new value to the plot
-    #   plotlyProxy("plot", session) %>%
-    #     plotlyProxyInvoke(
-    #       "extendTraces", 
-    #       list(
-    #         y = list(list(rv$yend)), 
-    #         x = list(list(rv$n))
-    #       ), 
-    #       list(0)
-    #     )
-    # })
+    shiny::observeEvent(input$stream, {
+      rv$stream <- if (rv$stream) FALSE else TRUE
+    })
+
+    shiny::observe({
+      # if we're not streaming, don't do anything
+      if (!rv$stream) return()
+
+      # if we have gone beyond number of bases stop
+      if (rv$n >= 100) return()
+      
+      # re-execute this code block to every 100 milliseconds
+      invalidateLater(100, session)
+      # changing a reactive value "invalidates" it, so isolate() is needed
+      # to avoid recursion
+      isolate({
+        rv$init <- vals %*% matrix(projs[,,rv$n], nrow = ncol(vals), ncol = 2L)
+        rv$n <- rv$n + 1
+      })
+
+      # add the new value to the plot
+       plotly::plotlyProxyInvoke(
+         plotly::plotlyProxy("plot", session),
+          "addTraces",
+          list(
+            y = rv$init[,2],
+            x = rv$init[,1],
+            type = "scattergl",
+            mode = "markers"
+          )
+        )
+       # delete the previous trace
+       plotly::plotlyProxyInvoke(
+         plotly::plotlyProxy("plot", session),
+         "deleteTraces", 
+         0)
+    })
     
   }
 }
