@@ -32,6 +32,38 @@
 }
 
 
+# slightly faster version of proj_dist in tourr via tcrossprod
+fproj_dist <- function(x, y) {
+  sqrt(sum((tcrossprod(x) - tcrossprod(y))^2))
+} 
+
+
+.interpolate <- function(basis_set, angle) {
+  dists <- sapply(2:n, function(i) {
+    proj_dist(basis_set[[i - 1]], basis_set[[i]])
+  })
+  steps <- sum(ceiling(dists/angle)) * 2
+  new_basis <- rep(NA, steps)
+  new_basis[1] <- TRUE
+  projs <- array(NA_real_, c(dim(basis_set)[1:2], steps))
+  i <- 1
+  tour <- new_tour(basis_set[, , 1], planned_tour(basis_set))
+  step <- tour(0)
+  stop_next <- FALSE
+  while (TRUE) {
+    new_basis[i] <- step$step <= 0
+    projs[, , i] <- step$proj
+    i <- i + 1
+    if (stop_next) 
+      break
+    step <- tour(angle)
+    if (step$step == -1) 
+      stop_next <- TRUE
+  }
+  projs <- projs[, , seq_len(i) - 1, drop = FALSE]
+  new_basis <- new_basis[seq_len(i) - 1, drop = FALSE]
+}
+
 #' @export
 setMethod("generate_bases",
           signature = "ANY",
