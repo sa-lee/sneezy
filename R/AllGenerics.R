@@ -193,6 +193,12 @@ setGeneric("view_xy",
              standardGeneric("view_xy")
            })
 
+#' @export
+setGeneric("compute_half_range",
+           signature = ".data",
+           function(.data) standardGeneric("compute_half_range")
+)
+
 #'@export
 setGeneric("view_tour_xy",
            signature = ".data", 

@@ -43,6 +43,15 @@ setMethod("generate_bases",
               .tour_path(.data, .engine, start, max_bases, step_size)
           })
 
+
+setMethod("generate_bases",
+          signature = "LinearEmbeddingMatrix",
+          function(.data, .on = NULL, clamp = FALSE, max_bases = 100, start = NULL, step_size = Inf, .engine = tourr::grand_tour()) {
+            vals <- sampleFactors(.data)
+            generate_bases(vals, .on, clamp, max_bases, start, step_size, .engine)
+          })
+            
+
 #' @export
 setMethod("generate_bases",
           signature = "TourExperiment",

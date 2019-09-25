@@ -1,7 +1,7 @@
 #'@export
 setMethod("view_tour_xy",
           signature = "TourExperiment",
-          function(.data, .on = NULL, .subset = NULL, ...) {
+          function(.data, .on = NULL, .subset = NULL, clamp = FALSE, ...) {
             
             if (!requireNamespace("shiny", quietly = TRUE)) {
               stop("Please install shiny", call. = FALSE)
@@ -15,7 +15,9 @@ setMethod("view_tour_xy",
             projs <- basisSet(.data, .on)
             vals <- .retrieve_mat(.data, .on, .subset)
             
-            half_range <- compute_half_range(vals)
+            if (is(vals, "LinearEmbeddingMatrix")) {
+              vals <- sampleFactors(vals)
+            }
             
             ui <- simple_ui()
             
@@ -32,7 +34,15 @@ simple_ui <- function() {
   )
 }
 
-compute_half_range  <- function(x) max(sqrt(rowSums(x^2)))
+setMethod("compute_half_range", 
+          "ANY", 
+          function(.data)   max(sqrt(rowSums(.data^2)))
+)
+
+setMethod("compute_half_range", 
+          "LinearEmbeddingMatrix",
+          function(.data) compute_half_range(sampleFactors(.data))
+)
 
 pl_axis <- function(half_range) {
   list(
@@ -41,7 +51,7 @@ pl_axis <- function(half_range) {
     showline = FALSE,
     showticklabels = FALSE,
     showgrid = FALSE,
-    range = half_range
+    range = c(-half_range, half_range)
   )
 }
 
