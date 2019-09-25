@@ -115,7 +115,7 @@ view_xy(pbmc3k_te,
 
 We can also estimate a basis set via a grand tour: 
 
-```{r, eval = FALSE}
+```{r}
 pbmc3k_te <- generate_bases(
   pbmc3k_te,
   .on = "pca_random",
@@ -123,7 +123,16 @@ pbmc3k_te <- generate_bases(
   clamp  = FALSE,
   .engine = tourr::grand_tour(),
 )
+pbmc3k_te
 ```
 
-We can then animate our tour using the 
+This creates an array with dimensions `r dim(basisSet(pbmc3k_te))`
+named `pca_random`. To access the underlying array use 
+`basisSet(pbmc3k_te)`.
+
+We can then view the principal components using the `view_tour_xy()`, this is a shiny application. You can view an example of it here:
+
+```{r, eval = FALSE}
+view_tour_xy(pbmc3k_te, .on = "pca_random")
+```
 
