@@ -193,5 +193,11 @@ setGeneric("view_xy",
              standardGeneric("view_xy")
            })
 
+#'@export
+setGeneric("view_tour_xy",
+           signature = ".data", 
+           function(.data, .on, ...) {
+             standardGeneric("view_tour_xy")
+           })
 
 
