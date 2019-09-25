@@ -39,29 +39,32 @@ fproj_dist <- function(x, y) {
 
 
 .interpolate <- function(basis_set, angle) {
-  dists <- sapply(2:n, function(i) {
-    proj_dist(basis_set[[i - 1]], basis_set[[i]])
-  })
+  
+  # dimensions
+  nr <- nrow(basis_set)
+  nc <- ncol(basis_set)
+  nb <- dim(basis_set)[3]
+  
+  # flatten into a list
+  basis_set  <- Map(function(x) x[[1]], apply(basis_set, 3, list))
+  
+  # compute distance between realised bases
+  dists <- vapply(seq.int(2, nb), 
+                  function(i) fproj_dist(basis_set[[i-1]], basis_set[[i]]),
+                  numeric(1)
+  )
+  
+  # steps are a function of distances between bases and the angle
+  # in radians
   steps <- sum(ceiling(dists/angle)) * 2
-  new_basis <- rep(NA, steps)
+  new_basis <- vector(length = steps)
   new_basis[1] <- TRUE
-  projs <- array(NA_real_, c(dim(basis_set)[1:2], steps))
+  
+  projs <- array(NA_real_, c(nr, nc, steps))
   i <- 1
-  tour <- new_tour(basis_set[, , 1], planned_tour(basis_set))
-  step <- tour(0)
-  stop_next <- FALSE
-  while (TRUE) {
-    new_basis[i] <- step$step <= 0
-    projs[, , i] <- step$proj
-    i <- i + 1
-    if (stop_next) 
-      break
-    step <- tour(angle)
-    if (step$step == -1) 
-      stop_next <- TRUE
-  }
-  projs <- projs[, , seq_len(i) - 1, drop = FALSE]
-  new_basis <- new_basis[seq_len(i) - 1, drop = FALSE]
+  
+  tour <- tourr::new_tour(basis_set[[1]], planned_tour(basis_set))
+  
 }
 
 #' @export
