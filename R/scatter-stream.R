@@ -7,23 +7,44 @@ setMethod("view_tour_xy",
               stop("Please install shiny", call. = FALSE)
             }
             
-            # -- data setup
-            if (is.null(.on)) {
-              # if .on is NULL we'll take the first basisSet
-              .on <- basisSetNames(.data)[1]
-            }
-            projs <- basisSet(.data, .on)
+            # -- data setup, extracting the matrix
             vals <- .retrieve_mat(.data, .on, .subset)
             
             if (is(vals, "LinearEmbeddingMatrix")) {
               vals <- sampleFactors(vals)
             }
             
+            # -- basis setup 
+            if (is.null(.on)) {
+              # if .on is NULL we'll take the first basisSet
+              .on <- basisSetNames(.data)[1]
+            }
+            
+            projs <- basisSet(.data, .on)
+            
+            # flatten into a list, this essentially so planned tour
+            # works
+            projs  <- Map(function(x) x[[1]], apply(projs, 3, list))
+            
+            angle <- 0.05
+            
+            # compute distance between realised bases
+            dists <- vapply(seq.int(2, length(projs)), 
+                            function(i) fproj_dist(projs[[i-1]], projs[[i]]),
+                            numeric(1)
+            )
+            
+            # steps for geodesic interpolation 
+            steps <- sum(ceiling(dists/angle)) * 2
+            
+            # setup the callback
+            plan <- tourr::new_tour(projs[[1]], tourr::planned_tour(projs))
+            
+            
             ui <- simple_ui()
             
-            server <- tour_server(vals, projs)
+            server <- tour_server(vals, plan, projs[[1]], steps, angle)
             shiny::shinyApp(ui, server)
-            
             
           })
 
@@ -33,16 +54,6 @@ simple_ui <- function() {
     plotly::plotlyOutput("plot")
   )
 }
-
-setMethod("compute_half_range", 
-          "ANY", 
-          function(.data)   max(sqrt(rowSums(.data^2)))
-)
-
-setMethod("compute_half_range", 
-          "LinearEmbeddingMatrix",
-          function(.data) compute_half_range(sampleFactors(.data))
-)
 
 pl_axis <- function(half_range) {
   list(
@@ -55,17 +66,17 @@ pl_axis <- function(half_range) {
   )
 }
 
-tour_server <- function(vals, projs) {
+
+tour_server <- function(vals, plan, start, steps, angle) {
   
   function(input, output, session) {
     
     # initial values
     half_range <- compute_half_range(vals)
-    #init <- vals %*% matrix(projs[,,1], nrow = ncol(vals), ncol = 2L)
     # initalise axis
     ax <- pl_axis(half_range)
     
-    # initiate graph with initial values
+    # graph shell
     output$plot <- plotly::renderPlotly({
       plotly::layout(
           plotly::plot_ly(type = "scattergl", mode = "markers"),
@@ -78,8 +89,9 @@ tour_server <- function(vals, projs) {
     # # maintain state (e.g., are we currently streaming?)
     rv <- shiny::reactiveValues(
       stream = FALSE,
-      init = matrix(nrow = nrow(projs), ncol = ncol(projs)),
-      n = 1
+      init = start,
+      n = 1,
+      step =  plan(0)
     )
     # 
     # # turn streaming on/off when the button is pressed
@@ -90,17 +102,19 @@ tour_server <- function(vals, projs) {
     shiny::observe({
       # if we're not streaming, don't do anything
       if (!rv$stream) return()
-
-      # if we have gone beyond number of bases stop
-      if (rv$n >= 100) return()
+      if (rv$step$step == -1) return()
       
-      # re-execute this code block to every 100 milliseconds
-      invalidateLater(100, session)
+      # re-execute this code block to according to frame rate
+      frame_rate <- angle * 1000
+      
+      invalidateLater(frame_rate, session)
       # changing a reactive value "invalidates" it, so isolate() is needed
       # to avoid recursion
       isolate({
-        rv$init <- vals %*% matrix(projs[,,rv$n], nrow = ncol(vals), ncol = 2L)
+        print(rv$step$step)
+        rv$init <- vals %*% rv$step$proj
         rv$n <- rv$n + 1
+        rv$step <- plan(angle)
       })
 
       # add the new value to the plot
@@ -123,6 +137,7 @@ tour_server <- function(vals, projs) {
     
   }
 }
+
 
 
 
