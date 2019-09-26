@@ -26,7 +26,7 @@ setMethod("view_tour_xy",
             # works
             projs  <- Map(function(x) x[[1]], apply(projs, 3, list))
             
-            angle <- 0.05
+            angle <- 1/30
             
             # compute distance between realised bases
             dists <- vapply(seq.int(2, length(projs)), 
@@ -43,7 +43,7 @@ setMethod("view_tour_xy",
             
             ui <- simple_ui()
             
-            server <- tour_server(vals, plan, projs[[1]], steps, angle)
+            server <- tour_server(vals, plan, steps, angle)
             shiny::shinyApp(ui, server)
             
           })
@@ -79,7 +79,7 @@ tour_server <- function(vals, plan, start, steps, angle) {
     # graph shell
     output$plot <- plotly::renderPlotly({
       plotly::layout(
-          plotly::plot_ly(type = "scattergl", mode = "markers"),
+        plotly::plot_ly(type = "scattergl", mode = "markers"),
         xaxis = ax,
         yaxis = ax
       )
@@ -105,34 +105,35 @@ tour_server <- function(vals, plan, start, steps, angle) {
       if (rv$step$step == -1) return()
       
       # re-execute this code block to according to frame rate
-      frame_rate <- angle * 1000
+      frame_rate <- 30
       
-      invalidateLater(frame_rate, session)
+      shiny::invalidateLater(1000/frame_rate, session)
       # changing a reactive value "invalidates" it, so isolate() is needed
       # to avoid recursion
-      isolate({
+      shiny::isolate({
         print(rv$step$step)
         rv$init <- vals %*% rv$step$proj
         rv$n <- rv$n + 1
-        rv$step <- plan(angle)
+        rv$step <- plan(1/30)
       })
 
       # add the new value to the plot
-       plotly::plotlyProxyInvoke(
-         plotly::plotlyProxy("plot", session),
-          "addTraces",
-          list(
-            y = rv$init[,2],
-            x = rv$init[,1],
-            type = "scattergl",
-            mode = "markers"
-          )
+      plotly::plotlyProxyInvoke(
+        plotly::plotlyProxy("plot", session),
+        "restyle",
+        list(
+          y = list(rv$init[,2]),
+          x = list(rv$init[,1])
+          # type = "scattergl",
+          # mode = "markers"
         )
-       # delete the previous trace
-       plotly::plotlyProxyInvoke(
-         plotly::plotlyProxy("plot", session),
-         "deleteTraces", 
-         0)
+      )
+      
+      # # delete the previous trace
+      # plotly::plotlyProxyInvoke(
+      #   plotly::plotlyProxy("plot", session),
+      #   "deleteTraces",
+      #   0)
     })
     
   }

@@ -119,7 +119,7 @@ We can also estimate a basis set via a grand tour:
 pbmc3k_te <- generate_bases(
   pbmc3k_te,
   .on = "pca_random",
-  max_bases = 30,
+  max_bases = 100,
   clamp  = FALSE,
   .engine = tourr::grand_tour(),
 )
