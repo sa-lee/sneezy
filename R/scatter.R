@@ -77,7 +77,7 @@ setMethod("view_xy",
               tbl[[.color]] <- .data[[.color]]
             }
             
-            p <- plotly::plot_ly(type = "scatter", mode = "markers", ...)
+            p <- plotly::plot_ly(type = "scattergl", mode = "markers", ...)
             
             if (ncol(tbl) == 3L) {
               p <- plotly::add_markers(p, 
@@ -85,7 +85,7 @@ setMethod("view_xy",
                                        x = .x_f,
                                        y = .y_f,
                                        color = as.formula(paste0("~", .color)),
-                                       type = "scatter")
+                                       type = "scattergl")
             } else {
               p <- plotly::add_markers(p,
                                        data = tbl,
@@ -112,7 +112,7 @@ setMethod("view_xy",
               .color <- .data[, .color]
             }
             
-            p <- plotly::plot_ly(type = "scatter", mode = "markers")
+            p <- plotly::plot_ly(type = "scattergl", mode = "markers")
             
             
             p <- plotly::add_markers(p, 
@@ -120,8 +120,6 @@ setMethod("view_xy",
                                      y = y, 
                                      color = .color)
             
-            p <- plotly::layout(p, dragmode = "lasso", showlegend = FALSE)
-            p <- plotly::toWebGL(p)
             p
             
           })
