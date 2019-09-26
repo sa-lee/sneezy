@@ -1,10 +1,5 @@
-.rescale <- function(.data) {
-  rng <- DelayedArray::colRanges(.data)
-  vals <- sweep(.data, 2, rng[,1])
-  sweep(vals, 2, rng[,2] - rng[, 1], FUN = "/")  
-}
-
-
+# the guts for generating a basis set, mostly pillaged
+# from tourr, for large basis sets could consider using DelayedArray backend?
 .tour_path <- function(.data, tour_path, start, max_bases, step_size) {
   # set up generator
   tour <- tourr::new_tour(.data, tour_path, start)
@@ -31,41 +26,6 @@
   projs
 }
 
-
-# slightly faster version of proj_dist in tourr via tcrossprod
-fproj_dist <- function(x, y) {
-  sqrt(sum((tcrossprod(x) - tcrossprod(y))^2))
-} 
-
-
-.interpolate <- function(basis_set, angle) {
-  
-  # dimensions
-  nr <- nrow(basis_set)
-  nc <- ncol(basis_set)
-  nb <- dim(basis_set)[3]
-  
-  # flatten into a list
-  basis_set  <- Map(function(x) x[[1]], apply(basis_set, 3, list))
-  
-  # compute distance between realised bases
-  dists <- vapply(seq.int(2, nb), 
-                  function(i) fproj_dist(basis_set[[i-1]], basis_set[[i]]),
-                  numeric(1)
-  )
-  
-  # steps are a function of distances between bases and the angle
-  # in radians
-  steps <- sum(ceiling(dists/angle)) * 2
-  new_basis <- vector(length = steps)
-  new_basis[1] <- TRUE
-  
-  projs <- array(NA_real_, c(nr, nc, steps))
-  i <- 1
-  
-  tour <- tourr::new_tour(basis_set[[1]], planned_tour(basis_set))
-  
-}
 
 #' @export
 setMethod("generate_bases",
