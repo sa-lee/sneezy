@@ -38,12 +38,9 @@ setMethod("view_tour_xy",
             # setup the callback
             plan <- tourr::new_tour(projs[[1]], tourr::planned_tour(projs))
             
-            # initial projection
-            start <- vals %*% projs[[1]]
-            
             ui <- simple_ui()
             
-            server <- tour_server(vals,  plan, .color, start, steps, angle, fps)
+            server <- tour_server(vals,  plan, .color, projs[[1]], steps, angle, fps)
             shiny::shinyApp(ui, server)
             
           })
@@ -61,16 +58,46 @@ simple_ui <- function() {
 }
 
 pl_axis <- function(half_range) {
-  list(
+  ax <- list(
     title = "",
     zeroline = FALSE,
     showline = FALSE,
     showticklabels = FALSE,
-    showgrid = FALSE,
-    range = c(-half_range, half_range)
+    showgrid = FALSE
   )
+  
+  if (missing(half_range)) {
+    return(ax)
+  }
+  
+  c(ax, list(range = c(-half_range, half_range)))
 }
 
+
+init_axis_plot <- function(basis, cols) {
+  nb <- nrow(basis) *2
+  evens <- seq.int(2, nb*2, by = 2)
+  x <- y <- rep(0, nb)
+  x[evens] <- basis[,1]
+  y[evens] <- basis[,2]
+  p <- plotly::plot_ly(
+    x = x, y = y, 
+    type = "scatter", 
+    mode = "lines", 
+    color = I("black"), 
+    showlegend = FALSE
+    )
+  p <-  plotly::add_annotations(p, 
+                                x = basis[,1]*1.1,
+                                y = basis[,2]*1.1,
+                                text = cols,
+                                xref = "x",
+                                yref = "y",
+                                showarrow = FALSE)
+  ax <- pl_axis()
+  p <- plotly::layout(p, xaxis = ax, yaxis = ax)
+  plotly::config(p, displayModeBar = FALSE)
+}
 
 tour_server <- function(vals, plan, .color, start, steps, angle, fps) {
   
@@ -81,19 +108,19 @@ tour_server <- function(vals, plan, .color, start, steps, angle, fps) {
     # initalise axis
     ax <- pl_axis(half_range)
     
+    init <- vals %*% start
+    
+    zeros <- rep(0, nrow(start))
+    
     # axis shell
     output$axes <- plotly::renderPlotly(
-      plotly::layout(
-        plotly::plot_ly(),
-        xaxis = ax,
-        yaxis = ax
-      )
+      init_axis_plot(start, colnames(vals))
     )
     
     # graph shell
     output$plot <- plotly::renderPlotly({
       plotly::layout(
-        view_xy(start, .x = 1, .y = 2, .color = .color),
+        view_xy(init, .x = 1, .y = 2, .color = .color),
         xaxis = ax,
         yaxis = ax
       )
@@ -103,7 +130,8 @@ tour_server <- function(vals, plan, .color, start, steps, angle, fps) {
     # # maintain state (e.g., are we currently streaming?)
     rv <- shiny::reactiveValues(
       stream = FALSE,
-      init = start,
+      basis = start,
+      proj = init,
       n = 1,
       step =  plan(0)
     )
@@ -125,7 +153,8 @@ tour_server <- function(vals, plan, .color, start, steps, angle, fps) {
       # changing a reactive value "invalidates" it, so isolate() is needed
       # to avoid recursion
       shiny::isolate({
-        rv$init <- vals %*% rv$step$proj
+        rv$basis <- rv$step$proj
+        rv$proj <- vals %*% rv$step$proj
         rv$n <- rv$n + 1
         rv$step <- plan(angle)
       })
@@ -135,19 +164,14 @@ tour_server <- function(vals, plan, .color, start, steps, angle, fps) {
         plotly::plotlyProxy("plot", session),
         "restyle",
         list(
-          y = list(rv$init[,2]),
-          x = list(rv$init[,1])
-          # type = "scattergl",
-          # mode = "markers"
+          y = list(rv$proj[,2]),
+          x = list(rv$proj[,1])
         ),
         list(1)
       )
       
-      # # delete the previous trace
-      # plotly::plotlyProxyInvoke(
-      #   plotly::plotlyProxy("plot", session),
-      #   "deleteTraces",
-      #   0)
+      # restyle the axes
+      output$axes <- plotly::renderPlotly(init_axis_plot(rv$basis, colnames(vals)))
     })
     
   }
