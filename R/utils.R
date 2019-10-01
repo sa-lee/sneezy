@@ -11,6 +11,11 @@ fproj_dist <- function(x, y) {
   sweep(vals, 2, rng[,2] - rng[, 1], FUN = "/")  
 }
 
+.check_shiny <- function() {
+  if (!requireNamespace("shiny", quietly = TRUE)) {
+    stop("Please install shiny", call. = FALSE)
+  }
+}
 
 #' @export
 setMethod("compute_half_range", 

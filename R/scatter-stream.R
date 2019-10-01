@@ -1,11 +1,9 @@
 #'@export
 setMethod("view_tour_xy",
           signature = "TourExperiment",
-          function(.data, .on = NULL, .subset = NULL, clamp = FALSE, ...) {
+          function(.data, .on = NULL, .subset = NULL, .color = NULL, clamp = FALSE, aps = 1, fps = 30,  ...) {
             
-            if (!requireNamespace("shiny", quietly = TRUE)) {
-              stop("Please install shiny", call. = FALSE)
-            }
+            .check_shiny()
             
             # -- data setup, extracting the matrix
             vals <- .retrieve_mat(.data, .on, .subset)
@@ -26,7 +24,7 @@ setMethod("view_tour_xy",
             # works
             projs  <- Map(function(x) x[[1]], apply(projs, 3, list))
             
-            angle <- 1/30
+            angle <- aps/fps
             
             # compute distance between realised bases
             dists <- vapply(seq.int(2, length(projs)), 
@@ -40,18 +38,25 @@ setMethod("view_tour_xy",
             # setup the callback
             plan <- tourr::new_tour(projs[[1]], tourr::planned_tour(projs))
             
+            # initial projection
+            start <- vals %*% projs[[1]]
             
             ui <- simple_ui()
             
-            server <- tour_server(vals, plan, steps, angle)
+            server <- tour_server(vals,  plan, .color, start, steps, angle, fps)
             shiny::shinyApp(ui, server)
             
           })
 
 simple_ui <- function() {
   shiny::fluidPage(
-    shiny::actionButton("stream", "Turn stream on/off"),
-    plotly::plotlyOutput("plot")
+    shiny::fluidRow(
+      shiny::actionButton("stream", "Turn stream on/off")
+    ),
+    shiny::fluidRow(
+      shiny::column(8, plotly::plotlyOutput("plot")),
+      shiny::column(2, plotly::plotlyOutput("axes"))
+    )
   )
 }
 
@@ -67,7 +72,7 @@ pl_axis <- function(half_range) {
 }
 
 
-tour_server <- function(vals, plan, start, steps, angle) {
+tour_server <- function(vals, plan, .color, start, steps, angle, fps) {
   
   function(input, output, session) {
     
@@ -76,10 +81,19 @@ tour_server <- function(vals, plan, start, steps, angle) {
     # initalise axis
     ax <- pl_axis(half_range)
     
+    # axis shell
+    output$axes <- plotly::renderPlotly(
+      plotly::layout(
+        plotly::plot_ly(),
+        xaxis = ax,
+        yaxis = ax
+      )
+    )
+    
     # graph shell
     output$plot <- plotly::renderPlotly({
       plotly::layout(
-        plotly::plot_ly(type = "scattergl", mode = "markers"),
+        view_xy(start, .x = 1, .y = 2, .color = .color),
         xaxis = ax,
         yaxis = ax
       )
@@ -105,16 +119,15 @@ tour_server <- function(vals, plan, start, steps, angle) {
       if (rv$step$step == -1) return()
       
       # re-execute this code block to according to frame rate
-      frame_rate <- 30
+      frame_rate <- 1000/fps
       
-      shiny::invalidateLater(1000/frame_rate, session)
+      shiny::invalidateLater(frame_rate, session)
       # changing a reactive value "invalidates" it, so isolate() is needed
       # to avoid recursion
       shiny::isolate({
-        print(rv$step$step)
         rv$init <- vals %*% rv$step$proj
         rv$n <- rv$n + 1
-        rv$step <- plan(1/30)
+        rv$step <- plan(angle)
       })
 
       # add the new value to the plot
@@ -126,7 +139,8 @@ tour_server <- function(vals, plan, start, steps, angle) {
           x = list(rv$init[,1])
           # type = "scattergl",
           # mode = "markers"
-        )
+        ),
+        list(1)
       )
       
       # # delete the previous trace

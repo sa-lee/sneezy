@@ -185,24 +185,55 @@ setGeneric("generate_bases",
            })
              
 
-# --- Visualisation ---
+#' Compute range of axes for bases
+#' 
+#' @param .data A 'matrix' like object
+#' @details This function computes the maximum squared 
+#' Euclidean distance of rows in a matrix like object. Mostly used
+#' internally for setting up xy-axis ranges for a tour animation.
+#' 
 #' @export
-setGeneric("view_xy", 
-           signature = ".data",
-           function(.data, .on = NULL, .x, .y, .color, ...) {
-             standardGeneric("view_xy")
-           })
-
-#' @export
-setGeneric("compute_half_range",
-           signature = ".data",
-           function(.data) standardGeneric("compute_half_range")
+setGeneric(
+  "compute_half_range",
+  signature = ".data",
+  function(.data) standardGeneric("compute_half_range")
 )
 
+# --- Visualisation ---
+
+#' Create a simple interactive scatter-plot
+#' 
+#' @param .data A `TourExperiment` object 
+#' @param .on which part of `.data` to select
+#' @param .x the x-aesthetic
+#' @param .y the y-aesthetic
+#' @param .color the the color-aesthetic
+#' 
+#' @export
+setGeneric(
+  "view_xy", 
+  signature = ".data",
+  function(.data, .on = NULL, .x, .y, .color, ...) {
+    standardGeneric("view_xy")
+  })
+
+
+
+#' Project a data set onto a basis set
+#' 
+#' @param .data A `TourExperiment` object 
+#' @param .on the name of the basisSet to tour (default = NULL, will be first basisSet)
+#' @param .subset which points to select?
+#' @param .color Colour points by a given variable 
+#' @param clamp Clamp all variables to lie in [0,1] (default = FALSE)
+#' @param aps Target angular velocity (how quickly to move between bases?) In radians per second. Defaults to 1.
+#' @param fps Target frame rate for streaming (defaults to 30)
+#' @param ... Other arguments
+#'      
 #'@export
 setGeneric("view_tour_xy",
            signature = ".data", 
-           function(.data, .on, ...) {
+           function(.data, .on = NULL, .subset = NULL, .color = NULL, clamp = TRUE, aps = 1, fps = NULL, ...) {
              standardGeneric("view_tour_xy")
            })
 

@@ -106,10 +106,12 @@ setMethod("view_xy",
             x <- .data[, .x]
             y <- .data[, .y]
             
-            if (missing(.color)) {
+            if (missing(.color) || is.null(.color)) {
               .color <- I("black")
             } else {
-              .color <- .data[, .color]
+              if (length(.color) != nrow(.data)) {
+                .color <- .data[, .color]
+              } 
             }
             
             p <- plotly::plot_ly(type = "scattergl", mode = "markers")
