@@ -1,7 +1,7 @@
 #'@export
 setMethod("view_tour_xy",
           signature = "TourExperiment",
-          function(.data, .on = NULL, .subset = NULL, .color = NULL, clamp = FALSE, aps = 1, fps = 30,  ...) {
+          function(.data, .on = NULL, .subset = NULL, .color = NULL, clamp = TRUE, aps = 1, fps = 30,  ...) {
             
             .check_shiny()
             
@@ -10,6 +10,10 @@ setMethod("view_tour_xy",
             
             if (is(vals, "LinearEmbeddingMatrix")) {
               vals <- sampleFactors(vals)
+            }
+            
+            if (clamp) {
+              vals <- .rescale(vals)
             }
             
             # -- basis setup 
@@ -74,12 +78,9 @@ pl_axis <- function(half_range) {
 }
 
 
-init_axis_plot <- function(basis, cols) {
-  nb <- nrow(basis) *2
-  evens <- seq.int(2, nb*2, by = 2)
-  x <- y <- rep(0, nb)
-  x[evens] <- basis[,1]
-  y[evens] <- basis[,2]
+init_axis_plot <- function(basis, cols, half_range) {
+  x <- pad_zeros(basis[,1])
+  y <- pad_zeros(basis[,2])
   p <- plotly::plot_ly(
     x = x, y = y, 
     type = "scatter", 
@@ -87,15 +88,12 @@ init_axis_plot <- function(basis, cols) {
     color = I("black"), 
     showlegend = FALSE
     )
-  p <-  plotly::add_annotations(p, 
-                                x = basis[,1]*1.1,
-                                y = basis[,2]*1.1,
-                                text = cols,
-                                xref = "x",
-                                yref = "y",
-                                showarrow = FALSE)
-  ax <- pl_axis()
-  p <- plotly::layout(p, xaxis = ax, yaxis = ax)
+  p <-  plotly::add_text(p, 
+                         x = basis[,1]*1.1,
+                         y = basis[,2]*1.1,
+                         text = cols, type = "text")
+  ax <- pl_axis(half_range)
+  p <- plotly::layout(p, xaxis = ax, yaxis = c(ax, list(scaleanchor = "x")))
   plotly::config(p, displayModeBar = FALSE)
 }
 
@@ -114,7 +112,7 @@ tour_server <- function(vals, plan, .color, start, steps, angle, fps) {
     
     # axis shell
     output$axes <- plotly::renderPlotly(
-      init_axis_plot(start, colnames(vals))
+      init_axis_plot(start, colnames(vals), half_range)
     )
     
     # graph shell
@@ -171,7 +169,27 @@ tour_server <- function(vals, plan, .color, start, steps, angle, fps) {
       )
       
       # restyle the axes
-      output$axes <- plotly::renderPlotly(init_axis_plot(rv$basis, colnames(vals)))
+      # add the new value to the plot
+      plotly::plotlyProxyInvoke(
+        plotly::plotlyProxy("axes", session),
+        "restyle",
+        list(
+          y = list(pad_zeros(rv$basis[,2])),
+          x = list(pad_zeros(rv$basis[,1]))
+        ),
+        list(0)
+      )
+      
+      plotly::plotlyProxyInvoke(
+        plotly::plotlyProxy("axes", session),
+        "restyle",
+        list(
+          y = list(rv$basis[,2]*1.1),
+          x = list(rv$basis[,1] * 1.1)
+        ),
+        list(1)
+      )
+      
     })
     
   }

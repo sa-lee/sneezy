@@ -11,10 +11,20 @@ fproj_dist <- function(x, y) {
   sweep(vals, 2, rng[,2] - rng[, 1], FUN = "/")  
 }
 
+# check if shiny installed
 .check_shiny <- function() {
   if (!requireNamespace("shiny", quietly = TRUE)) {
     stop("Please install shiny", call. = FALSE)
   }
+}
+
+# zero pad a vector at even index 
+pad_zeros <- function(x) {
+  n <- length(x) * 2
+  ans <- rep(0L, n)
+  inx <- seq.int(2, n*2, by = 2)
+  ans[inx] <- x
+  ans  
 }
 
 #' @export
