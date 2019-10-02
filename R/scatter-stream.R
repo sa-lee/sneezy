@@ -52,11 +52,13 @@ setMethod("view_tour_xy",
 simple_ui <- function() {
   shiny::fluidPage(
     shiny::fluidRow(
-      shiny::actionButton("stream", "Turn stream on/off")
-    ),
-    shiny::fluidRow(
-      shiny::column(8, plotly::plotlyOutput("plot")),
-      shiny::column(2, plotly::plotlyOutput("axes"))
+      shiny::column(4, 
+                    shiny::fluidRow(
+                      shiny::actionButton("stream", "Turn stream on/off"),
+                      plotly::plotlyOutput("axes", width = "100%")
+                    )
+      ),
+      shiny::column(8, plotly::plotlyOutput("plot", width = "100%"))
     )
   )
 }
@@ -120,7 +122,7 @@ tour_server <- function(vals, plan, .color, start, steps, angle, fps) {
       plotly::layout(
         view_xy(init, .x = 1, .y = 2, .color = .color),
         xaxis = ax,
-        yaxis = ax
+        yaxis = c(ax, list(scaleanchor = "x"))
       )
     })
     
