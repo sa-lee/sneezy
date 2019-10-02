@@ -9,7 +9,7 @@ setMethod("view_tour_xy",
             vals <- .retrieve_mat(.data, .on, .subset)
             
             if (is(vals, "LinearEmbeddingMatrix")) {
-              vals <- sampleFactors(vals)
+              vals <- SingleCellExperiment::sampleFactors(vals)
             }
             
             if (clamp) {
@@ -26,7 +26,7 @@ setMethod("view_tour_xy",
             
             # flatten into a list, this essentially so planned tour
             # works
-            projs  <- Map(function(x) x[[1]], apply(projs, 3, list))
+            projs  <- flatten_array(projs)
             
             angle <- aps/fps
             
@@ -53,12 +53,15 @@ simple_ui <- function() {
   shiny::fluidPage(
     shiny::fluidRow(
       shiny::column(4, 
-                    shiny::fluidRow(
-                      shiny::actionButton("stream", "Turn stream on/off"),
-                      plotly::plotlyOutput("axes", width = "100%")
-                    )
-      ),
-      shiny::column(8, plotly::plotlyOutput("plot", width = "100%"))
+                    shiny::actionButton("stream", icon = shiny::icon("play"), label = NULL),
+                    shiny::actionButton("reset", icon = shiny::icon("undo"), label = NULL ),
+                    plotly::plotlyOutput("axes")
+      )
+      ,
+      shiny::column(8, plotly::plotlyOutput("plot"))
+    ),
+    shiny::fluidRow(
+      shiny::column(12, plotly::plotlyOutput("path"))
     )
   )
 }
@@ -117,80 +120,128 @@ tour_server <- function(vals, plan, .color, start, steps, angle, fps) {
       init_axis_plot(start, colnames(vals), half_range)
     )
     
-    # graph shell
+    # tour shell
     output$plot <- plotly::renderPlotly({
       plotly::layout(
         view_xy(init, .x = 1, .y = 2, .color = .color),
         xaxis = ax,
-        yaxis = c(ax, list(scaleanchor = "x"))
+        yaxis = c(ax, list(scaleanchor = "x")) # fixed aspect ratio
       )
     })
+    
+    # path shell
+    output$path <- plotly::renderPlotly({
+      plotly::layout(
+        plotly::add_lines(
+          plotly::plot_ly(type = "scatter", mode = "lines"),
+          x = 1, 
+          y = 1
+        ),
+        yaxis = pl_axis(),
+        xaxis = list(
+          title = "Step",
+          showline = FALSE,
+          zeroline = FALSE,
+          showticklabels = TRUE,
+          showgrid = FALSE
+        )
+      )
+    })
+    
     
     # # reactiveValues() act very much like input values, but may be used to 
     # # maintain state (e.g., are we currently streaming?)
     rv <- shiny::reactiveValues(
-      stream = FALSE,
+      stream = 0,
       basis = start,
       proj = init,
       n = 1,
+      new_basis = TRUE,
       step =  plan(0)
     )
+    
+    # re-execute this code block to according to frame rate
+    frame_rate <- 1000/fps
     # 
     # # turn streaming on/off when the button is pressed
     shiny::observeEvent(input$stream, {
-      rv$stream <- if (rv$stream) FALSE else TRUE
+      rv$stream <- 1 - rv$stream
+      start_icon <- shiny::icon(c("play", "pause")[rv$stream + 1])
+      shiny::updateActionButton(session, "stream", icon = start_icon)
     })
 
     shiny::observe({
-      # if we're not streaming, don't do anything
-      if (!rv$stream) return()
-      if (rv$step$step == -1) return()
-      
-      # re-execute this code block to according to frame rate
-      frame_rate <- 1000/fps
-      
-      shiny::invalidateLater(frame_rate, session)
-      # changing a reactive value "invalidates" it, so isolate() is needed
-      # to avoid recursion
-      shiny::isolate({
-        rv$basis <- rv$step$proj
-        rv$proj <- vals %*% rv$step$proj
-        rv$n <- rv$n + 1
-        rv$step <- plan(angle)
-      })
 
-      # add the new value to the plot
-      plotly::plotlyProxyInvoke(
-        plotly::plotlyProxy("plot", session),
-        "restyle",
-        list(
-          y = list(rv$proj[,2]),
-          x = list(rv$proj[,1])
-        ),
-        list(1)
-      )
       
-      # restyle the axes
-      # add the new value to the plot
-      plotly::plotlyProxyInvoke(
-        plotly::plotlyProxy("axes", session),
-        "restyle",
-        list(
-          y = list(pad_zeros(rv$basis[,2])),
-          x = list(pad_zeros(rv$basis[,1]))
-        ),
-        list(0)
-      )
+      # if (rv$step$step == -1) {
+      #   shiny::isolate({
+      #     rv$stream <- 1
+      #   })
+      #   return()
+      # }
+      shiny::invalidateLater(frame_rate, session)
       
-      plotly::plotlyProxyInvoke(
-        plotly::plotlyProxy("axes", session),
-        "restyle",
-        list(
-          y = list(rv$basis[,2]*1.1),
-          x = list(rv$basis[,1] * 1.1)
-        ),
-        list(1)
-      )
+      if (rv$stream == 1) {
+        
+        # changing a reactive value "invalidates" it, so isolate() is needed
+        # to avoid recursion
+        if (!input$stream) {
+          shiny::isolate(rv$stream <- 1)
+        }
+        
+        shiny::isolate({
+          rv$basis <- rv$step$proj
+          rv$proj <- vals %*% rv$step$proj
+          rv$n <- rv$n + 1
+          rv$new_basis <- rv$step$step == 0
+          rv$step <- plan(angle)
+        })
+        
+        # add the new value to the plot
+        plotly::plotlyProxyInvoke(
+          plotly::plotlyProxy("plot", session),
+          "restyle",
+          list(
+            y = list(rv$proj[,2]),
+            x = list(rv$proj[,1])
+          ),
+          list(1)
+        )
+        
+        # restyle the axes
+        # add the new value to the plot
+        plotly::plotlyProxyInvoke(
+          plotly::plotlyProxy("axes", session),
+          "restyle",
+          list(
+            y = list(pad_zeros(rv$basis[,2])),
+            x = list(pad_zeros(rv$basis[,1]))
+          ),
+          list(0)
+        )
+        
+        plotly::plotlyProxyInvoke(
+          plotly::plotlyProxy("axes", session),
+          "restyle",
+          list(
+            y = list(rv$basis[,2]*1.1),
+            x = list(rv$basis[,1] * 1.1)
+          ),
+          list(1)
+        )
+        
+        # add the new value to the plot
+        plotly::plotlyProxyInvoke(
+          plotly::plotlyProxy("path", session), 
+          "extendTraces", 
+          list(
+            y = list(list(1)), 
+            x = list(list(rv$n))
+          ),
+          list(1)
+        )
+      }
+
       
     })
     

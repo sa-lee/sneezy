@@ -27,6 +27,8 @@ pad_zeros <- function(x) {
   ans  
 }
 
+flatten_array <- function(projs) Map(function(x) x[[1]], apply(projs, 3, list))
+
 #' @export
 setMethod("compute_half_range", 
           "ANY", 
