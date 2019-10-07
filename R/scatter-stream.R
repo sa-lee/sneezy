@@ -172,6 +172,7 @@ tour_server <- function(vals, plan, .color, start, steps, angle, fps) {
 
     shiny::observe({
 
+      if (rv$stream == 0) return()
       
       # if (rv$step$step == -1) {
       #   shiny::isolate({
@@ -185,9 +186,6 @@ tour_server <- function(vals, plan, .color, start, steps, angle, fps) {
         
         # changing a reactive value "invalidates" it, so isolate() is needed
         # to avoid recursion
-        if (!input$stream) {
-          shiny::isolate(rv$stream <- 1)
-        }
         
         shiny::isolate({
           rv$basis <- rv$step$proj
@@ -219,7 +217,7 @@ tour_server <- function(vals, plan, .color, start, steps, angle, fps) {
           ),
           list(0)
         )
-        
+
         plotly::plotlyProxyInvoke(
           plotly::plotlyProxy("axes", session),
           "restyle",
@@ -229,13 +227,13 @@ tour_server <- function(vals, plan, .color, start, steps, angle, fps) {
           ),
           list(1)
         )
-        
+
         # add the new value to the plot
         plotly::plotlyProxyInvoke(
-          plotly::plotlyProxy("path", session), 
-          "extendTraces", 
+          plotly::plotlyProxy("path", session),
+          "extendTraces",
           list(
-            y = list(list(1)), 
+            y = list(list(1)),
             x = list(list(rv$n))
           ),
           list(1)
