@@ -19,13 +19,7 @@ fproj_dist <- function(x, y) {
 }
 
 # zero pad a vector at even index 
-pad_zeros <- function(x) {
-  n <- length(x) * 2
-  ans <- rep(0L, n)
-  inx <- seq.int(2, n*2, by = 2)
-  ans[inx] <- x
-  ans  
-}
+
 
 flatten_array <- function(projs) Map(function(x) x[[1]], apply(projs, 3, list))
 

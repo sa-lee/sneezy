@@ -54,52 +54,13 @@ simple_ui <- function() {
     shiny::fluidRow(
       shiny::column(4, 
                     shiny::actionButton("stream", icon = shiny::icon("play"), label = NULL),
-                    shiny::actionButton("reset", icon = shiny::icon("undo"), label = NULL ),
-                    plotly::plotlyOutput("axes")
-      )
-      ,
+                    plotly::plotlyOutput("axes")),
       shiny::column(8, plotly::plotlyOutput("plot"))
     ),
     shiny::fluidRow(
       shiny::column(12, plotly::plotlyOutput("path"))
     )
   )
-}
-
-pl_axis <- function(half_range) {
-  ax <- list(
-    title = "",
-    zeroline = FALSE,
-    showline = FALSE,
-    showticklabels = FALSE,
-    showgrid = FALSE
-  )
-  
-  if (missing(half_range)) {
-    return(ax)
-  }
-  
-  c(ax, list(range = c(-half_range, half_range)))
-}
-
-
-init_axis_plot <- function(basis, cols, half_range) {
-  x <- pad_zeros(basis[,1])
-  y <- pad_zeros(basis[,2])
-  p <- plotly::plot_ly(
-    x = x, y = y, 
-    type = "scatter", 
-    mode = "lines", 
-    color = I("black"), 
-    showlegend = FALSE
-    )
-  p <-  plotly::add_text(p, 
-                         x = basis[,1]*1.1,
-                         y = basis[,2]*1.1,
-                         text = cols, type = "text")
-  ax <- pl_axis(half_range)
-  p <- plotly::layout(p, xaxis = ax, yaxis = c(ax, list(scaleanchor = "x")))
-  plotly::config(p, displayModeBar = FALSE)
 }
 
 tour_server <- function(vals, plan, .color, start, steps, angle, fps) {
@@ -122,6 +83,7 @@ tour_server <- function(vals, plan, .color, start, steps, angle, fps) {
     
     # tour shell
     output$plot <- plotly::renderPlotly({
+      
       plotly::layout(
         view_xy(init, .x = 1, .y = 2, .color = .color),
         xaxis = ax,
@@ -149,97 +111,39 @@ tour_server <- function(vals, plan, .color, start, steps, angle, fps) {
     })
     
     
-    # # reactiveValues() act very much like input values, but may be used to 
-    # # maintain state (e.g., are we currently streaming?)
-    rv <- shiny::reactiveValues(
-      stream = 0,
-      basis = start,
-      proj = init,
-      n = 1,
-      new_basis = TRUE,
-      step =  plan(0)
-    )
     
-    # re-execute this code block to according to frame rate
-    frame_rate <- 1000/fps
-    # 
-    # # turn streaming on/off when the button is pressed
+    autoInvalidate <- shiny::reactiveTimer(1000/fps)
+    
+    rv <- shiny::reactiveValues(play = FALSE, step = plan(0))
+    
+
     shiny::observeEvent(input$stream, {
-      rv$stream <- 1 - rv$stream
-      start_icon <- shiny::icon(c("play", "pause")[rv$stream + 1])
-      shiny::updateActionButton(session, "stream", icon = start_icon)
+      rv$play <- if (rv$play) FALSE else TRUE
     })
-
+    
+    
+    # turn streaming on/off when the button is pressed
     shiny::observe({
-
-      if (rv$stream == 0) return()
       
-      # if (rv$step$step == -1) {
-      #   shiny::isolate({
-      #     rv$stream <- 1
-      #   })
-      #   return()
-      # }
-      shiny::invalidateLater(frame_rate, session)
+      # reset if we have gotten to end of path
+      if (rv$step$step == -1 || !rv$play) {
+        return()
+      }
       
-      if (rv$stream == 1) {
-        
-        # changing a reactive value "invalidates" it, so isolate() is needed
-        # to avoid recursion
-        
+      autoInvalidate()
+      if (rv$play) {
         shiny::isolate({
-          rv$basis <- rv$step$proj
-          rv$proj <- vals %*% rv$step$proj
-          rv$n <- rv$n + 1
-          rv$new_basis <- rv$step$step == 0
+          basis <- rv$step$proj
+          proj <- vals %*% basis
+          new_basis <- rv$step$step == 0
           rv$step <- plan(angle)
+          # restyle traces
+          restyle_points("plot", 1, session, proj)
+          restyle_points("axes", 0, session, pad_zeros(basis))
+          restyle_points("axes", 1, session, basis*1.1)
         })
         
-        # add the new value to the plot
-        plotly::plotlyProxyInvoke(
-          plotly::plotlyProxy("plot", session),
-          "restyle",
-          list(
-            y = list(rv$proj[,2]),
-            x = list(rv$proj[,1])
-          ),
-          list(1)
-        )
-        
-        # restyle the axes
-        # add the new value to the plot
-        plotly::plotlyProxyInvoke(
-          plotly::plotlyProxy("axes", session),
-          "restyle",
-          list(
-            y = list(pad_zeros(rv$basis[,2])),
-            x = list(pad_zeros(rv$basis[,1]))
-          ),
-          list(0)
-        )
-
-        plotly::plotlyProxyInvoke(
-          plotly::plotlyProxy("axes", session),
-          "restyle",
-          list(
-            y = list(rv$basis[,2]*1.1),
-            x = list(rv$basis[,1] * 1.1)
-          ),
-          list(1)
-        )
-
-        # add the new value to the plot
-        plotly::plotlyProxyInvoke(
-          plotly::plotlyProxy("path", session),
-          "extendTraces",
-          list(
-            y = list(list(1)),
-            x = list(list(rv$n))
-          ),
-          list(1)
-        )
       }
-
       
     })
     
