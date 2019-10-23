@@ -117,7 +117,7 @@ setReplaceMethod("neighborSet",
                    
                    internals <- int_colData(x)
                    
-                   if (!is.null(value) && !identical(nrow(value) == ncol(x))) {
+                   if (!is.null(value) && !identical(nrow(value), ncol(x))) {
                      stop("invalid value in neighborSet(<",
                           class(x), ">, type = 'numeric') <- value\n",
                           "nrow(value) does not equal ncol(x)")
@@ -142,7 +142,7 @@ setReplaceMethod("neighborSet",
                  function(x, type, ..., value) {
                    internals <- int_colData(x)
                    
-                   if (!is.null(value) && !identical(nrow(value) == ncol(x))) {
+                   if (!is.null(value) && !identical(nrow(value), ncol(x))) {
                      stop("invalid value in neighborSet(<",
                           class(x), ">, type = 'numeric') <- value\n",
                           "nrow(value) does not equal ncol(x)")

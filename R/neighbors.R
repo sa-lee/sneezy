@@ -2,42 +2,37 @@
 #' 
 #' @param .data a `TourExperiment` object 
 #' @param num_neighbors An integer scalar for number of neighbors
-#' @param from a character scalar, indicating the part of `.data` to
+#' @param .on a character scalar, indicating the part of `.data` to
 #' estimate nearest neighbors. If missing the first assay will be used. 
 #' @param .engine A `BiocNeighbor::BiocNeighborParam()` object that
 #' reperesents the algorithm used to compute nearest neighbors. 
 #' 
-#' 
-#' @details The representation of the nearest neighbors is a list with
-#' two elements, one called `index` containing a matrix of the nearest
-#' neighbor indexes and another `distance` containing the distance
-#' to each neighbor. 
-#' 
-#' 
-#' 
+#' @details The representation of the nearest neighbors is a matrix of
+#' size ncol(.data) by num_neighbors containing the neighbor indexes for
+#' each sample in `.data`
+#'
 #' @return A `TourExperiment` object with the `neighborSets` slot
 #' filled. 
-#' @importFrom BiocNeighbors findKNN
+#' @importFrom BiocNeighbors findKNN KmknnParam
 #' 
 #' @export
-estimate_neighbors <- function(.data, num_neighbors, from = NULL, .engine) {
+estimate_neighbors <- function(.data, num_neighbors, .on = NULL, .engine = BiocNeighbors::KmknnParam()) {
   
   if (!is(.data, "TourExperiment")) {
     stop(".data is not a TourExperiment object")
   }
   
-  if (is(from, "character") || is.null(from)) {
+  if (!(is(.on, "character") || is.null(.on))) {
     stop("from must be a character(1) or NULL")
   }
   
-  val <- .retrieve_mat(.data, from)
+  val <- .retrieve_mat(.data, .on)
   nn <- BiocNeighbors::findKNN(val, 
                                k = num_neighbors, 
                                get.index = TRUE,
-                               get.distance = TRUE,
+                               get.distance = FALSE,
                                BNPARAM = .engine)
-  # flatten as an adjancey matrix
-  neighborSet(.data, from) <- nn
+  neighborSet(.data, .on) <- nn$index
   .data
 }
 

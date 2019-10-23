@@ -168,6 +168,18 @@ In this case it looks as though t-SNE has worked ok: it has identified
 the three subclusters of the second cluster embededded in 3-dimensions, 
 and seperated the two 10-d clusters.
 
+Next we can estimate the nearest neighbors on both the original dataset
+and in the embedding. This produces a matrix of indices for each row
+giving the nearest neighbor. 
+
+```{r}
+multi_te2 <- estimate_neighbors(multi_te2, 30, .on = "view")
+multi_te2 <- estimate_neighbors(multi_te2, 30, .on = "tsne_exact")
+
+neighborSet(multi_te2, "tsne_exact")
+```
+
+
 
 ## Viewing high-dimensional space
 
