@@ -179,6 +179,19 @@ multi_te2 <- estimate_neighbors(multi_te2, 30, .on = "tsne_exact")
 neighborSet(multi_te2, "tsne_exact")
 ```
 
+You can then view the k-nearest neighbors graph overlaid on the
+scatter via add_neighborhood function:
+
+```{r}
+pl +
+  overlay_neighbors(sampleFactors(tsne)[,1], 
+                    sampleFactors(tsne)[,2], 
+                    neighborSets(multi_te2, "tsne_exact"),
+                    alpha = 0.01)
+
+```
+
+
 
 
 ## Viewing high-dimensional space

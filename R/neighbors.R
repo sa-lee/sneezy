@@ -37,6 +37,20 @@ estimate_neighbors <- function(.data, num_neighbors, .on = NULL, .engine = BiocN
 }
 
 
+overlay_neighbors <- function(x, y, indices, ...) {
+  
+  flattened <- flatten_graph(indices, .subset)
+  
+  mesh <- data.frame(x = x[flattened[,1]],
+                     y = y[flattened[,1]],
+                     xend = x[flattened[,2]],
+                     yend = y[flattened[,2]])
+  ggplot2::geom_segment(data = mesh, 
+                        ggplot2::aes(x = x, xend = xend, y = y, yend = yend),
+                        ...)
+}
+
+
 .retrieve_mat <- function(.data, from = NULL, .subset = NULL) {
   
   if (is.null(from)) {
@@ -102,6 +116,17 @@ norm_args_nn <- function(tsne_coords) {
     coords =  tsne_coords$Y,
     K = 3 * tsne_coords$perplexity
   )
+}
+
+flatten_graph <- function(indices) {
+  n <- nrow(indices)
+  .subset <- seq_len(n)
+  k <- ncol(indices)
+  # reschape into from/to form
+  dim(indices) <- c(n * k, 1)
+  indices <- cbind(rep(.subset, each =  k), indices)
+  colnames(indices) <- c("from", "to")
+  indices
 }
 
 flatten_edges <- function(edges, args, .subset) {
