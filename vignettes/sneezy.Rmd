@@ -1,5 +1,5 @@
 ---
-title: "sneezy"
+title: "Introducing sneezy"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{sneezy}
@@ -18,60 +18,158 @@ knitr::opts_chunk$set(
 library(sneezy)
 ```
 
-# Quick start
+# Exploring non-linear embeddings sneezy
 
-sneezy comes preloaded with some datasets from the 
-[multi-challenge dataset](http://ifs.tuwien.ac.at/dm/dataSets.html). Let's 
-look at a example, consisting two well sepearted Gaussian clusters
+The goal of sneezy is to allow a user to exlpore non-linear embedding
+algorithms such as t-SNE and UMAP in the context of global geometry of
+the original high dimensional space. It does this in a few ways:
+
+* generating a tour of the original (high dimensional) data set
+* estimating and visualising nearest neighbor graphs in the original and embedding space
+* providing numerical and visual diagnostics to determine the quality of the embedding
+
+It provides a unified interface to a selection of embedding methods 
+and nearest neighbor estimation methods. 
+
+
+# The multi-challenge dataset
+
+sneezy comes preloaded with a benchmark from the 
+[multi-challenge dataset](http://ifs.tuwien.ac.at/dm/dataSets.html). 
+
+This data arrives as a simple `tibble` that contains a key indicating 
+the challenge id and an index giving the observation id for that particular
+challenge, the remaining coordinates are the dimensions.
+
+```{r}
+library(sneezy)
+head(multi)
+```
+
+## The TourExperiment object
+
+In order to keep track of the embeddings and transformations on the
+numerical parts of the data, sneezy creates a data structure called a
+TourExperiment. It extends the `SingleCellExperiment::SingleCellExperiment()`
+object with two additional slots called `basisSets` and `neighborSets`,
+we will describe their use in more detail shortly. 
+
+A TourExperiment object can be created from a data.frame or a matrix as follows:
+
+```{r}
+multi_te <- TourExperiment(multi,
+                           basisSets = SimpleList(),
+                           neighborSets = SimpleList(),
+                           X1:X10)
+multi_te
+```
+
+The last argument is the selection of columns that form the numeric data
+that we are interested in exploring the structure of, called an assay
+in the nonmelcature of bioinformatics. Note this is transposed so rows are
+variables and columns are observations.
+
+```{r}
+library(SingleCellExperiment)
+# the x1 - x10 data
+assay(multi_te, "view")[, 1:5]
+```
+
+## Making Shapes
+
+We will start with a simpler look of the data by selecting the keys "A"
+and "D". This consists of two well sepearted Gaussian clusters
 in 10 dimensional space (with same covariance matrix), and two 3-dimensional
 Gaussian clusters embeded in 10 dimensional space. One of the clusters has more granular
 structure and consists of three sub clusters. From the multichallenge dataset
-page this subset is described as follows
+page this subset is described as follows:
 
 > The first subset consists of a Gaussian cluster and another cluster that is itself divided into three Gaussian clusters, all of them living in a three-dimensional space. This subset is used to demonstrate how an algorithm deals with different levels of granularity in cluster structures. The distance between the centers of the two main clusters, i.e. the the big cluster and the cluster that consists of the three smaller ones, is 5 times the standard deviation d of the first main cluster. The three smaller clusters are arranged around the center of the second cluster, which they themselves form, on a circle of radius 5-d equidistant from each other. The three 3 small cluster centers and the center of the large cluster lie in the same plane. The small clusters each have a standard deviation of d and one third of the number of 3 data points of the large cluster.
 
-## Making shapes
+First we will subset the `multi_te` object:
 
-We can get a view of the structure using principal components:
+```{r}
+multi_te2 <- multi_te[, colData(multi_te)$key %in% c("A", "D")]
+colData(multi_te2)$labels <- ifelse(colData(multi_te2)$key == "A", 
+                                    "sub-gaussian", 
+                                    "10-d 2x cluster")
+multi_te2
+```
+
+We can get a view of the structure using exact principal components via
+the `embed_linear` function:
+
+```{r}
+multi_te2 <- embed_linear(multi_te2, 
+                          num_comp = nrow(multi_te2),
+                          .on = "view",
+                          center = TRUE,
+                          .engine = pca_exact())
+multi_te2
+```
+
+This adds an element to the reducedDims slot called `pca_exact()` that
+stores the sample factors, and loadings for the principal components.
+
+```{r}
+pcs <- reducedDim(multi_te2, "pca_exact")
+pcs
+```
+
+The resulting principal components can be viewed via ggplot2:
 
 ```{r}
 library(ggplot2)
-library(gganimate) # required for printing tours
-library(sneezy)
-theme_set(theme_bw())
-spheres <- subset(multi, key %in% c("A", "D"))
-labels <- ifelse(spheres$key == "A", "sub-gaussian", "10-d 2x cluster")
-spheres <- as.matrix(spheres[, -c(1,2)])
-
-pc <- prcomp(spheres)
-asp <- sqrt(pc$sdev[1] / pc$sdev[2])
-ggplot(as.data.frame(pc$x), aes(PC1, PC2)) +
-  geom_point(aes(colour = labels)) +
-  coord_fixed(asp)
-
+ggplot(
+  data.frame(sampleFactors(pcs), labels = colData(multi_te2)$labels),
+  aes(x = PC1, y = PC2)
+  ) +
+  geom_point(aes(colour = labels))
 ```
 
-And the equivalent t-SNE, with our simplified wrapper which computes
-exact t-SNE for a given perplexity and exaggeration factor alpha. 
+From the PCs we can clearly see the separation of the two 10-d clusters
+but cannot see the finer structure in the sub-gaussian clusters. 
 
-In this case it looks as though t-SNE has worked well: it has identified 
-the three  subclusters of the second cluster embededded in 3-dimensions, 
-and seperated the two 10-d clusters.
+At this point we can compute exact t-SNE for a given perpelexity and
+exaggeration factor alpha:
 
 ```{r}
 set.seed(1010010)
-coords <- basic_tsne(spheres, perplexity = 30)
-pl <- ggplot(as.data.frame(coords$Y), aes(V1, V2)) +
+multi_te2 <- embed_nonlinear(
+  multi_te2,
+  num_comp = 2,
+  .on = "view", 
+  .engine = tsne_exact(perplexity = 10, alpha = ncol(multi_te2) / 10)
+)
+
+tsne <- reducedDim(multi_te2, "tsne_exact")
+```
+
+And we can follow the same approach as before for 
+visualising the results:
+
+```{r}
+pl <- ggplot(
+  data.frame(sampleFactors(tsne), labels = colData(multi_te2)$labels),
+  aes(x = Dim1, y = Dim2)
+) +
   geom_point(aes(colour = labels)) +
-  coord_equal() +
   scale_color_brewer(palette = "Dark2") +
   theme(axis.title = element_blank(), 
         axis.ticks = element_blank(), 
         axis.text = element_blank(),
         panel.grid = element_blank())
-pl
+
+pl  
+
 ```
 
+In this case it looks as though t-SNE has worked ok: it has identified 
+the three subclusters of the second cluster embededded in 3-dimensions, 
+and seperated the two 10-d clusters.
+
+
+## Viewing high-dimensional space
 
 We can also tour around a data space, and see how the nearest neighbours
 graph from t-SNE space is preserved in high-dimensional space. We can take

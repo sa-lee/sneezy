@@ -14,9 +14,15 @@
     .name <- as.character(substitute(.engine))[1]
     res <- do.call(fun, args)
     
-        
-    reducedDim(.data,  .name) <- NonLinearEmbeddingMatrix(res$Y,
-                                                          param = .engine) 
+    sf <- res$Y
+    fl <- matrix(ncol = ncol(sf))
+    nlem <- NonLinearEmbeddingMatrix(sampleFactors = sf,
+                                     featureLoadings = fl,
+                                     param = .engine)
+    
+    colnames(nlem) <- paste0("Dim", seq_len(ncol(sf)))
+    
+    reducedDim(.data,  .name) <- nlem
     
     .data
   

@@ -10,13 +10,7 @@ multi <- read_tsv(url, col_names = FALSE) %>%
     index = rep(seq_len(200), 5),
     key = rep(LETTERS[1:5], each = 200L)
   ) %>%
-  select(key, index, X1:X10)
-
-# turn it into a TourExperiment object
-multi <- TourExperiment(multi,
-                        S4Vectors::SimpleList(),
-                        S4Vectors::SimpleList(),
-                        X1:X10)
-
+  select(key, index, X1:X10) %>% 
+  as.data.frame()
 
 usethis::use_data(multi, overwrite = TRUE)
