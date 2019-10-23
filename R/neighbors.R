@@ -37,6 +37,14 @@ estimate_neighbors <- function(.data, num_neighbors, .on = NULL, .engine = BiocN
 }
 
 
+#' Overlay a neighborSet on a set of xy coordinates
+#' 
+#' @param x,y numeric vectors to produce segments from
+#' @param indices a neighborSet index matrix
+#' @param ... additional arguments to pass to [ggplot2::geom_segment]
+#' 
+#' @export
+#' @importFrom ggplot2 geom_segment
 overlay_neighbors <- function(x, y, indices, ...) {
   
   flattened <- flatten_graph(indices, .subset)
@@ -110,14 +118,6 @@ get_centroids_from_nn <- function(data, tsne_coords) {
   
 }
 
-
-norm_args_nn <- function(tsne_coords) {
-  list(
-    coords =  tsne_coords$Y,
-    K = 3 * tsne_coords$perplexity
-  )
-}
-
 flatten_graph <- function(indices) {
   n <- nrow(indices)
   .subset <- seq_len(n)
@@ -129,20 +129,6 @@ flatten_graph <- function(indices) {
   indices
 }
 
-flatten_edges <- function(edges, args, .subset) {
-  # set up dimensions
-  if (!is.null(.subset)) {
-    n <- length(.subset)
-  } else {
-    n <- nrow(args$coords)
-    .subset <- seq_len(n)
-  }
-  # reshape to include from edges
-  dim(edges) <- c(n * args$K, 1)
-  edges <- cbind(rep(.subset, each = args$K), edges)
-  colnames(edges) <- c("from", "to")
-  edges 
-}
 
 
 compute_flat_dist <- function(data, coords) {
