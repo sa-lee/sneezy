@@ -1,4 +1,4 @@
-#' Esiimate k-nearest neighbours graph from a TourExperiment object
+#' Estimate k-nearest neighbours graph from a TourExperiment object
 #' 
 #' @param .data a `TourExperiment` object 
 #' @param num_neighbors An integer scalar for number of neighbors
@@ -19,14 +19,15 @@
 estimate_neighbors <- function(.data, num_neighbors, .on = NULL, .engine = BiocNeighbors::KmknnParam()) {
   
   if (!is(.data, "TourExperiment")) {
-    stop(".data is not a TourExperiment object")
+    stop("`.data` must be a TourExperiment object")
   }
   
   if (!(is(.on, "character") || is.null(.on))) {
-    stop("from must be a character(1) or NULL")
+    stop("`.on` must be a character(1) vector or NULL")
   }
   
   val <- .retrieve_mat(.data, .on)
+  
   nn <- BiocNeighbors::findKNN(val, 
                                k = num_neighbors, 
                                get.index = TRUE,
@@ -47,86 +48,87 @@ estimate_neighbors <- function(.data, num_neighbors, .on = NULL, .engine = BiocN
 #' @importFrom ggplot2 geom_segment
 overlay_neighbors <- function(x, y, indices, ...) {
   
-  flattened <- flatten_graph(indices, .subset)
-  
-  mesh <- data.frame(x = x[flattened[,1]],
-                     y = y[flattened[,1]],
-                     xend = x[flattened[,2]],
-                     yend = y[flattened[,2]])
-  ggplot2::geom_segment(data = mesh, 
-                        ggplot2::aes(x = x, xend = xend, y = y, yend = yend),
-                        ...)
+  flattened <- flatten_graph(indices)
+  mesh <- create_mesh(x,y, flattened)
+  add_segments(mesh, 
+               ggplot2::vars(xend = xend, yend = yend),
+               ...)
 }
 
-
-.retrieve_mat <- function(.data, from = NULL, .subset = NULL) {
+overlay_shared_neighbors <- function(x, y, indices, type = "rank", ...) {
+  flattened <- scran::neighborsToSNNGraph(indices, type = type)
+  flattened <- igraph::get.data.frame(flattened,what = "edges")
+  mesh <- cbind(create_mesh(x,y, flattened), 
+                weight = flattened[["weight"]])
+  add_segments(mesh,
+               ggplot2::vars(xend = xend, yend = yend, alpha = weight),
+               ...)
   
-  if (is.null(from)) {
-    res <- t(assay(.data))
-  } else {
-    # check slots
-    # idea is to get named assay unless there's a reducedDim slot
-    # if there isn't then throw an error
-    a_selector <- intersect(from, SummarizedExperiment::assayNames(.data))
-    if (length(a_selector) == 0) {
-      rd_selector <- intersect(from, SingleCellExperiment::reducedDimNames(.data))
-      if (length(rd_selector) == 0) {
-        stop(paste("`from`:", from, "is not available in object."))
-      }
-      # subset is ignored if returning a reducedDim slot
-      return(SingleCellExperiment::reducedDim(.data, rd_selector))
-    } else {
-      
-      res <- t(SummarizedExperiment::assay(.data, a_selector))
-    }
-  }
-  
-  if (!is.null(.subset)) {
-    return(res[, .subset])
-  }
-  res
 }
 
-get_centroids_from_nn <- function(data, tsne_coords) {
-  args <- norm_args_nn(tsne_coords)
-  
-  nn <- BiocNeighbors::findKNN(args$coords, 
-                               k = args$K / 3, 
-                               get.index = TRUE,
-                               get.distance = FALSE)
-  
-  edges <- nn$index
-  
-  # centroids for each neighbour
-  seen <- integer(nrow(edges))
-  centroids <- matrix(nrow = nrow(edges), ncol = ncol(data))
-  colnames(centroids) <- colnames(data)
-  for (i in seq_len(nrow(edges))) {
-    if (i %in% seen) {
-      next
-    } 
-    inx <- edges[i,]
-    seen <- c(i, inx, seen)
-    centroids[i, ] <- colMeans(data[inx,,drop = FALSE])
-  }
-  
-  centroids[!is.na(centroids[,1]), ]
-  
-  #t(apply(edges, 1, function(.x) colMeans(args$coords[.x, ])))
-  
-  
-  
+create_mesh <- function(x, y, flattened) {
+  data.frame(x = x[flattened[,1]],
+             y = y[flattened[,1]],
+             xend = x[flattened[,2]],
+             yend = y[flattened[,2]])
+}
+
+add_segments <- function(mesh, aes, ...) {
+  ggplot2::geom_segment(
+    data = mesh, 
+    ggplot2::aes(x, y, !!!aes),
+    ...
+  )
+}
+
+centroids_by_groups <- function(groups, x, y) {
+  centroids <- lapply(groups, function(inx) {
+    x <- mean(x[inx])
+    y <- mean(y[inx])
+    c(x = x, y = y)
+  })
+  as.data.frame(do.call("rbind", centroids))
+}
+
+estimate_knn_centroids <- function(x, y, indices) {
+  knn <- scran::neighborsToKNNGraph(indices)
+  clust <- igraph::cluster_louvain(knn)
+  groups <- igraph::communities(clust)
+  centroids_by_groups(groups, x, y)
+}
+
+estimate_snn_centroids <- function(x, y, indices) {
+  snn <- scran::neighborsToSNNGraph(indices)
+  clust <- igraph::cluster_louvain(snn)
+  groups <- igraph::communities(clust)
+  centroids_by_groups(groups, x, y)
+}
+
+estimate_kmeans <- function(x, y, num_centers) {
+  kmeans(cbind(x = x, y = y), centers = num_centers)
+}
+
+overlay_knn_centroids <- function(x, y, indices, ...) {
+  vals <- estimate_knn_centroids(x,y,indices)
+  ggplot2::geom_point(data = vals, ggplot2::aes(x = x, y = y), ...)
+}
+
+overlay_snn_centroids <- function(x, y, indices, ...) {
+  vals <- estimate_snn_centroids(x,y,indices)
+  ggplot2::geom_point(data = vals, ggplot2::aes(x = x, y = y), ...)
+}
+
+overlay_kmeans_centroids <- function(x, y, num_centers, ...) {
+  vals <- as.data.frame(estimate_kmeans(x, y, num_centers)$centers)
+  ggplot2::geom_point(data = vals, ggplot2::aes(x = x, y = y), ...)
 }
 
 flatten_graph <- function(indices) {
-  n <- nrow(indices)
-  .subset <- seq_len(n)
-  k <- ncol(indices)
-  # reschape into from/to form
-  dim(indices) <- c(n * k, 1)
-  indices <- cbind(rep(.subset, each =  k), indices)
-  colnames(indices) <- c("from", "to")
-  indices
+  
+  from <- as.vector(row(indices))
+  to <- as.vector(indices)
+  cbind("from" = from, "to" = to)
+  
 }
 
 

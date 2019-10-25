@@ -139,7 +139,7 @@ multi_te2 <- embed_nonlinear(
   multi_te2,
   num_comp = 2,
   .on = "view", 
-  .engine = tsne_exact(perplexity = 10, alpha = ncol(multi_te2) / 10)
+  .engine = tsne_exact(perplexity = 30, alpha = ncol(multi_te2) / 10)
 )
 
 tsne <- reducedDim(multi_te2, "tsne_exact")
@@ -165,34 +165,59 @@ pl
 ```
 
 In this case it looks as though t-SNE has worked ok: it has identified 
-the three subclusters of the second cluster embededded in 3-dimensions, 
-and seperated the two 10-d clusters.
+the three subclusters of the second cluster for the orange points, 
+and seperated the two ten dimensional clusters.
 
 Next we can estimate the nearest neighbors on both the original dataset
 and in the embedding. This produces a matrix of indices for each row
 giving the nearest neighbor. 
 
 ```{r}
-multi_te2 <- estimate_neighbors(multi_te2, 30, .on = "view")
-multi_te2 <- estimate_neighbors(multi_te2, 30, .on = "tsne_exact")
+multi_te2 <- estimate_neighbors(multi_te2, 90, .on = "view")
+multi_te2 <- estimate_neighbors(multi_te2, 90, .on = "tsne_exact")
 
-neighborSet(multi_te2, "tsne_exact")
+dim(neighborSet(multi_te2, "tsne_exact"))
 ```
 
 You can then view the k-nearest neighbors graph overlaid on the
-scatter via add_neighborhood function:
+scatter via the `overlay_neighbors()` function:
 
 ```{r}
 pl +
   overlay_neighbors(sampleFactors(tsne)[,1], 
                     sampleFactors(tsne)[,2], 
-                    neighborSets(multi_te2, "tsne_exact"),
+                    neighborSet(multi_te2, "tsne_exact"),
                     alpha = 0.01)
 
 ```
 
+This can give us a direct visualisation of how the difference
+between the emphasis t-SNE provides on local geometry by viewing
+the k-NN graph from the original dataset on the t-SNE layout.
 
+```{r}
+pl +
+  overlay_neighbors(sampleFactors(tsne)[,1], 
+                    sampleFactors(tsne)[,2], 
+                    neighborSet(multi_te2, "view"),
+                    alpha = 0.01)
+```
 
+Sometimes the graph view can be messy, especially when there's lots of neighbors. Instead we can estimate the centroids of clusters seen in the
+embedding by clustering the complete kNN or the shared nearest neighbor (sNN) graph. 
+
+```{r}
+pl +
+  overlay_knn_centroids(sampleFactors(tsne)[,1], 
+                        sampleFactors(tsne)[,2], 
+                        neighborSet(multi_te2, "tsne_exact"),
+                        color = "darkblue") +
+  overlay_snn_centroids(sampleFactors(tsne)[,1], 
+                        sampleFactors(tsne)[,2], 
+                        neighborSet(multi_te2, "tsne_exact"),
+                        color = "darkred") 
+
+```
 
 ## Viewing high-dimensional space
 
