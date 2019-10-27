@@ -2,16 +2,17 @@
 % Please edit documentation in R/neighbors.R
 \name{estimate_neighbors}
 \alias{estimate_neighbors}
-\title{Esiimate k-nearest neighbours graph from a TourExperiment object}
+\title{Estimate k-nearest neighbours graph from a TourExperiment object}
 \usage{
-estimate_neighbors(.data, num_neighbors, from = NULL, .engine)
+estimate_neighbors(.data, num_neighbors, .on = NULL,
+  .engine = BiocNeighbors::KmknnParam())
 }
 \arguments{
 \item{.data}{a \code{TourExperiment} object}
 
 \item{num_neighbors}{An integer scalar for number of neighbors}
 
-\item{from}{a character scalar, indicating the part of \code{.data} to
+\item{.on}{a character scalar, indicating the part of \code{.data} to
 estimate nearest neighbors. If missing the first assay will be used.}
 
 \item{.engine}{A \code{BiocNeighbor::BiocNeighborParam()} object that
@@ -22,11 +23,10 @@ A \code{TourExperiment} object with the \code{neighborSets} slot
 filled.
 }
 \description{
-Esiimate k-nearest neighbours graph from a TourExperiment object
+Estimate k-nearest neighbours graph from a TourExperiment object
 }
 \details{
-The representation of the nearest neighbors is a list with
-two elements, one called \code{index} containing a matrix of the nearest
-neighbor indexes and another \code{distance} containing the distance
-to each neighbor.
+The representation of the nearest neighbors is a matrix of
+size ncol(.data) by num_neighbors containing the neighbor indexes for
+each sample in \code{.data}
 }

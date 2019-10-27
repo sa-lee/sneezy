@@ -25,7 +25,6 @@ sneezy_neighbors <- function(.data, basis, neighbor, ...) {
 
   # set up display
   dxy <- tourr::display_xy(edges = n_set, ...)
-  
   tourr::render_gif(vals, tour_path = plan)
 }
 
