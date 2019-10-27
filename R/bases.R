@@ -39,6 +39,7 @@ setMethod("generate_bases",
           })
 
 
+#' @export
 setMethod("generate_bases",
           signature = "LinearEmbeddingMatrix",
           function(.data, .on = NULL, clamp = FALSE, max_bases = 100, start = NULL, step_size = Inf, .engine = tourr::grand_tour()) {
