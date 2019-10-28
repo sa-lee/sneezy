@@ -1,5 +1,6 @@
 #' Linear Embedding Drivers
 #' 
+#' @inheritParams BiocSingular::ExactParam 
 #' @details Different engines for computing 
 #' linear embeddings (mostly PCA at this stage). Usually you
 #' won't need to interact with these functions directly.
@@ -10,9 +11,13 @@
 #' @importFrom BiocSingular ExactParam IrlbaParam RandomParam
 #' @export
 pca_exact <- BiocSingular::ExactParam
+
+#' @inheritParams BiocSingular::IrlbaParam
 #' @rdname le-backends
 #' @export
 pca_irlba <- BiocSingular::IrlbaParam
+
+#' @inheritParams BiocSingular::RandomParam
 #' @rdname le-backends
 #' @export
 pca_random <- BiocSingular::RandomParam
@@ -27,6 +32,8 @@ pca_random <- BiocSingular::RandomParam
 }
 
 
+#' @name embed_linear
+#' @rdname embed_linear
 #' @export
 setMethod("embed_linear", 
           "missing", 
@@ -42,6 +49,8 @@ setMethod("embed_linear",
           })
 
 
+#' @name embed_linear
+#' @rdname embed_linear
 #' @importClassesFrom BiocSingular BiocSingularParam
 #' @importFrom BiocSingular runPCA
 #' @importFrom SummarizedExperiment assay

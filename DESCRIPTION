@@ -12,30 +12,33 @@ Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.1.1
+Depends: R (>= 3.6)
 Imports: 
-    tourr,
-    Rtsne,
+    tourr (>= 0.5.6),
+    Rtsne (>= 0.15),
     stats,
-    BiocNeighbors,
-    shiny,
+    BiocNeighbors (>= 1.3.5),
+    shiny (>= 1.4.0),
     methods,
-    SingleCellExperiment,
-    BiocSingular,
+    SingleCellExperiment (>= 1.7.11),
+    BiocSingular (>= 1.1.7),
     utils,
-    plotly,
-    ggplot2,
-    igraph,
-    scran,
-    S4Vectors,
-    SummarizedExperiment
+    plotly (>= 4.9.0),
+    ggplot2 (>= 3.2.1),
+    igraph (>= 1.2.4.1),
+    scran (>= 1.13.32),
+    S4Vectors (>= 0.23.25),
+    SummarizedExperiment (>= 1.15.9),
+    DelayedArray
 URL: https://github.com/sa-lee/sneezy
 BugReports: https://github.com/sa-lee/sneezy/issues
 Suggests: 
-    gifski,
-    gganimate,
-    knitr,
-    rmarkdown,
+    gifski (>= 0.8.6),
+    gganimate (>= 1.0.3),
+    knitr (>= 1.25),
+    rmarkdown (>= 1.16),
     testthat (>= 2.1.0),
-    dplyr,
-    scater
+    dplyr (>= 0.8.3),
+    scater (>= 1.13.27),
+    TENxPBMCData (>= 1.3.0)
 VignetteBuilder: knitr

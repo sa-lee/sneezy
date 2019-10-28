@@ -2,6 +2,7 @@
 % Please edit documentation in R/AllGenerics.R
 \name{view_tour_xy}
 \alias{view_tour_xy}
+\alias{view_tour_xy,TourExperiment-method}
 \title{Project a data set onto a basis set}
 \usage{
 view_tour_xy(.data, .on = NULL, .subset = NULL, .color = NULL,

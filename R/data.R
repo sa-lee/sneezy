@@ -30,6 +30,11 @@
 "multi"
 
 
+#' pdfsense data
+#' @details 56 variables summarised over many particle physics experiments
+#' @source [http://www.physics.smu.edu/botingw/PDFsense_web_histlogy](http://www.physics.smu.edu/botingw/PDFsense_web_histlogy)
+"pdfsense"
+
 #' Sample from a p-dimensional solid sphere
 #' 
 #' @param n number of samples

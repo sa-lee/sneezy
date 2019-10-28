@@ -35,6 +35,7 @@ fproj_dist <- function(x, y) {
 
 # rescale to have values lie in [0,1]. Unlike the tourr version
 # allows for a DelayedArray backend
+#' @importFrom DelayedArray colRanges
 .rescale <- function(.data) {
   rng <- DelayedArray::colRanges(.data)
   vals <- sweep(.data, 2, rng[,1])
@@ -56,12 +57,16 @@ flatten_graph <- function(indices) {
 
 flatten_array <- function(projs) Map(function(x) x[[1]], apply(projs, 3, list))
 
+#' @rdname compute_half_range
+#' @name compute_half_range
 #' @export
 setMethod("compute_half_range", 
           "ANY", 
           function(.data)   max(sqrt(rowSums(.data^2)))
 )
 
+#' @rdname compute_half_range
+#' @name compute_half_range
 #' @export
 setMethod("compute_half_range", 
           "LinearEmbeddingMatrix",

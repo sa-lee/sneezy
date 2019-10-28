@@ -13,6 +13,7 @@
 \alias{neighborSet<-}
 \alias{neighborSets<-}
 \alias{neighborSetNames<-}
+\alias{neighborSets<-,TourExperiment-method}
 \alias{neighborSet<-,TourExperiment,missing-method}
 \alias{neighborSet<-,TourExperiment,numeric-method}
 \alias{neighborSet<-,TourExperiment,character-method}

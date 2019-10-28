@@ -2,6 +2,9 @@
 % Please edit documentation in R/AllGenerics.R
 \name{view_xy}
 \alias{view_xy}
+\alias{view_xy,DFrame-method}
+\alias{view_xy,LinearEmbeddingMatrix-method}
+\alias{view_xy,matrix-method}
 \title{Create a simple interactive scatter-plot}
 \usage{
 view_xy(.data, .on = NULL, .x, .y, .color, ...)

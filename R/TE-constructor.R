@@ -1,5 +1,5 @@
 #' @param object a `TourExperiment` object
-#' @name TourExperiment
+#' @name TourExperiment-class
 #' @rdname TourExperiment-class 
 #' @export
 setMethod("show", "TourExperiment", function(object) {

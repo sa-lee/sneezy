@@ -30,7 +30,7 @@ tsne_approx(perplexity, alpha, theta, ...)
 
 \item{alpha}{The exaggeration factor parameter for t-SNE}
 
-\item{...}{additional arguments forwarded to other methods}
+\item{...}{additional arguments forwarded to  \link[Rtsne:Rtsne]{Rtsne::Rtsne}}
 
 \item{theta}{The speed/accuracy trade-off parameter.}
 }
@@ -44,10 +44,8 @@ two concrete classes, \code{tsneParam} and \code{tsneNeighborsParam}. The
 interfaces to created these functions.
 }
 \examples{
-
-tsne_exact()
-
+tsne_exact(perplexity = 30, alpha = 10)
 }
 \seealso{
-\code{embed_nonlinear()}
+\code{\link[=embed_nonlinear]{embed_nonlinear()}}
 }

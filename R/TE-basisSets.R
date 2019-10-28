@@ -8,6 +8,9 @@ setMethod("basisSets", "TourExperiment",
 
 is_arrayish <- function(x)  is(x, "array") || is(x, "DelayedArray")
 
+#' @name basisSets
+#' @rdname basisSets
+#' @export
 setReplaceMethod("basisSets",
                  "TourExperiment",
                  function(x, value) {

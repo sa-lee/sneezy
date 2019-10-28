@@ -26,7 +26,8 @@
   projs
 }
 
-
+#' @name generate_bases
+#' @rdname generate_bases
 #' @export
 setMethod("generate_bases",
           signature = "ANY",
@@ -39,6 +40,8 @@ setMethod("generate_bases",
           })
 
 
+#' @name generate_bases
+#' @rdname generate_bases
 #' @export
 setMethod("generate_bases",
           signature = "LinearEmbeddingMatrix",
@@ -47,7 +50,8 @@ setMethod("generate_bases",
             generate_bases(vals, .on, clamp, max_bases, start, step_size, .engine)
           })
             
-
+#' @name generate_bases
+#' @rdname generate_bases
 #' @export
 setMethod("generate_bases",
           signature = "TourExperiment",

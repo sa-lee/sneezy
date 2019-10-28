@@ -2,7 +2,8 @@
 % Please edit documentation in R/AllClasses.R, R/AllGenerics.R,
 %   R/TE-constructor.R
 \docType{class}
-\name{TourExperiment}
+\name{TourExperiment-class}
+\alias{TourExperiment-class}
 \alias{TourExperiment}
 \alias{show,TourExperiment-method}
 \alias{TourExperiment,SingleCellExperiment-method}
@@ -72,10 +73,13 @@ te_sphere
 
 # convert a data.frame to a TourExperiment object
 # this allows you to select columns that will form the assay data
-te_olive <- TourExperiment(tourr::olive, palmitic:eicosenoic)
+te_olive <- TourExperiment(tourr::olive, 
+                           S4Vectors::SimpleList(), 
+                           S4Vectors::SimpleList(), 
+                           palmitic:eicosenoic)
 te_olive
 
 }
 \seealso{
-\code{basisSets()}, \code{neighborSets()}
+\code{\link[=basisSets]{basisSets()}}, \code{\link[=neighborSets]{neighborSets()}}
 }

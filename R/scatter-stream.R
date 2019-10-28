@@ -83,11 +83,21 @@ tour_server <- function(vals, plan, .color, start, steps, angle, fps) {
     
     # tour shell
     output$plot <- plotly::renderPlotly({
-      
-      plotly::layout(
-        view_xy(init, .x = 1, .y = 2, .color = .color),
+      base <- plotly::plot_ly(type = "scattergl", mode = "markers")
+      base <- plotly::add_markers(base, 
+                                          x = init[,1], 
+                                          y = init[,2], 
+                                          color = .color,
+                                          frame = 1)
+      base <- plotly::layout(
+        base,
         xaxis = ax,
         yaxis = c(ax, list(scaleanchor = "x")) # fixed aspect ratio
+      )
+      plotly::animation_opts(base,
+        frame = 1000/fps,
+        transition = 0,
+        redraw = FALSE
       )
     })
     

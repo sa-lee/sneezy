@@ -54,10 +54,9 @@ sneezy_centroids <- function(.data, basis, neighbor, ...) {
   extra_args <- list(...)
   
   if ("col" %in% names(extra_args)) {
-    col <- scales::alpha(c(extra_args[["col"]], 
-                           rep("red", nrow(centroids))))
+    col <- c(extra_args[["col"]], rep("red", nrow(centroids)))
   } else {
-    col <- scales::alpha(rep("black", nrow(vals)),  centroids.col)
+    col <- c(rep("black", nrow(vals)),  centroids.col)
   }
   
   vals <- rbind(vals, centroids)
@@ -80,4 +79,23 @@ sneezy_centroids <- function(.data, basis, neighbor, ...) {
   # flatten to array
   projs <- flatten_array(projs)
   tourr::planned_tour(projs)
+}
+
+gif_tour <- function(data, tour_path, display, ... ) {
+  dir <- tempdir()
+  png_path <- file.path(dir, "frame%03d.png")
+  
+  tourr::render(data,
+                tour_path = tour_path,
+                display = display,
+                dev = "png",
+                png_path,
+                frames = 200,
+                ...
+  )
+  png_files <- sprintf(png_path, 1:200)
+  gif_file <- tempfile(fileext = ".gif")
+  gifski::gifski(png_files, gif_file, delay = 0.25, progress = TRUE)
+  on.exit(unlink(png_files))
+  gganimate::gif_file(gif_file)
 }

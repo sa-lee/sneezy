@@ -12,6 +12,16 @@ pca_irlba(deferred = FALSE, fold = Inf, extra.work = 7, ...)
 
 pca_random(deferred = FALSE, fold = Inf, ...)
 }
+\arguments{
+\item{deferred}{Logical scalar indicating whether centering/scaling should be deferred, see \code{?"\link{BiocSingular-options}"}.}
+
+\item{fold}{Numeric scalar specifying the minimum fold-difference for cross-product calculation, see \code{?"\link{BiocSingular-options}"}.}
+
+\item{extra.work}{Integer scalar, additional dimensionality of the workspace in \code{\link{runIrlbaSVD}}.}
+
+\item{...}{Additional arguments to pass to \code{\link{runIrlbaSVD}} or \code{\link{runRandomSVD}}.
+    This should not include any named arguments in those functions.}
+}
 \value{
 A \code{BiocSingular::BiocSingularParam()} object.
 }

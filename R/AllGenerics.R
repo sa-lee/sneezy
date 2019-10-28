@@ -40,6 +40,7 @@ setGeneric("TourExperiment",
 #' basisSet,TourExperiment,character-method
 #' basisSetNames,TourExperiment-method 
 #' basisSet<- basisSets<- basisSetNames<- 
+#' basisSets<-,TourExperiment-method
 #' basisSet<-,TourExperiment,missing-method
 #' basisSet<-,TourExperiment,numeric-method
 #' basisSet<-,TourExperiment,character-method
@@ -93,6 +94,7 @@ setGeneric("basisSetNames<-", function(x, type, ..., value) standardGeneric("bas
 #' neighborSet,TourExperiment,character-method
 #' neighborSetNames,TourExperiment-method 
 #' neighborSet<- neighborSets<- neighborSetNames<-
+#' neighborSets<-,TourExperiment-method
 #' neighborSet<-,TourExperiment,missing-method
 #' neighborSet<-,TourExperiment,numeric-method
 #' neighborSet<-,TourExperiment,character-method
@@ -156,7 +158,12 @@ setMethod("nleArgs", "NonLinearEmbeddingParam", function(object) object@args)
 #' 
 #' 
 #' 
-#' @export 
+#' @export
+#' @name embed_linear
+#' @rdname embed_linear
+#' @aliases 
+#' embed_linear,BiocSingularParam-method
+#' embed_linear,missing-method
 setGeneric(
   "embed_linear", 
   signature = ".engine",
@@ -214,6 +221,12 @@ setGeneric(
 #' @param step_size Distance between each step, set to `Inf` which forces new basis generation
 #' @param .engine A tour path generator (defaults to [tourr::grand_tour()])
 #' @export
+#' @name generate_bases
+#' @rdname generate_bases
+#' @aliases 
+#' generate_bases,ANY-method
+#' generate_bases,LinearEmbeddingMatrix-method
+#' generate_bases,TourExperiment-method
 setGeneric("generate_bases",
            signature = ".data",
            function(.data, .on = NULL, clamp = FALSE, max_bases = 100, start = NULL, step_size = Inf, .engine = tourr::grand_tour()) {
@@ -228,7 +241,12 @@ setGeneric("generate_bases",
 #' Euclidean distance of rows in a matrix like object. Mostly used
 #' internally for setting up xy-axis ranges for a tour animation.
 #' 
+#' @rdname compute_half_range
+#' @name compute_half_range
 #' @export
+#' @aliases 
+#' compute_half_range,ANY-method
+#' compute_half_range,LinearEmbeddingMatrix-method
 setGeneric(
   "compute_half_range",
   signature = ".data",
@@ -247,6 +265,10 @@ setGeneric(
 #' @param ... additional args
 #' 
 #' @export
+#' @aliases 
+#' view_xy,DFrame-method
+#' view_xy,LinearEmbeddingMatrix-method
+#' view_xy,matrix-method
 setGeneric(
   "view_xy", 
   signature = ".data",
@@ -268,10 +290,10 @@ setGeneric(
 #' @param ... Other arguments
 #'      
 #'@export
+#'@aliases
+#' view_tour_xy,TourExperiment-method
 setGeneric("view_tour_xy",
            signature = ".data", 
            function(.data, .on = NULL, .subset = NULL, .color = NULL, clamp = TRUE, aps = 1, fps = NULL, ...) {
              standardGeneric("view_tour_xy")
            })
-
-

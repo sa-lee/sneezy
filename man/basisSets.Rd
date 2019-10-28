@@ -13,6 +13,7 @@
 \alias{basisSet<-}
 \alias{basisSets<-}
 \alias{basisSetNames<-}
+\alias{basisSets<-,TourExperiment-method}
 \alias{basisSet<-,TourExperiment,missing-method}
 \alias{basisSet<-,TourExperiment,numeric-method}
 \alias{basisSet<-,TourExperiment,character-method}
@@ -32,6 +33,8 @@ basisSetNames(x, type, ...)
 basisSetNames(x, type, ...) <- value
 
 \S4method{basisSets}{TourExperiment}(x)
+
+\S4method{basisSets}{TourExperiment}(x) <- value
 
 \S4method{basisSet}{TourExperiment,missing}(x, type)
 

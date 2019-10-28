@@ -27,8 +27,7 @@
 #' @importFrom SingleCellExperiment SingleCellExperiment
 #' @importFrom methods setClass setOldClass setGeneric
 #' 
-#' @seealso `basisSets()`, `neighborSets()`
-#' @export
+#' @seealso [basisSets()], [neighborSets()]
 #' @examples 
 #' sphere <- generate_sphere(1000, 10, mean =  5, sd = 2)
 #' te_sphere <- TourExperiment(sphere)
@@ -36,12 +35,16 @@
 #' 
 #' # convert a data.frame to a TourExperiment object
 #' # this allows you to select columns that will form the assay data
-#' te_olive <- TourExperiment(tourr::olive, palmitic:eicosenoic)
+#' te_olive <- TourExperiment(tourr::olive, 
+#'                            S4Vectors::SimpleList(), 
+#'                            S4Vectors::SimpleList(), 
+#'                            palmitic:eicosenoic)
 #' te_olive
 #' 
 #' @importFrom  S4Vectors SimpleList
-#' @name TourExperiment
-#' @rdname TourExperiment-class     
+#' @name TourExperiment-class
+#' @rdname TourExperiment-class 
+#' @export    
 setClass("TourExperiment", contains = "SingleCellExperiment")
 
 # internal fields
@@ -58,16 +61,14 @@ setClass("TourExperiment", contains = "SingleCellExperiment")
 #' @param perplexity The perplexity paramter for t-SNE
 #' @param alpha The exaggeration factor parameter for t-SNE
 #' @param theta The speed/accuracy trade-off parameter. 
-#' @param ... additional arguments forwarded to other methods
+#' @param ... additional arguments forwarded to  [Rtsne::Rtsne]
 #' 
 #' @rdname NonLinearEmbeddingParam-class
 #' @export
 #' 
-#' @seealso `embed_nonlinear()`
+#' @seealso [embed_nonlinear()]
 #' @examples 
-#' 
-#' tsne_exact()
-#' 
+#' tsne_exact(perplexity = 30, alpha = 10)
 setClass("NonLinearEmbeddingParam", 
          contains = "VIRTUAL",
          slots = c("args" = "list")

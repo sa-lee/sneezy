@@ -5,6 +5,7 @@
 #' @param .x The x aesthetic (a character or integer)
 #' @param .y The y aesthetic (a character or integer)
 #' @param .color The colour aesthetic (either a vector or dimensions from `.on`)
+#' @param ... additional arguments forwarded to [plotly::plot_ly]
 #' 
 #' @importFrom SummarizedExperiment colData
 #' @export

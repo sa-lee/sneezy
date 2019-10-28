@@ -18,6 +18,8 @@
 \item{.y}{The y aesthetic (a character or integer)}
 
 \item{.color}{The colour aesthetic (either a vector or dimensions from \code{.on})}
+
+\item{...}{additional arguments forwarded to \link[plotly:plot_ly]{plotly::plot_ly}}
 }
 \description{
 Simple interactive xy-plots for TourExperiment objects
