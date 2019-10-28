@@ -3,6 +3,20 @@
 \docType{methods}
 \name{neighborSets}
 \alias{neighborSets}
+\alias{neighborSet}
+\alias{neighborSetNames}
+\alias{neighborSets,TourExperiment-method}
+\alias{neighborSet,TourExperiment,missing-method}
+\alias{neighborSet,TourExperiment,numeric-method}
+\alias{neighborSet,TourExperiment,character-method}
+\alias{neighborSetNames,TourExperiment-method}
+\alias{neighborSet<-}
+\alias{neighborSets<-}
+\alias{neighborSetNames<-}
+\alias{neighborSet<-,TourExperiment,missing-method}
+\alias{neighborSet<-,TourExperiment,numeric-method}
+\alias{neighborSet<-,TourExperiment,character-method}
+\alias{neighborSetNames<-,TourExperiment-method}
 \title{Access or set the neighborSets of a TourExperiment}
 \usage{
 neighborSet(x, type, ...)
@@ -11,7 +25,7 @@ neighborSet(x, type, ...) <- value
 
 neighborSets(x, ...)
 
-neighborSets(x, type, ...) <- value
+neighborSets(x, ...) <- value
 
 neighborSetNames(x, type, ...)
 
@@ -43,7 +57,11 @@ neighborSetNames(x, type, ...) <- value
 
 \item{type}{the name or a number of the list to access}
 
+\item{...}{additional arguments}
+
 \item{value}{a matrix to assign to an element of basisSets}
+
+\item{withDimnames}{include row and column names in output?}
 }
 \value{
 a \code{TourExperiment} object

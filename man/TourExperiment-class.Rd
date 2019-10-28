@@ -4,6 +4,11 @@
 \docType{class}
 \name{TourExperiment}
 \alias{TourExperiment}
+\alias{show,TourExperiment-method}
+\alias{TourExperiment,SingleCellExperiment-method}
+\alias{TourExperiment,SummarizedExperiment-method}
+\alias{TourExperiment,matrix-method}
+\alias{TourExperiment,data.frame-method}
 \title{Represent a data.frame or matrix or assay-like object as a \code{TourExperiment}}
 \usage{
 TourExperiment(.data, basisSets = S4Vectors::SimpleList(),
@@ -38,6 +43,8 @@ TourExperiment(.data, basisSets = S4Vectors::SimpleList(),
 every other column not included in \code{...} will become colData, the names
 of the columns selected with \code{...} will be become row names in the resulting
 object.}
+
+\item{object}{a \code{TourExperiment} object}
 
 \item{viewAs}{the type of matrix if \code{.data} is a data.frame (default is numeric matrix).}
 }

@@ -1,3 +1,4 @@
+#' @param object a `TourExperiment` object
 #' @name TourExperiment
 #' @rdname TourExperiment-class 
 #' @export

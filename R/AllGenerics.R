@@ -4,7 +4,15 @@
 
 #' @name TourExperiment
 #' @rdname TourExperiment-class 
-#' @export    
+#' @importFrom methods as callNextMethod is new show
+#' @export
+#' @aliases 
+#' show,TourExperiment-method
+#' TourExperiment,SingleCellExperiment-method
+#' TourExperiment,SummarizedExperiment-method
+#' TourExperiment,matrix-method
+#' TourExperiment,data.frame-method
+#'         
 setGeneric("TourExperiment", 
            signature = ".data", 
            function(.data, basisSets = S4Vectors::SimpleList(), neighborSets = S4Vectors::SimpleList(), ...) {
@@ -16,6 +24,7 @@ setGeneric("TourExperiment",
 #' @param x an object (a TourExperiment)
 #' @param type the name or a number of the list to access
 #' @param value a matrix to assign to an element of basisSets
+#' @param ... optional arguments passed to downstream methods
 #' 
 #' @return a `TourExperiment` object
 #' 
@@ -23,6 +32,19 @@ setGeneric("TourExperiment",
 #' @rdname basisSets
 #' @importFrom SingleCellExperiment int_metadata int_metadata<-
 #' @export
+#' @aliases 
+#' basisSet basisSetNames 
+#' basisSets,TourExperiment-method
+#' basisSet,TourExperiment,missing-method
+#' basisSet,TourExperiment,numeric-method
+#' basisSet,TourExperiment,character-method
+#' basisSetNames,TourExperiment-method 
+#' basisSet<- basisSets<- basisSetNames<- 
+#' basisSet<-,TourExperiment,missing-method
+#' basisSet<-,TourExperiment,numeric-method
+#' basisSet<-,TourExperiment,character-method
+#' basisSetNames<-,TourExperiment-method
+#' 
 setGeneric("basisSet", function(x, type, ...) standardGeneric("basisSet"))
 
 #' @name basisSets
@@ -55,12 +77,26 @@ setGeneric("basisSetNames<-", function(x, type, ..., value) standardGeneric("bas
 #' @param x an object (a TourExperiment)
 #' @param type the name or a number of the list to access
 #' @param value a matrix to assign to an element of basisSets
+#' @param withDimnames include row and column names in output?
+#' @param ... additional arguments
 #' 
 #' @return a `TourExperiment` object
 #' 
 #' @name neighborSets
 #' @rdname neighborSets
 #' @export
+#' @aliases 
+#' neighborSet neighborSets neighborSetNames
+#' neighborSets,TourExperiment-method
+#' neighborSet,TourExperiment,missing-method
+#' neighborSet,TourExperiment,numeric-method
+#' neighborSet,TourExperiment,character-method
+#' neighborSetNames,TourExperiment-method 
+#' neighborSet<- neighborSets<- neighborSetNames<-
+#' neighborSet<-,TourExperiment,missing-method
+#' neighborSet<-,TourExperiment,numeric-method
+#' neighborSet<-,TourExperiment,character-method
+#' neighborSetNames<-,TourExperiment-method
 setGeneric("neighborSet", function(x, type, ...) standardGeneric("neighborSet"))
 
 #' @name neighborSets
@@ -76,7 +112,7 @@ setGeneric("neighborSets", function(x, ...) standardGeneric("neighborSets"))
 #' @name neighborSets
 #' @rdname neighborSets
 #' @export
-setGeneric("neighborSets<-", function(x, type, ...) standardGeneric("neighborSets<-"))
+setGeneric("neighborSets<-", function(x, ..., value) standardGeneric("neighborSets<-"))
 
 #' @name neighborSets
 #' @rdname neighborSets
@@ -172,7 +208,7 @@ setGeneric(
 #' 
 #' @param .data a TourExperiment object or matrix-like object 
 #' @param .on Which part of `.data` to tour
-#' @param clamp Should the columns of toured data be clamped to lie in [0,1]?
+#' @param clamp Should the columns of toured data be clamped to lie in (0,1)?
 #' @param max_bases Maximum number of bases to generate
 #' @param start Optional starting projection for tour
 #' @param step_size Distance between each step, set to `Inf` which forces new basis generation
@@ -208,6 +244,7 @@ setGeneric(
 #' @param .x the x-aesthetic
 #' @param .y the y-aesthetic
 #' @param .color the the color-aesthetic
+#' @param ... additional args
 #' 
 #' @export
 setGeneric(
@@ -225,7 +262,7 @@ setGeneric(
 #' @param .on the name of the basisSet to tour (default = NULL, will be first basisSet)
 #' @param .subset which points to select?
 #' @param .color Colour points by a given variable 
-#' @param clamp Clamp all variables to lie in [0,1] (default = FALSE)
+#' @param clamp Clamp all variables to lie in (0,1) (default = FALSE)
 #' @param aps Target angular velocity (how quickly to move between bases?) In radians per second. Defaults to 1.
 #' @param fps Target frame rate for streaming (defaults to 30)
 #' @param ... Other arguments

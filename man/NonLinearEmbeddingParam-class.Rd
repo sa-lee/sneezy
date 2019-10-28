@@ -8,6 +8,7 @@
 \alias{tnseNeighborsParam-class}
 \alias{nleArgs}
 \alias{nleArgs,NonLinearEmbeddingParam-method}
+\alias{show,NonLinearEmbeddingParam-method}
 \alias{tsne_exact}
 \alias{tsne_approx}
 \title{Non-linear Embedding Drivers}
@@ -16,11 +17,15 @@ nleArgs(object)
 
 \S4method{nleArgs}{NonLinearEmbeddingParam}(object)
 
+\S4method{show}{NonLinearEmbeddingParam}(object)
+
 tsne_exact(perplexity, alpha, ...)
 
 tsne_approx(perplexity, alpha, theta, ...)
 }
 \arguments{
+\item{object}{NonLinearEmbeddingParam object}
+
 \item{perplexity}{The perplexity paramter for t-SNE}
 
 \item{alpha}{The exaggeration factor parameter for t-SNE}

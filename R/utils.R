@@ -48,7 +48,11 @@ fproj_dist <- function(x, y) {
   }
 }
 
-
+flatten_graph <- function(indices) {
+  from <- as.vector(row(indices))
+  to <- as.vector(indices)
+  cbind("from" = from, "to" = to)
+}
 
 flatten_array <- function(projs) Map(function(x) x[[1]], apply(projs, 3, list))
 

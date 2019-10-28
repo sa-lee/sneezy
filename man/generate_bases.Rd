@@ -12,7 +12,7 @@ generate_bases(.data, .on = NULL, clamp = FALSE, max_bases = 100,
 
 \item{.on}{Which part of \code{.data} to tour}
 
-\item{clamp}{Should the columns of toured data be clamped to lie in \link{0,1}?}
+\item{clamp}{Should the columns of toured data be clamped to lie in (0,1)?}
 
 \item{max_bases}{Maximum number of bases to generate}
 

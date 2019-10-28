@@ -16,6 +16,8 @@ view_xy(.data, .on = NULL, .x, .y, .color, ...)
 \item{.y}{the y-aesthetic}
 
 \item{.color}{the the color-aesthetic}
+
+\item{...}{additional args}
 }
 \description{
 Create a simple interactive scatter-plot

@@ -3,6 +3,20 @@
 \docType{methods}
 \name{basisSets}
 \alias{basisSets}
+\alias{basisSet}
+\alias{basisSetNames}
+\alias{basisSets,TourExperiment-method}
+\alias{basisSet,TourExperiment,missing-method}
+\alias{basisSet,TourExperiment,numeric-method}
+\alias{basisSet,TourExperiment,character-method}
+\alias{basisSetNames,TourExperiment-method}
+\alias{basisSet<-}
+\alias{basisSets<-}
+\alias{basisSetNames<-}
+\alias{basisSet<-,TourExperiment,missing-method}
+\alias{basisSet<-,TourExperiment,numeric-method}
+\alias{basisSet<-,TourExperiment,character-method}
+\alias{basisSetNames<-,TourExperiment-method}
 \title{Access or set the basisSets  of a TourExperiment}
 \usage{
 basisSet(x, type, ...)
@@ -39,6 +53,8 @@ basisSetNames(x, type, ...) <- value
 \item{x}{an object (a TourExperiment)}
 
 \item{type}{the name or a number of the list to access}
+
+\item{...}{optional arguments passed to downstream methods}
 
 \item{value}{a matrix to assign to an element of basisSets}
 }

@@ -55,6 +55,14 @@ overlay_neighbors <- function(x, y, indices, ...) {
                ...)
 }
 
+
+#' Overlay a shared nearest neighbors graph onto an xy-scatter
+#' 
+#' @inheritParams overlay_neighbors
+#' @param type Algorithm used to compute shared nearest neighbors graph
+#' @export 
+#' @importFrom scran neighborsToSNNGraph neighborsToKNNGraph
+#' @importFrom igraph get.data.frame
 overlay_shared_neighbors <- function(x, y, indices, type = "rank", ...) {
   flattened <- scran::neighborsToSNNGraph(indices, type = type)
   flattened <- igraph::get.data.frame(flattened,what = "edges")
@@ -98,6 +106,7 @@ centroids_by_groups_mat <- function(groups, mat) {
   do.call("rbind", centroids)
 }
 
+
 estimate_knn_centroids <- function(x, y, indices) {
   knn <- scran::neighborsToKNNGraph(indices)
   clust <- igraph::cluster_louvain(knn)
@@ -113,47 +122,33 @@ estimate_snn_centroids <- function(x, y, indices) {
 }
 
 estimate_kmeans <- function(x, y, num_centers) {
-  kmeans(cbind(x = x, y = y), centers = num_centers)
+  stats::kmeans(cbind(x = x, y = y), centers = num_centers)
 }
 
+#' Overlay k-NN centroids
+#' @inheritParams overlay_neighbors
+#' @export
 overlay_knn_centroids <- function(x, y, indices, ...) {
   vals <- estimate_knn_centroids(x,y,indices)
   ggplot2::geom_point(data = vals, ggplot2::aes(x = x, y = y), ...)
 }
 
+
+#' Overlay s-NN centroids
+#' @inheritParams overlay_neighbors
+#' @export
 overlay_snn_centroids <- function(x, y, indices, ...) {
   vals <- estimate_snn_centroids(x,y,indices)
   ggplot2::geom_point(data = vals, ggplot2::aes(x = x, y = y), ...)
 }
 
+
+#' Overylay k-means centroids onto an xy scatter
+#' @inheritParams overlay_neighbors
+#' @param num_centers the number of centroids to estimate
+#' @export
+#' @importFrom stats kmeans
 overlay_kmeans_centroids <- function(x, y, num_centers, ...) {
   vals <- as.data.frame(estimate_kmeans(x, y, num_centers)$centers)
   ggplot2::geom_point(data = vals, ggplot2::aes(x = x, y = y), ...)
-}
-
-flatten_graph <- function(indices) {
-  from <- as.vector(row(indices))
-  to <- as.vector(indices)
-  cbind("from" = from, "to" = to)
-}
-
-
-
-compute_flat_dist <- function(data, coords) {
-  data.frame(
-    original = as.numeric(stats::dist(Rtsne::normalize_input(data))),
-    embedding = as.numeric(stats::dist(Rtsne::normalize_input(coords$Y)))
-  )
-}
-
-#' @export
-sneezy_shep <- function(data, coords) {
-  
-  distances <- data.frame(D = as.numeric(stats::dist(data)),
-                          d = as.numeric(stats::dist(coords$Y)))
-  
-  ggplot2::ggplot(data = distances, ggplot2::aes(x = d, y = D)) +
-    ggplot2::geom_point() +
-    ggplot2::labs(x = "Embedding distance", y = "Original distance")
-  
 }

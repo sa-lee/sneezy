@@ -128,10 +128,7 @@ ggplot(
   aes(x = PC1, y = PC2)
   ) +
   geom_point(aes(colour = labels)) +
-  scale_color_brewer(palette = "Dark2") +
-  overlay_neighbors(x = sampleFactors(pcs)[,1],
-                    y = sampleFactors(pcs)[,2],
-                    indices =  neighborSet(multi_te2, "pca_exact"))
+  scale_color_brewer(palette = "Dark2")
 ```
 
 From the PCs we can clearly see the separation of the two 10-d clusters
@@ -218,7 +215,7 @@ pl +
   overlay_knn_centroids(sampleFactors(tsne)[,1], 
                         sampleFactors(tsne)[,2], 
                         neighborSet(multi_te2, "tsne_exact"),
-                        color = "darkblue") 
+                        color = "red") 
 ```
 
 ## Viewing high-dimensional space
@@ -250,12 +247,4 @@ And look at the centroids in the original space of the nearest neighbours graph 
 
 ```{r}
 sneezy_centroids(multi_te2, "view", "tsne_exact", col = pal)
-```
-
-
-Finally, we can also produce a "Shephard's plot" comparing distances
-in the embedding space against the original high-dimensional space"
-
-```{r}
-sneezy_shep(spheres, coords)
 ```

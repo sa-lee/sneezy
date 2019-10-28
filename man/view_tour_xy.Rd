@@ -16,7 +16,7 @@ view_tour_xy(.data, .on = NULL, .subset = NULL, .color = NULL,
 
 \item{.color}{Colour points by a given variable}
 
-\item{clamp}{Clamp all variables to lie in \link{0,1} (default = FALSE)}
+\item{clamp}{Clamp all variables to lie in (0,1) (default = FALSE)}
 
 \item{aps}{Target angular velocity (how quickly to move between bases?) In radians per second. Defaults to 1.}
 

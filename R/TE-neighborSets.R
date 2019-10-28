@@ -40,7 +40,7 @@ setReplaceMethod("neighborSets",
 setMethod("neighborSet", 
           c("TourExperiment", "missing"),
           function(x, type, withDimnames = TRUE) {
-            if (length(neighborSetNames(x)) == 0) return(nset)
+            if (length(neighborSetNames(x)) == 0) return(NULL)
             neighborSet(x, 1, withDimnames)
           }
 )

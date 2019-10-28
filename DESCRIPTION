@@ -22,7 +22,12 @@ Imports:
     SingleCellExperiment,
     BiocSingular,
     utils,
-    plotly
+    plotly,
+    ggplot2,
+    igraph,
+    scran,
+    S4Vectors,
+    SummarizedExperiment
 URL: https://github.com/sa-lee/sneezy
 BugReports: https://github.com/sa-lee/sneezy/issues
 Suggests: 
@@ -30,9 +35,7 @@ Suggests:
     gganimate,
     knitr,
     rmarkdown,
-    ggplot2,
     testthat (>= 2.1.0),
     dplyr,
-    scater,
-    scran
+    scater
 VignetteBuilder: knitr

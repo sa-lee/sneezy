@@ -1,3 +1,5 @@
+#' @rdname NonLinearEmbeddingParam-class
+#' @param object NonLinearEmbeddingParam object
 #' @export
 setMethod("show", 
           "NonLinearEmbeddingParam", 
