@@ -240,7 +240,7 @@ with the following:
 library(gganimate)
 pal <- c("#1B9E77","#D95F02")[as.integer(factor(colData(multi_te2)$labels))]
 
-knitr::knit_print(sneezy_neighbors(multi_te2, "view", "tsne_exact", col = pal))
+sneezy_neighbors(multi_te2, "view", "tsne_exact", col = pal)
 ```
 
 And look at the centroids in the original space of the nearest neighbours graph in t-SNE space:
