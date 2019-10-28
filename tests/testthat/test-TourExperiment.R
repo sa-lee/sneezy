@@ -19,9 +19,9 @@ test_that("constructor works", {
   se_olive <- TourExperiment(olive)
   expect_s4_class(se_olive, "TourExperiment")
   expect_true(is(se_olive, "SingleCellExperiment"))
-  expect_equal(dim(assay(se_olive)), c(nrow(olive), 0))
+  expect_equal(dim(assay(se_olive)), c(0, nrow(olive)))
   expect_identical(
-    as.data.frame(rowData(se_olive)), olive 
+    as.data.frame(colData(se_olive)), olive 
   )
   
   # selecting throws an error if non-homegenous types
