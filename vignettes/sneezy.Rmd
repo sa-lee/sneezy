@@ -229,7 +229,7 @@ our `TourExperiment`:
 
 ```{r}
 set.seed(1999)
-multi_te2 <- generate_bases(multi_te2, .on = "view")
+multi_te2 <- generate_bases(multi_te2, .on = "view", max_bases = 300)
 basisSetNames(multi_te2)
 ```
 
@@ -240,7 +240,7 @@ with the following:
 library(gganimate)
 pal <- c("#1B9E77","#D95F02")[as.integer(factor(colData(multi_te2)$labels))]
 
-sneezy_neighbors(multi_te2, "view", "tsne_exact", col = pal)
+knitr::knit_print(sneezy_neighbors(multi_te2, "view", "tsne_exact", col = pal))
 ```
 
 And look at the centroids in the original space of the nearest neighbours graph in t-SNE space:
