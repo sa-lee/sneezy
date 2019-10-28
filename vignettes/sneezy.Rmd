@@ -14,11 +14,14 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
+```{r setup, include = FALSE}
 library(sneezy)
+library(SingleCellExperiment)
+# to display gifs inline
+library(gganimate)
 ```
 
-# Exploring non-linear embeddings sneezy
+# Exploring non-linear embeddings with sneezy
 
 The goal of sneezy is to allow a user to exlpore non-linear embedding
 algorithms such as t-SNE and UMAP in the context of global geometry of
@@ -37,11 +40,12 @@ and nearest neighbor estimation methods.
 sneezy comes preloaded with a benchmark from the 
 [multi-challenge dataset](http://ifs.tuwien.ac.at/dm/dataSets.html). 
 
-This data arrives as a simple `tibble` that contains a key indicating 
+This data arrives as a simple `data.frame` that contains a key indicating 
 the challenge id and an index giving the observation id for that particular
 challenge, the remaining coordinates are the dimensions.
 
 ```{r}
+library(SingleCellExperiment)
 library(sneezy)
 head(multi)
 ```
@@ -54,7 +58,7 @@ TourExperiment. It extends the `SingleCellExperiment::SingleCellExperiment()`
 object with two additional slots called `basisSets` and `neighborSets`,
 we will describe their use in more detail shortly. 
 
-A TourExperiment object can be created from a data.frame or a matrix as follows:
+A TourExperiment object can be created directly from a data.frame or a matrix as follows:
 
 ```{r}
 multi_te <- TourExperiment(multi,
@@ -70,7 +74,6 @@ in the nonmelcature of bioinformatics. Note this is transposed so rows are
 variables and columns are observations.
 
 ```{r}
-library(SingleCellExperiment)
 # the x1 - x10 data
 assay(multi_te, "view")[, 1:5]
 ```
@@ -124,7 +127,11 @@ ggplot(
   data.frame(sampleFactors(pcs), labels = colData(multi_te2)$labels),
   aes(x = PC1, y = PC2)
   ) +
-  geom_point(aes(colour = labels))
+  geom_point(aes(colour = labels)) +
+  scale_color_brewer(palette = "Dark2") +
+  overlay_neighbors(x = sampleFactors(pcs)[,1],
+                    y = sampleFactors(pcs)[,2],
+                    indices =  neighborSet(multi_te2, "pca_exact"))
 ```
 
 From the PCs we can clearly see the separation of the two 10-d clusters
@@ -173,8 +180,8 @@ and in the embedding. This produces a matrix of indices for each row
 giving the nearest neighbor. 
 
 ```{r}
-multi_te2 <- estimate_neighbors(multi_te2, 90, .on = "view")
-multi_te2 <- estimate_neighbors(multi_te2, 90, .on = "tsne_exact")
+multi_te2 <- estimate_neighbors(multi_te2, 30, .on = "view")
+multi_te2 <- estimate_neighbors(multi_te2, 30, .on = "tsne_exact")
 
 dim(neighborSet(multi_te2, "tsne_exact"))
 ```
@@ -211,44 +218,38 @@ pl +
   overlay_knn_centroids(sampleFactors(tsne)[,1], 
                         sampleFactors(tsne)[,2], 
                         neighborSet(multi_te2, "tsne_exact"),
-                        color = "darkblue") +
-  overlay_snn_centroids(sampleFactors(tsne)[,1], 
-                        sampleFactors(tsne)[,2], 
-                        neighborSet(multi_te2, "tsne_exact"),
-                        color = "darkred") 
-
+                        color = "darkblue") 
 ```
 
 ## Viewing high-dimensional space
 
 We can also tour around a data space, and see how the nearest neighbours
-graph from t-SNE space is preserved in high-dimensional space. We can take
-subsets of the nn graph to see how the t-SNE preserves local topology, 
-for example the points on the outside of the subcluster on the right hand side:
+graph from t-SNE space is preserved in high-dimensional space. We can take view the entire k-NN or s-NN graph in the embedding space.
+This allows us to see how t-SNE preserves local topology. First
+we generate a basis set on the  for our tour, which will form part of
+our `TourExperiment`:
 
 
 ```{r}
-pal <- c("#1B9E77", "#D95F02")[as.integer(as.factor(labels))]
-sneezy_neighbours(spheres, coords, .subset = 171, col = pal)
+set.seed(1999)
+multi_te2 <- generate_bases(multi_te2, .on = "view")
+basisSetNames(multi_te2)
 ```
 
-We can also triangulate the points in t-SNE space, and see how that moves
-via the grand tour.
+Then we can animate the tour view and overlay the neighbors
+with the following:
 
 ```{r}
-pl +  add_triangles(coords) 
+library(gganimate)
+pal <- c("#1B9E77","#D95F02")[as.integer(factor(colData(multi_te2)$labels))]
+
+sneezy_neighbors(multi_te2, "view", "tsne_exact", col = pal)
 ```
 
+And look at the centroids in the original space of the nearest neighbours graph in t-SNE space:
 
 ```{r}
-sneezy_triangles(spheres, coords, col = pal)
-```
-
-And look at the centroids in the original space of the nearest neighbours
-graph in t-SNE space:
-
-```{r}
-sneezy_centroids(spheres, coords)
+sneezy_centroids(multi_te2, "view", "tsne_exact", col = pal)
 ```
 
 

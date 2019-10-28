@@ -9,12 +9,13 @@
 #' @param ... other control options passed to [tourr::display_xy()]
 #' 
 #' @export
+#' @importFrom tourr planned_tour render_gif 
+#' @importFrom 
 sneezy_neighbors <- function(.data, basis, neighbor, ...) {
-  # extract basisSet
-  projs <- basisSet(.data, basis)
-  # flatten to array
-  projs <- flatten_array(projs)
-  plan <- tourr::planned_tour(projs)
+  
+  stopifnot(is(.data, "TourExperiment"))
+  
+  plan <- .setup_plan(.data, basis)
   
   # extract neighborSet
   n_set <- neighborSet(.data, neighbor)
@@ -22,19 +23,60 @@ sneezy_neighbors <- function(.data, basis, neighbor, ...) {
   
   # named basisSet will be .data
   vals <- .retrieve_mat(.data, basis)
-
   # set up display
   dxy <- tourr::display_xy(edges = n_set, ...)
-  tourr::render_gif(vals, tour_path = plan)
+  
+  gganimate::gif_file(
+    tourr::render_gif(vals, 
+                      tour_path = plan, 
+                      display = dxy)
+  )
 }
 
 
 
 #' @export
-sneezy_centroids <- function(data, tsne_coords, col, ...) {
-  centroids <- get_centroids_from_nn(data, tsne_coords)
-  col <- scales::alpha(c(col, rep("red", nrow(centroids))))
-  data <- rbind(data, centroids)
-  gif_tour(data, tour_path = tourr::grand_tour(), edges = NULL, col = col)
+sneezy_centroids <- function(.data, basis, neighbor, ...) {
   
+  plan <- .setup_plan(.data, basis)
+  
+  vals <- .retrieve_mat(.data, basis)
+  
+  indices <- neighborSet(.data, neighbor)
+  snn <- scran::neighborsToSNNGraph(indices)
+  clust <- igraph::cluster_louvain(snn)
+  groups <- igraph::communities(clust)
+  centroids <- centroids_by_groups_mat(groups, vals)
+  
+  centroids.col <- rep("red", nrow(centroids))
+  
+  extra_args <- list(...)
+  
+  if ("col" %in% names(extra_args)) {
+    col <- scales::alpha(c(extra_args[["col"]], 
+                           rep("red", nrow(centroids))))
+  } else {
+    col <- scales::alpha(rep("black", nrow(vals)),  centroids.col)
+  }
+  
+  vals <- rbind(vals, centroids)
+  
+  # set up display
+  dxy <- tourr::display_xy(col = col)
+  
+  gganimate::gif_file(
+    tourr::render_gif(vals, 
+                      tour_path = plan, 
+                      display = dxy
+    )
+  )
+  
+}
+
+.setup_plan <- function(.data, basis) {
+  # extract basisSet
+  projs <- basisSet(.data, basis)
+  # flatten to array
+  projs <- flatten_array(projs)
+  tourr::planned_tour(projs)
 }

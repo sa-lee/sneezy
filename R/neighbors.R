@@ -90,6 +90,14 @@ centroids_by_groups <- function(groups, x, y) {
   as.data.frame(do.call("rbind", centroids))
 }
 
+centroids_by_groups_mat <- function(groups, mat) {
+  centroids <- lapply(groups, 
+                      function(inx) {
+                        colMeans(mat[inx,])
+                      })
+  do.call("rbind", centroids)
+}
+
 estimate_knn_centroids <- function(x, y, indices) {
   knn <- scran::neighborsToKNNGraph(indices)
   clust <- igraph::cluster_louvain(knn)
