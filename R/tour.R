@@ -4,13 +4,12 @@
 #' @param .data a numeric dataset
 #' @param basis name of basisSet in .data
 #' @param neighbor name of neighborSet in .data 
-#' @param .subset a vector of indices to find nearest neighbours, by default
-#' all nearest neighbours will be used.
 #' @param ... other control options passed to [tourr::display_xy()]
 #' 
 #' @export
 #' @importFrom tourr planned_tour render_gif 
-#' @importFrom 
+#' @importFrom scran neighborsToSNNGraph
+#' @importFrom igraph cluster_louvain communities
 sneezy_neighbors <- function(.data, basis, neighbor, ...) {
   
   stopifnot(is(.data, "TourExperiment"))
@@ -34,7 +33,9 @@ sneezy_neighbors <- function(.data, basis, neighbor, ...) {
 }
 
 
-
+#' Animate a tour with a centroids overlay
+#' 
+#' @inheritParams sneezy_neighbors
 #' @export
 sneezy_centroids <- function(.data, basis, neighbor, ...) {
   
