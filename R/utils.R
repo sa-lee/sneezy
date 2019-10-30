@@ -1,4 +1,7 @@
 # internal functions
+
+#' @importFrom SummarizedExperiment assayNames
+#' @importFrom SingleCellExperiment reducedDimNames reducedDim
 .retrieve_mat <- function(.data, from = NULL, .subset = NULL) {
   
   if (is.null(from)) {
@@ -68,6 +71,7 @@ setMethod("compute_half_range",
 #' @rdname compute_half_range
 #' @name compute_half_range
 #' @export
+#' @importFrom SingleCellExperiment sampleFactors
 setMethod("compute_half_range", 
           "LinearEmbeddingMatrix",
           function(.data) compute_half_range(sampleFactors(.data))

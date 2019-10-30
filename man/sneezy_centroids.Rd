@@ -2,9 +2,10 @@
 % Please edit documentation in R/tour.R
 \name{sneezy_centroids}
 \alias{sneezy_centroids}
-\title{Animate a tour with a centroids overlay}
+\title{Animate a tour path with a centroids overlay}
 \usage{
-sneezy_centroids(.data, basis, neighbor, ...)
+sneezy_centroids(.data, basis, neighbor, centroid.col = "black",
+  apf = 1/10, frames = 100, height = 400, width = 400, ...)
 }
 \arguments{
 \item{.data}{a numeric dataset}
@@ -13,8 +14,18 @@ sneezy_centroids(.data, basis, neighbor, ...)
 
 \item{neighbor}{name of neighborSet in .data}
 
+\item{apf}{angles per frame (defulats to 1/30)}
+
+\item{frames}{number of frames in animation (defaults to 300)}
+
+\item{height}{the size of the animation in pixes}
+
+\item{width}{the size of the animation in pixes}
+
 \item{...}{other control options passed to \code{\link[tourr:display_xy]{tourr::display_xy()}}}
+
+\item{centroids.col}{A character(1) with a color name for the centroid points (default = "black")}
 }
 \description{
-Animate a tour with a centroids overlay
+Animate a tour path with a centroids overlay
 }

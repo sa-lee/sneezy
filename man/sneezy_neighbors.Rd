@@ -2,9 +2,10 @@
 % Please edit documentation in R/tour.R
 \name{sneezy_neighbors}
 \alias{sneezy_neighbors}
-\title{Animate tour with neighborhood graph}
+\title{Animate a tour path with a neighborhood overlay}
 \usage{
-sneezy_neighbors(.data, basis, neighbor, ...)
+sneezy_neighbors(.data, basis, neighbor, apf = 1/10, frames = 100,
+  height = 400, width = 400, ...)
 }
 \arguments{
 \item{.data}{a numeric dataset}
@@ -13,8 +14,21 @@ sneezy_neighbors(.data, basis, neighbor, ...)
 
 \item{neighbor}{name of neighborSet in .data}
 
+\item{apf}{angles per frame (defulats to 1/30)}
+
+\item{frames}{number of frames in animation (defaults to 300)}
+
+\item{height, width}{the size of the animation in pixes}
+
 \item{...}{other control options passed to \code{\link[tourr:display_xy]{tourr::display_xy()}}}
 }
+\value{
+A \link[gganimate:gif_file]{gganimate::gif_file} that can be embedded in an Rmd or
+R console viwer pane.
+}
 \description{
-Animate tour with neighborhood graph
+Animate a tour path with a neighborhood overlay
+}
+\seealso{
+\code{\link[tourr:animate_xy]{tourr::animate_xy()}}, \code{\link[tourr:display_xy]{tourr::display_xy()}}
 }
