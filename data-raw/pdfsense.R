@@ -18,13 +18,8 @@ meta <- read_tsv(
   file.path(tsv_path, "metadata_RawData.tsv")
 )
 
-together <- cbind(meta, mat)
+pdfsense <- as.data.frame(cbind(meta, mat))
 
-pdfsense <- TourExperiment(together, 
-                       SimpleList(),
-                       SimpleList(),
-                       X1:X56)
-
-unlink(dir)
+unlink(dir, recursive = TRUE)
 
 usethis::use_data(pdfsense, overwrite = TRUE)
