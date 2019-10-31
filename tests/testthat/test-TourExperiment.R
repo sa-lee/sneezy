@@ -6,11 +6,7 @@ olive <- tourr::olive
 rownames(olive) <- as.character(1:nrow(olive))
 
 test_that("constructor works", {
-  se_olive <- TourExperiment(olive,
-                             basisSets = SimpleList(),
-                             neighborSets = SimpleList(),
-                             palmitic:eicosenoic
-  )
+  se_olive <- TourExperiment(olive, palmitic:eicosenoic)
   expect_s4_class(se_olive, "TourExperiment")
   expect_true(is(se_olive, "SingleCellExperiment"))
   expect_identical(assayNames(se_olive), "view")
@@ -25,10 +21,7 @@ test_that("constructor works", {
   )
   
   # selecting throws an error if non-homegenous types
-  expect_error(TourExperiment(olive, 
-                          basisSets = SimpleList(),
-                          neighborSets = SimpleList(),
-                          1:ncol(olive)))
+  expect_error(TourExperiment(olive,  1:ncol(olive)))
   
   # matrix constructor 
   sphere <- generate_sphere(1000, 10, 0, 1)
@@ -36,4 +29,12 @@ test_that("constructor works", {
   expect_s4_class(se_sphere, "TourExperiment")
   expect_true(is(se_sphere, "SingleCellExperiment"))
   expect_identical(assay(se_sphere), sphere)
+  
+  # SummarizedExperiment
+  se <- SummarizedExperiment::SummarizedExperiment(assays = list(view = sphere))
+  expect_identical(TourExperiment(se), se_sphere)
+  
+  # sce 
+  se <- SingleCellExperiment(assays = list(view = sphere))
+  expect_identical(TourExperiment(se), se_sphere)
 })

@@ -16,18 +16,24 @@
 #' 
 
 #' @param .data object to convert to a `TourExperiment` object
-#' @param basisSets a SimpleList object containing tour bases
-#' @param neighborSets a SimpleList conatining nearest neighbours
 #' @param ... if `.data` is a data.frame the columns to convert to a matrix,
 #' every other column not included in `...` will become colData, the names
 #' of the columns selected with `...` will be become row names in the resulting
 #' object.
-#' @param viewAs the type of matrix if `.data` is a data.frame (default is numeric matrix).
+#' @param assayName the character name of the `assay` slot in the `TourExperiment` object.
+#' Defaults to 'view'. 
+#' @param assayType the type of matrix if `.data` is a data.frame. Defaults to
+#' 'matrix'.
+#' @param basisSets a SimpleList object containing tour bases. Default is
+#' an empty list.
+#' @param neighborSets a SimpleList conatining nearest neighbours Default
+#' is an empty list.
 #' 
 #' @importFrom SingleCellExperiment SingleCellExperiment
 #' @importFrom methods setClass setOldClass setGeneric
 #' 
-#' @seealso [basisSets()], [neighborSets()]
+#' @seealso [generate_bases()], [basisSets()], 
+#' [estimate_neighbors()], [neighborSets()]
 #' @examples 
 #' sphere <- generate_sphere(1000, 10, mean =  5, sd = 2)
 #' te_sphere <- TourExperiment(sphere)
@@ -35,11 +41,8 @@
 #' 
 #' # convert a data.frame to a TourExperiment object
 #' # this allows you to select columns that will form the assay data
-#' te_olive <- TourExperiment(tourr::olive, 
-#'                            S4Vectors::SimpleList(), 
-#'                            S4Vectors::SimpleList(), 
-#'                            palmitic:eicosenoic)
-#' te_olive
+#' multi_te <- TourExperiment(multi, X1:X10)
+#' multi_te
 #' 
 #' @importFrom  S4Vectors SimpleList
 #' @name TourExperiment-class

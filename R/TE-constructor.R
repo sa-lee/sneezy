@@ -40,7 +40,7 @@ setValidity("TourExperiment", .valid_te)
 #' @export    
 setMethod("TourExperiment", 
           c("SingleCellExperiment"), 
-          function(.data, basisSets, neighborSets, ...) {
+          function(.data, basisSets = SimpleList(), neighborSets = SimpleList()) {
             .te(.data, basisSets, neighborSets)
           })
 
@@ -49,7 +49,7 @@ setMethod("TourExperiment",
 #' @export    
 setMethod("TourExperiment", 
           c("SummarizedExperiment"), 
-          function(.data, basisSets = S4Vectors::SimpleList(), neighborSets = S4Vectors::SimpleList(), ...) {
+          function(.data, basisSets = SimpleList(), neighborSets = SimpleList()) {
             .te(as(.data, "SingleCellExperiment"), basisSets, neighborSets)
           })
 
@@ -58,8 +58,10 @@ setMethod("TourExperiment",
 #' @export    
 setMethod("TourExperiment", 
           c("matrix"), 
-          function(.data, basisSets = S4Vectors::SimpleList(), neighborSets = S4Vectors::SimpleList(), ...) {
-            sce <- SingleCellExperiment::SingleCellExperiment(list(view = .data))
+          function(.data, ..., assayName = "view", basisSets = SimpleList(), neighborSets = SimpleList()) {
+            lst <- list()
+            lst[[assayName]] <- .data
+            sce <- SingleCellExperiment::SingleCellExperiment(lst)
             .te(sce, basisSets, neighborSets)
           })
 
@@ -68,7 +70,7 @@ setMethod("TourExperiment",
 #' @export    
 setMethod("TourExperiment", 
           c("data.frame"), 
-          function(.data,  basisSets = S4Vectors::SimpleList(), neighborSets = S4Vectors::SimpleList(), ..., viewAs = "matrix") {
+          function(.data, ...,  assayName = "view", assayType = "matrix", basisSets = SimpleList(), neighborSets = SimpleList()) {
             # select the matrix part
             if (!requireNamespace("dplyr", quietly = TRUE)) {
               stop("Please install dplyr", call. = FALSE)
@@ -81,16 +83,17 @@ setMethod("TourExperiment",
               stop("selection must only contain numeric variables",
                    call. = FALSE)
             }
-            mat_part <- as(mat_part, viewAs)
+            mat_part <- as(mat_part, assayType)
             
             col_part <- .data[,
                               !(names(.data) %in% drop_cols), 
                               drop = FALSE]
             # reorient, and rownames are now variable identfiers
-            mat_part <- t(mat_part)
+            mat_part <- list(t(mat_part))
+            names(mat_part) <- assayName
 
             se <- SingleCellExperiment::SingleCellExperiment(
-              assays = list(view = mat_part),
+              assays = mat_part,
               colData = col_part
             )
             .te(se, basisSets, neighborSets)

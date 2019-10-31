@@ -5,6 +5,7 @@
 #' @name TourExperiment
 #' @rdname TourExperiment-class 
 #' @importFrom methods as callNextMethod is new show
+#' @importFrom S4Vectors SimpleList
 #' @export
 #' @aliases 
 #' show,TourExperiment-method
@@ -15,7 +16,7 @@
 #'         
 setGeneric("TourExperiment", 
            signature = ".data", 
-           function(.data, basisSets = S4Vectors::SimpleList(), neighborSets = S4Vectors::SimpleList(), ...) {
+           function(.data, ... , basisSets = SimpleList(), neighborSets = SimpleList()) {
              standardGeneric("TourExperiment")
            })
 
