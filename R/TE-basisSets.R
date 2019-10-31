@@ -36,8 +36,7 @@ setReplaceMethod("basisSets",
 setMethod("basisSet", 
           c("TourExperiment", "missing"),
           function(x, type) {
-            bset <- basisSets(x)
-            if (length(bset) == 0) return(bset)
+            if (length(basisSetNames(x)) == 0) return(NULL)
             basisSet(x, 1)
           }
 )
