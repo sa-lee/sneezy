@@ -3,8 +3,8 @@
 \docType{data}
 \name{pdfsense}
 \alias{pdfsense}
-\title{pdfsense data}
-\format{An object of class \code{TourExperiment} with 56 rows and 2808 columns.}
+\title{Parton distribution function sensitivity experiments}
+\format{An object of class \code{data.frame} with 2808 rows and 62 columns.}
 \source{
 \url{http://www.physics.smu.edu/botingw/PDFsense_web_histlogy}
 }
@@ -12,9 +12,32 @@
 pdfsense
 }
 \description{
-pdfsense data
+Data from Wang et al., 2018 to compare embedding approaches to a
+tour path.
 }
 \details{
-56 variables summarised over many particle physics experiments
+Data were obtained from CT14HERA2 parton distribution function
+fits as used in Laa et al., 2018. There are 56 variables labelled X1-X56
+describing fits summarised over many particle physics experiments
+(see table 3 in that paper for more explicit details).
+
+The remaining columns are:
+\itemize{
+\item InFit: ???
+\item ID: contains the identifier of experiment
+\item pt: the per experiment observational id
+\item x,mu: ???
+}
+}
+\references{
+Wang, B.-T., Hobbs, T. J., Doyle, S., Gao, J., Hou, T.-J., Nadolsky, P. M.,
+& Olness, F. I. (2018). PDFSense: Mapping the sensitivity of
+hadronic experiments to nucleon structure.
+Retrieved from \url{http://arxiv.org/abs/1808.07470}
+
+Cook, D., Laa, U., & Valencia, G. (2018).
+Dynamical projections for the visualization of PDFSense data.
+The European Physical Journal C, 78(9), 742.
+\url{https://doi.org/10.1140/epjc/s10052-018-6205-2}
 }
 \keyword{datasets}
