@@ -9,3 +9,5 @@
 ^\.travis\.yml$
 ^codecov\.yml$
 ^\.covrignore$
+^appveyor\.yml$
+^tic\.R$
