@@ -29,12 +29,14 @@ after_script: R -q -e 'tic::after_script()'
 
 # Header
 language: r
-sudo: false
 dist: xenial
 cache: packages
 latex: false
-
 warnings_are_errors: false
+
+addons:
+  apt:
+    packages: cargo
 
 branches:
   only:
@@ -48,5 +50,3 @@ env:
   global:
   - MAKEFLAGS="-j 2"
 
-#services
-services:
