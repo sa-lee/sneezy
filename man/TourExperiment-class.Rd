@@ -12,42 +12,45 @@
 \alias{TourExperiment,data.frame-method}
 \title{Represent a data.frame or matrix or assay-like object as a \code{TourExperiment}}
 \usage{
-TourExperiment(.data, basisSets = S4Vectors::SimpleList(),
-  neighborSets = S4Vectors::SimpleList(), ...)
+TourExperiment(.data, ..., basisSets = SimpleList(),
+  neighborSets = SimpleList())
 
 \S4method{show}{TourExperiment}(object)
 
 \S4method{TourExperiment}{SingleCellExperiment}(.data,
-  basisSets = S4Vectors::SimpleList(),
-  neighborSets = S4Vectors::SimpleList(), ...)
+  basisSets = SimpleList(), neighborSets = SimpleList())
 
 \S4method{TourExperiment}{SummarizedExperiment}(.data,
-  basisSets = S4Vectors::SimpleList(),
-  neighborSets = S4Vectors::SimpleList(), ...)
+  basisSets = SimpleList(), neighborSets = SimpleList())
 
-\S4method{TourExperiment}{matrix}(.data,
-  basisSets = S4Vectors::SimpleList(),
-  neighborSets = S4Vectors::SimpleList(), ...)
+\S4method{TourExperiment}{matrix}(.data, ..., assayName = "view",
+  basisSets = SimpleList(), neighborSets = SimpleList())
 
-\S4method{TourExperiment}{data.frame}(.data,
-  basisSets = S4Vectors::SimpleList(),
-  neighborSets = S4Vectors::SimpleList(), ..., viewAs = "matrix")
+\S4method{TourExperiment}{data.frame}(.data, ..., assayName = "view",
+  assayType = "matrix", basisSets = SimpleList(),
+  neighborSets = SimpleList())
 }
 \arguments{
 \item{.data}{object to convert to a \code{TourExperiment} object}
-
-\item{basisSets}{a SimpleList object containing tour bases}
-
-\item{neighborSets}{a SimpleList conatining nearest neighbours}
 
 \item{...}{if \code{.data} is a data.frame the columns to convert to a matrix,
 every other column not included in \code{...} will become colData, the names
 of the columns selected with \code{...} will be become row names in the resulting
 object.}
 
+\item{basisSets}{a SimpleList object containing tour bases. Default is
+an empty list.}
+
+\item{neighborSets}{a SimpleList conatining nearest neighbours Default
+is an empty list.}
+
 \item{object}{a \code{TourExperiment} object}
 
-\item{viewAs}{the type of matrix if \code{.data} is a data.frame (default is numeric matrix).}
+\item{assayName}{the character name of the \code{assay} slot in the \code{TourExperiment} object.
+Defaults to 'view'.}
+
+\item{assayType}{the type of matrix if \code{.data} is a data.frame. Defaults to
+'matrix'.}
 }
 \description{
 Represent a data.frame or matrix or assay-like object as a \code{TourExperiment}
@@ -73,13 +76,11 @@ te_sphere
 
 # convert a data.frame to a TourExperiment object
 # this allows you to select columns that will form the assay data
-te_olive <- TourExperiment(tourr::olive, 
-                           S4Vectors::SimpleList(), 
-                           S4Vectors::SimpleList(), 
-                           palmitic:eicosenoic)
-te_olive
+multi_te <- TourExperiment(multi, X1:X10)
+multi_te
 
 }
 \seealso{
-\code{\link[=basisSets]{basisSets()}}, \code{\link[=neighborSets]{neighborSets()}}
+\code{\link[=generate_bases]{generate_bases()}}, \code{\link[=basisSets]{basisSets()}},
+\code{\link[=estimate_neighbors]{estimate_neighbors()}}, \code{\link[=neighborSets]{neighborSets()}}
 }

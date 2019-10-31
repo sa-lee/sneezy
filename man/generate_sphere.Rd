@@ -11,7 +11,7 @@ generate_sphere(n, p, mean, sd)
 
 \item{p}{number of dimensions}
 
-\item{mean, sd}{passed to \code{stats::rnorm}}
+\item{mean, sd}{passed to \link[stats:rnorm]{stats::rnorm}}
 }
 \description{
 Sample from a p-dimensional solid sphere

@@ -4,23 +4,26 @@
 \alias{sneezy_centroids}
 \title{Animate a tour path with a centroids overlay}
 \usage{
-sneezy_centroids(.data, basis, neighbor, centroid.col = "black",
-  apf = 1/10, frames = 100, height = 400, width = 400, ...)
+sneezy_centroids(.data, basis = 1, neighbor = 1,
+  centroid.col = "black", apf = 1/10, frames = 100, height = 400,
+  width = 400, ...)
 }
 \arguments{
-\item{.data}{a numeric dataset}
+\item{.data}{A \link{TourExperiment} object}
 
-\item{basis}{name of basisSet in .data}
+\item{basis}{The name or position of a \link{basisSet} in \code{.data},
+defaults to the first element. The name}
 
-\item{neighbor}{name of neighborSet in .data}
+\item{neighbor}{The name or position of a \link{neighborSet} in \code{.data},
+defaults to the first element.}
 
 \item{apf}{angles per frame (defulats to 1/30)}
 
 \item{frames}{number of frames in animation (defaults to 300)}
 
-\item{height}{the size of the animation in pixes}
+\item{height}{the size of the animation in pixels}
 
-\item{width}{the size of the animation in pixes}
+\item{width}{the size of the animation in pixels}
 
 \item{...}{other control options passed to \code{\link[tourr:display_xy]{tourr::display_xy()}}}
 

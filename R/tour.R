@@ -1,12 +1,13 @@
 #' Animate a tour path with a neighborhood overlay
 #' 
-#' 
-#' @param .data a numeric dataset
-#' @param basis name of basisSet in .data
-#' @param neighbor name of neighborSet in .data 
+#' @param .data A [TourExperiment] object  
+#' @param basis The name or position of a [basisSet] in `.data`, 
+#' defaults to the first element. The name 
+#' @param neighbor The name or position of a [neighborSet] in `.data`,
+#' defaults to the first element. 
 #' @param apf angles per frame (defulats to 1/30)
 #' @param frames number of frames in animation (defaults to 300)
-#' @param height,width the size of the animation in pixes 
+#' @param height,width the size of the animation in pixels 
 #' @param ... other control options passed to [tourr::display_xy()]
 #' 
 #' @return 
@@ -20,13 +21,20 @@
 #' @importFrom gifski gifski
 #' @importFrom gganimate gif_file
 #' 
+#' @examples 
+#' multi_te <- TourExperiment(multi, X1:X10)
+#' multi_te <- generate_bases(multi_te, .on = "view")
+#' multi_te <- estimate_neighbors(multi_te, 10, .on = "view")
+#' 
+#' sneezy_neighbors(multi_te)
+#' 
 #' @seealso [tourr::animate_xy()], [tourr::display_xy()]
-sneezy_neighbors <- function(.data, basis, neighbor, apf = 1/10, frames = 100, height = 400, width = 400, ...) {
+sneezy_neighbors <- function(.data, basis = 1, neighbor = 1, apf = 1/10, frames = 100, height = 400, width = 400, ...) {
   
-  stopifnot(is(.data, "TourExperiment"))
-  stopifnot(is.character(basis) && length(basis) == 1L)
-  stopifnot(is.character(neighbor) && length(neighbor) == 1L)
+  .norm_args_sneezy(.data, basis, neighbor)
   
+  basis <- .set_basis(.data, basis)
+
   # tour path
   plan <- .setup_plan(.data, basis)
   
@@ -49,7 +57,8 @@ sneezy_neighbors <- function(.data, basis, neighbor, apf = 1/10, frames = 100, h
   # set up display
   dxy <- do.call(tourr::display_xy, extra_args)
   
-  .gif_tour(vals, plan, dxy, apf = apf, frames = frames, height = height, width = width)
+  .gif_tour(vals, plan, dxy, 
+            apf = apf, frames = frames, height = height, width = width)
 }
 
 
@@ -58,9 +67,18 @@ sneezy_neighbors <- function(.data, basis, neighbor, apf = 1/10, frames = 100, h
 #' 
 #' @inheritParams sneezy_neighbors
 #' @param centroids.col A character(1) with a color name for the centroid points (default = "black")
+#' @examples 
+#' multi_te <- TourExperiment(multi, X1:X10)
+#' multi_te <- generate_bases(multi_te, .on = "view")
+#' multi_te <- estimate_neighbors(multi_te, 10, .on = "view")
 #' 
+#' sneezy_centroids(multi_te)
 #' @export
-sneezy_centroids <- function(.data, basis, neighbor, centroid.col = "black", apf = 1/10, frames = 100, height = 400, width = 400, ...) {
+sneezy_centroids <- function(.data, basis = 1, neighbor = 1, centroid.col = "black", apf = 1/10, frames = 100, height = 400, width = 400, ...) {
+  
+  .norm_args_sneezy(.data, basis, neighbor)
+  
+  basis <- .set_basis(.data, basis)
   
   plan <- .setup_plan(.data, basis)
   
@@ -97,8 +115,25 @@ sneezy_centroids <- function(.data, basis, neighbor, centroid.col = "black", apf
   
 }
 
+
+.norm_args_sneezy <- function(.data, basis, neighbor) {
+  stopifnot(is(.data, "TourExperiment"))
+  stopifnot(
+    (is.numeric(basis) | is.character(basis)) & length(basis) == 1
+  )
+  stopifnot(
+    (is.numeric(neighbor) | is.character(neighbor)) & length(neighbor) == 1
+  )
+}
+
+
+.set_basis <- function(.data, basis) {
+  # change to character for retrieval
+  if (is.numeric(basis)) return(basisSetNames(.data)[basis])
+  basis
+}
+
 .setup_plan <- function(.data, basis) {
-  # extract basisSet
   projs <- basisSet(.data, basis)
   # flatten to array
   projs <- flatten_array(projs)
@@ -107,6 +142,7 @@ sneezy_centroids <- function(.data, basis, neighbor, centroid.col = "black", apf
 
 # internal function for rendering a tour path in rstudio or knitr
 .gif_tour <- function(data, tour_path, display, apf, frames, width, height) {
+  
   dir <- tempdir()
   png_path <- file.path(dir, "frame%03d.png")
   

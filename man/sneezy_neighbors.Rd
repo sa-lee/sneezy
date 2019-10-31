@@ -4,21 +4,23 @@
 \alias{sneezy_neighbors}
 \title{Animate a tour path with a neighborhood overlay}
 \usage{
-sneezy_neighbors(.data, basis, neighbor, apf = 1/10, frames = 100,
-  height = 400, width = 400, ...)
+sneezy_neighbors(.data, basis = 1, neighbor = 1, apf = 1/10,
+  frames = 100, height = 400, width = 400, ...)
 }
 \arguments{
-\item{.data}{a numeric dataset}
+\item{.data}{A \link{TourExperiment} object}
 
-\item{basis}{name of basisSet in .data}
+\item{basis}{The name or position of a \link{basisSet} in \code{.data},
+defaults to the first element. The name}
 
-\item{neighbor}{name of neighborSet in .data}
+\item{neighbor}{The name or position of a \link{neighborSet} in \code{.data},
+defaults to the first element.}
 
 \item{apf}{angles per frame (defulats to 1/30)}
 
 \item{frames}{number of frames in animation (defaults to 300)}
 
-\item{height, width}{the size of the animation in pixes}
+\item{height, width}{the size of the animation in pixels}
 
 \item{...}{other control options passed to \code{\link[tourr:display_xy]{tourr::display_xy()}}}
 }
@@ -28,6 +30,14 @@ R console viwer pane.
 }
 \description{
 Animate a tour path with a neighborhood overlay
+}
+\examples{
+multi_te <- TourExperiment(multi, X1:X10)
+multi_te <- generate_bases(multi_te, .on = "view")
+multi_te <- estimate_neighbors(multi_te, 10, .on = "view")
+
+sneezy_neighbors(multi_te)
+
 }
 \seealso{
 \code{\link[tourr:animate_xy]{tourr::animate_xy()}}, \code{\link[tourr:display_xy]{tourr::display_xy()}}

@@ -29,17 +29,17 @@ Imports:
     scran (>= 1.13.32),
     S4Vectors (>= 0.23.25),
     SummarizedExperiment (>= 1.15.9),
-    DelayedArray
+    DelayedArray (>= 0.11.8),
+    gifski,
+    gganimate
 URL: https://github.com/sa-lee/sneezy
 BugReports: https://github.com/sa-lee/sneezy/issues
 Suggests: 
-    gifski (>= 0.8.6),
-    gganimate (>= 1.0.3),
     knitr (>= 1.25),
     rmarkdown (>= 1.16),
     testthat (>= 2.1.0),
     dplyr (>= 0.8.3),
     scater (>= 1.13.27),
     TENxPBMCData (>= 1.3.0),
-    covr
+    covr (>= 3.3.2)
 VignetteBuilder: knitr
