@@ -17,16 +17,25 @@ tour path.
 }
 \details{
 Data were obtained from CT14HERA2 parton distribution function
-fits as used in Laa et al., 2018. There are 56 variables labelled X1-X56
-describing fits summarised over many particle physics experiments
+fits as used in Laa et al., 2018. There are 28 directions in the parameter
+space of parton distribution function fit, each point in the variables
+labelled X1-X56 indicate moving +- 1 standard devation from the 'best'
+(maximum likelihood estimate) fit of the function. Each observation has
+all predictions of the corresponding measurement from an experiment.
+
 (see table 3 in that paper for more explicit details).
 
 The remaining columns are:
 \itemize{
-\item InFit: ???
-\item ID: contains the identifier of experiment
+\item InFit: A flag indicating whether an observation entered the fit of
+CT14HERA2 parton distribution function
+\item Type: First number of ID
+\item ID: contains the identifier of experiment, 1XX/2XX/5XX correpsonds
+to Deep Inelastic Scattering (DIS) / Vector Boson Production (VBP) /
+Strong Interaction (JET). Every ID points to an experimental paper.
 \item pt: the per experiment observational id
-\item x,mu: ???
+\item x,mu: the kinematics of a parton. x is the parton momentum fraction, and
+mu is the factorisation scale.
 }
 }
 \references{
