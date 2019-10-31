@@ -10,6 +10,8 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 
 [![Travis build
 status](https://travis-ci.org/sa-lee/sneezy.svg?branch=master)](https://travis-ci.org/sa-lee/sneezy)
+[![Codecov test
+coverage](https://codecov.io/gh/sa-lee/sneezy/branch/master/graph/badge.svg)](https://codecov.io/gh/sa-lee/sneezy?branch=master)
 <!-- badges: end -->
 
 Explaining t-SNE via diagnostics and tours.
