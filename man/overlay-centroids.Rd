@@ -14,14 +14,6 @@ overlay_snn_centroids(x, y, indices, ...)
 overlay_kmeans_centroids(x, y, num_centers, ...)
 }
 \arguments{
-\item{x}{numeric vectors to produce segments from}
-
-\item{y}{numeric vectors to produce segments from}
-
-\item{indices}{a neighborSet index matrix}
-
-\item{...}{additional arguments to pass to \link[ggplot2:geom_segment]{ggplot2::geom_segment}}
-
 \item{num_centers}{the number of centroids to estimate}
 }
 \value{
