@@ -32,3 +32,10 @@ defaults to the first element.}
 \description{
 Animate a tour path with a centroids overlay
 }
+\examples{
+multi_te <- TourExperiment(multi, X1:X10)
+multi_te <- generate_bases(multi_te, .on = "view")
+multi_te <- estimate_neighbors(multi_te, 10, .on = "view")
+
+sneezy_centroids(multi_te)
+}
