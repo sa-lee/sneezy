@@ -34,6 +34,10 @@ the original high dimensional space. It does this in a few ways:
 It provides a unified interface to a selection of embedding methods 
 and nearest neighbor estimation methods. 
 
+This vignette walks through basic usage of sneezy to get you familiar
+with the data structures and methods available. For more advanced useage
+with 'realistic' analysis scenarios see the [pbmc3k]() and [pdfsense]()
+vignettes.
 
 # The multi-challenge dataset
 
