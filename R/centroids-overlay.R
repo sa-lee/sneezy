@@ -1,5 +1,5 @@
 #' Overlay centroids via k-means or graph-based clustering
-#' @inheritParams overlay_neighbors
+#' @inheritParams overlay-neighbors
 #' @export
 #' @name overlay-centroids
 #' @rdname overlay-centroids
@@ -19,7 +19,7 @@ overlay_knn_centroids <- function(x, y, indices, ...) {
 }
 
 
-#' @inheritParams overlay_neighbors
+#' @inheritParams overlay-neighbors
 #' @export
 #' @name overlay-centroids
 #' @rdname overlay-centroids
@@ -30,7 +30,7 @@ overlay_snn_centroids <- function(x, y, indices, ...) {
 
 
 #' Overylay k-means centroids onto an xy scatter
-#' @inheritParams overlay_neighbors
+#' @inheritParams overlay-neighbors
 #' @param num_centers the number of centroids to estimate
 #' @export
 #' @name overlay-centroids

@@ -177,8 +177,8 @@ and in the embedding. This produces a matrix of indices for each row
 giving the nearest neighbor. 
 
 ```{r}
-multi_te2 <- estimate_neighbors(multi_te2, 30, .on = "view")
-multi_te2 <- estimate_neighbors(multi_te2, 30, .on = "tsne_exact")
+multi_te2 <- estimate_neighbors(multi_te2, 90, .on = "view")
+multi_te2 <- estimate_neighbors(multi_te2, 90, .on = "tsne_exact")
 
 dim(neighborSet(multi_te2, "tsne_exact"))
 ```
@@ -207,12 +207,35 @@ pl +
                     alpha = 0.01)
 ```
 
-Sometimes the graph view can be messy, especially when there's lots of neighbors. Instead we can estimate the centroids of clusters seen in the
-embedding by clustering the complete kNN or the shared nearest neighbor (sNN) graph. 
+We can directly visualise the difference: 
 
 ```{r}
 pl +
-  overlay_knn_centroids(sampleFactors(tsne)[,1], 
+  overlay_difference_neighbors(sampleFactors(tsne)[,1], 
+                    sampleFactors(tsne)[,2], 
+                    neighborSet(multi_te2, "view"),
+                    neighborSet(multi_te2, "tsne_exact"),
+                    alpha = 0.01)
+```
+
+Or the intersection:
+
+```{r}
+pl +
+  overlay_intersect_neighbors(sampleFactors(tsne)[,1], 
+                    sampleFactors(tsne)[,2], 
+                    neighborSet(multi_te2, "view"),
+                    neighborSet(multi_te2, "tsne_exact"),
+                    alpha = 0.01)
+```
+
+
+Sometimes the graph view can be messy, especially when there's lots of neighbors. Instead we can estimate the centroids of clusters seen in the
+embedding by clustering the complete kNN or the shared nearest neighbor (sNN) graph. Note that this is heavily influenced by the use of  
+
+```{r}
+pl +
+  overlay_snn_centroids(sampleFactors(tsne)[,1], 
                         sampleFactors(tsne)[,2], 
                         neighborSet(multi_te2, "tsne_exact"),
                         color = "red") 

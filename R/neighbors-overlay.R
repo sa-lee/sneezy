@@ -15,9 +15,8 @@ overlay_neighbors <- function(x, y, indices, ...) {
                ...)
 }
 
-#' @inheritParams overlay_neighbors
+#' @inheritParams overlay-neighbors
 #' @param type Algorithm used to compute shared nearest neighbors graph
-#' @export 
 #' @seealso [scran::neighborsToSNNGraph]
 #' @importFrom scran neighborsToSNNGraph neighborsToKNNGraph
 #' @importFrom igraph get.data.frame
@@ -41,14 +40,14 @@ overlay_shared_neighbors <- function(x, y, indices, type = "rank", ...) {
     )
     mesh <- .expand_by_edges(x, y, edges)
   } else {
-    edges <- igraph::get.data.dframe(
+    edges <- igraph::get.data.frame(
       scran::neighborsToSNNGraph(indices, ...),
       what = "edges"
     )
     mesh <- .expand_by_edges(x, y, edges)
     mesh[["weight"]] <- edges[["weight"]]
   }
-  
+  mesh
 }
 
 .expand_by_edges <- function(x, y, edges) {
@@ -68,8 +67,73 @@ add_segments <- function(mesh, aes, ...) {
   )
 }
 
+.graph_op <- function(set1, set2, as = "knn", op = igraph::difference, ...) {
+  as <- match.arg(as, c("knn", "snn"))
+  if (as == "knn") {
+    g1 <- scran::neighborsToKNNGraph(set1)
+    g2 <- scran::neighborsToKNNGraph(set2)
+  } else {
+    g1 <- scran::neighborsToSNNGraph(set1, ...)
+    g2 <- scran::neighborsToSNNGraph(set2, ...)
+  }
+  op(g1, g2)
+}
+
+#' Overlay a difference/intersection of two neighborSets
+#' 
+#' @param x,y numeric vectors to produce segments from
+#' @param set1,set2 nearest neighbor graph indices to compare
+#' 
+#' @name overlay-neighbors-diff
+#' @rdname overlay-neighbors-diff
+#' @export
 overlay_difference_neighbors <- function(x, y, set1, set2, ...) {
-  g1 <- scran::neighborsToKNNGraph(set1)
-  g2 <- scran::neighborsToKNNGraph(set2)
-  igraph::difference(g1, g2)
+  edges <- igraph::get.data.frame(.graph_op(set1, set2))
+  mesh <- .expand_by_edges(x,y,edges)
+  add_segments(mesh, 
+               ggplot2::vars(xend = xend, yend = yend),
+               ...)
+}
+
+#' @inheritParams overlay-neighbors-diff
+#' @param type Algorithm used to compute shared nearest neighbors graph
+#' @name overlay-neighbors-diff
+#' @rdname overlay-neighbors-diff
+#' @export
+overlay_difference_shared_neighbors <- function(x, y, set1, set2, type = "rank", ...) {
+  edges <- igraph::get.data.frame(.graph_op(set1, set2, as = "snn", type = type))
+  mesh <- .expand_by_edges(x,y,edges)
+  add_segments(mesh, 
+               ggplot2::vars(xend = xend, yend = yend, alpha = weight),
+               ...)
+}
+
+
+#' @inheritParams overlay-neighbors-diff
+#' @name overlay-neighbors-diff
+#' @rdname overlay-neighbors-diff
+#' @export
+overlay_intersect_neighbors <- function(x, y, set1, set2, ...) {
+  edges <- igraph::get.data.frame(.graph_op(set1, set2, 
+                                            op = igraph::intersection))
+  mesh <- .expand_by_edges(x,y,edges)
+  add_segments(mesh, 
+               ggplot2::vars(xend = xend, yend = yend),
+               ...)
+}
+
+
+#' @inheritParams overlay-neighbors-diff
+#' @name overlay-neighbors-diff
+#' @rdname overlay-neighbors-diff
+#' @export
+overlay_intersect_shared_neighbors <- function(x, y, set1, set2, type = "rank", ...) {
+  edges <- igraph::get.data.frame(.graph_op(set1, set2,
+                                            as = "snn",
+                                            op = igraph::intersection,
+                                            type = type))
+  mesh <- .expand_by_edges(x,y,edges)
+  add_segments(mesh, 
+               ggplot2::vars(xend = xend, yend = yend),
+               ...)
 }
