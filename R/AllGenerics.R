@@ -216,6 +216,7 @@ setGeneric(
 #' 
 #' @param .data a TourExperiment object or matrix-like object 
 #' @param .on Which part of `.data` to tour
+#' @param subset Restrict the number of columns of toured data?
 #' @param clamp Should the columns of toured data be clamped to lie in (0,1)?
 #' @param max_bases Maximum number of bases to generate
 #' @param start Optional starting projection for tour
@@ -230,7 +231,7 @@ setGeneric(
 #' generate_bases,TourExperiment-method
 setGeneric("generate_bases",
            signature = ".data",
-           function(.data, .on = NULL, clamp = FALSE, max_bases = 100, start = NULL, step_size = Inf, .engine = tourr::grand_tour()) {
+           function(.data, .on = NULL, subset = NULL, clamp = FALSE, max_bases = 100, start = NULL, step_size = Inf, .engine = tourr::grand_tour()) {
              standardGeneric("generate_bases")
            })
              

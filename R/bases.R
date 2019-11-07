@@ -1,6 +1,12 @@
 # the guts for generating a basis set, mostly pillaged
 # from tourr, for large basis sets could consider using DelayedArray backend?
 .tour_path <- function(.data, tour_path, start, max_bases, step_size) {
+  # checks
+  stopifnot(is.numeric(step_size), 
+            is.numeric(max_bases), 
+            is.null(start) || is.matrix(start)
+  )
+  
   # set up generator
   tour <- tourr::new_tour(.data, tour_path, start)
   # starting projection
@@ -31,12 +37,18 @@
 #' @export
 setMethod("generate_bases",
           signature = "ANY",
-          function(.data, .on = NULL, clamp = FALSE, max_bases = 100, start = NULL, step_size = Inf, .engine = tourr::grand_tour()) {
+          function(.data, .on = NULL, subset = NULL, clamp = FALSE, max_bases = 100, start = NULL, step_size = Inf, .engine = tourr::grand_tour()) {
             stopifnot(inherits(.engine, "tour_path")) 
-              if (clamp) {
-                .data <- .rescale(.data)
-              }
-              .tour_path(.data, .engine, start, max_bases, step_size)
+  
+            if (clamp) {
+              .data <- .rescale(.data)
+            }
+            
+            .tour_path(.data, 
+                       tour_path = .engine, 
+                       start = start, 
+                       max_bases = max_bases, 
+                       step_size = step_size)
           })
 
 
@@ -45,9 +57,12 @@ setMethod("generate_bases",
 #' @export
 setMethod("generate_bases",
           signature = "LinearEmbeddingMatrix",
-          function(.data, .on = NULL, clamp = FALSE, max_bases = 100, start = NULL, step_size = Inf, .engine = tourr::grand_tour()) {
+          function(.data, .on = NULL, subset = NULL, clamp = FALSE, max_bases = 100, start = NULL, step_size = Inf, .engine = tourr::grand_tour()) {
             vals <- sampleFactors(.data)
-            generate_bases(vals, .on, clamp, max_bases, start, step_size, .engine)
+            if (!is.null(subset)) {
+              vals <- vals[, subset, drop = FALSE]
+            }
+            generate_bases(vals, .on, subset = NULL, clamp, max_bases, start, step_size, .engine)
           })
             
 #' @name generate_bases
@@ -55,9 +70,19 @@ setMethod("generate_bases",
 #' @export
 setMethod("generate_bases",
           signature = "TourExperiment",
-          function(.data, .on = NULL, clamp = FALSE, max_bases = 100, start = NULL, step_size = Inf, .engine = tourr::grand_tour()) {
+          function(.data, .on = NULL, subset = NULL, clamp = FALSE, max_bases = 100, start = NULL, step_size = Inf, .engine = tourr::grand_tour()) {
             vals <- .retrieve_mat(.data, .on)
-            path <- generate_bases(vals, .on, clamp, max_bases, start, step_size, .engine)
+            if (!is.null(subset)) {
+              vals <- vals[, subset, drop = FALSE]
+            }
+            path <- generate_bases(vals, 
+                                   .on, 
+                                   subset = NULL, 
+                                   clamp = clamp, 
+                                   max_bases = max_bases, 
+                                   start = NULL, 
+                                   step_size = step_size, 
+                                   .engine = .engine)
             
             basisSet(.data, .on) <- path
             .data
