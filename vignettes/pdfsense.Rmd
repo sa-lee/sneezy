@@ -88,12 +88,13 @@ Approximately %70 of the variance in the pdf fits are explained by the first
 15 principal components.
 
 Next we can generate a set of bases to tour on the principal components.
-Note that we restrict our view to the first 15 principal components and 
-generate 100 new bases to tour on:
+Note that we restrict our view to the first 6 principal components and 
+generate 100 new bases via the grand tour (we choose 6 to follow the original paper):
+
 ```{r}
 pdfsense <- generate_bases(pdfsense,
                            .on = "pca_exact",
-                           subset = 1:15)
+                           subset = 1:6)
 
 dim(basisSet(pdfsense))
 ```
