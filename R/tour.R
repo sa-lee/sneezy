@@ -80,7 +80,7 @@ sneezy_tour <- function(.data, basis = 1, row_subset = NULL, apf = 1/10, frames 
 #' R console viwer pane.
 #' 
 #' @export
-#' @importFrom tourr planned_tour render_gif 
+#' @importFrom tourr planned_tour
 #' @importFrom scran neighborsToSNNGraph
 #' @importFrom igraph cluster_louvain communities
 #' @importFrom gifski gifski
