@@ -139,5 +139,13 @@ pl <- ggplot(
   labs(color = "Type") +
   theme_minimal() +
   theme(axis.text.x = element_blank(), axis.text.y = element_blank()) 
-pl  
 ```
+
+We can link a tour view next to the embedding to give us
+a clear picture of the clustering:
+
+```{r}
+view <- link_left(highlight, pl)
+view 
+```
+
