@@ -1,11 +1,73 @@
+#' Animate a tour path directly with TourExperiment
+#' 
+#' @param .data A [TourExperiment] object  
+#' @param basis The name or position of a [basisSet] in `.data`, 
+#' defaults to the first element. The name of the [basisSet] will
+#' also be used to extract the underlying data. 
+#' @param row_subset The number of rows to subset the view on, the default
+#' which is NULL will select all rows.
+#' @param apf angles per frame (defaults to 1/30)
+#' @param frames number of frames in animation (defaults to 300)
+#' @param height,width the size of the animation in pixels 
+#' @param ... other control options passed to [tourr::display_xy()]
+#' 
+#' @return 
+#' A [gganimate::gif_file] that can be embedded in an Rmd or 
+#' R console viwer pane.
+#' 
+#' @export
+#' @examples 
+#' multi_te <- TourExperiment(multi, X1:X10)
+#' multi_te <- generate_bases(multi_te, .on = "view")
+#' multi_te <- estimate_neighbors(multi_te, 10, .on = "view")
+#' 
+#' sneezy_neighbors(multi_te)
+#' 
+#' @seealso [tourr::animate_xy()], [tourr::display_xy()]
+sneezy_tour <- function(.data, basis = 1, row_subset = NULL, apf = 1/10, frames = 100, height = 400, width = 400, ...) {
+  
+  .norm_args_sneezy(.data, basis, neighbor = 1)
+  
+  basis <- .set_basis(.data, basis)
+  
+  # tour path
+  plan <- .setup_plan(.data, basis)
+  
+  # figure out if we need to subset columns
+  # column subset
+  col_subset <- seq_len(nrow(basisSet(.data, basis)))
+  
+  # named basisSet will be .data
+  vals <- .retrieve_mat(.data, basis, .subset = row_subset)
+  
+  vals <- vals[, col_subset, drop = FALSE]
+  
+  extra_args <- list(...)
+  
+  if (!("axes" %in% names(extra_args))) {
+    extra_args[["axes"]] <- "bottomleft"
+  }
+  
+  
+  # set up display
+  dxy <- do.call(tourr::display_xy, extra_args)
+  
+  .gif_tour(vals, plan, dxy, 
+            apf = apf, frames = frames, height = height, width = width)
+}
+
+
 #' Animate a tour path with a neighborhood overlay
 #' 
 #' @param .data A [TourExperiment] object  
 #' @param basis The name or position of a [basisSet] in `.data`, 
-#' defaults to the first element. The name 
+#' defaults to the first element. The name of the [basisSet] will
+#' also be used to extract the underlying data. 
 #' @param neighbor The name or position of a [neighborSet] in `.data`,
 #' defaults to the first element. 
-#' @param apf angles per frame (defulats to 1/30)
+#' @param row_subset The number of rows to subset the view on, the default
+#' which is NULL will select all rows.
+#' @param apf angles per frame (defaults to 1/30)
 #' @param frames number of frames in animation (defaults to 300)
 #' @param height,width the size of the animation in pixels 
 #' @param ... other control options passed to [tourr::display_xy()]
@@ -29,21 +91,26 @@
 #' sneezy_neighbors(multi_te)
 #' 
 #' @seealso [tourr::animate_xy()], [tourr::display_xy()]
-sneezy_neighbors <- function(.data, basis = 1, neighbor = 1, apf = 1/10, frames = 100, height = 400, width = 400, ...) {
+sneezy_neighbors <- function(.data, basis = 1, neighbor = 1, row_subset = NULL, apf = 1/10, frames = 100, height = 400, width = 400, ...) {
   
   .norm_args_sneezy(.data, basis, neighbor)
   
   basis <- .set_basis(.data, basis)
-
+  
   # tour path
   plan <- .setup_plan(.data, basis)
+  
+  # figure out if we need to subset columns
+  # column subset
+  col_subset <- seq_len(nrow(plan[[1]]))
   
   # extract neighborSet
   n_set <- neighborSet(.data, neighbor)
   n_set <- flatten_graph(n_set)
   
   # named basisSet will be .data
-  vals <- .retrieve_mat(.data, basis)
+  vals <- .retrieve_mat(.data, basis, row_subset)
+  vals <- vals[, col_subset, drop = FALSE]
   
   extra_args <- list(...)
   

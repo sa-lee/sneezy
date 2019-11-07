@@ -4,6 +4,10 @@
   function(.data, num_comp, .on, normalize = TRUE, .parallel, .engine) {
     val <- .retrieve_mat(.data, .on)
     
+    if (is(val, "LinearEmbeddingMatrix")) {
+      val <- sampleFactors(val)
+    }
+    
     args <- list(X = val,
                  dims = num_comp,
                  normalize = normalize,
