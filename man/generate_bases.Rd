@@ -8,25 +8,28 @@
 \alias{generate_bases,TourExperiment-method}
 \title{Generate a new basis set via a tour}
 \usage{
-generate_bases(.data, .on = NULL, clamp = FALSE, max_bases = 100,
-  start = NULL, step_size = Inf, .engine = tourr::grand_tour())
-
-\S4method{generate_bases}{ANY}(.data, .on = NULL, clamp = FALSE,
+generate_bases(.data, .on = NULL, subset = NULL, clamp = FALSE,
   max_bases = 100, start = NULL, step_size = Inf,
   .engine = tourr::grand_tour())
 
-\S4method{generate_bases}{LinearEmbeddingMatrix}(.data, .on = NULL,
+\S4method{generate_bases}{ANY}(.data, .on = NULL, subset = NULL,
   clamp = FALSE, max_bases = 100, start = NULL, step_size = Inf,
   .engine = tourr::grand_tour())
 
+\S4method{generate_bases}{LinearEmbeddingMatrix}(.data, .on = NULL,
+  subset = NULL, clamp = FALSE, max_bases = 100, start = NULL,
+  step_size = Inf, .engine = tourr::grand_tour())
+
 \S4method{generate_bases}{TourExperiment}(.data, .on = NULL,
-  clamp = FALSE, max_bases = 100, start = NULL, step_size = Inf,
-  .engine = tourr::grand_tour())
+  subset = NULL, clamp = FALSE, max_bases = 100, start = NULL,
+  step_size = Inf, .engine = tourr::grand_tour())
 }
 \arguments{
 \item{.data}{a TourExperiment object or matrix-like object}
 
 \item{.on}{Which part of \code{.data} to tour}
+
+\item{subset}{Restrict the number of columns of toured data?}
 
 \item{clamp}{Should the columns of toured data be clamped to lie in (0,1)?}
 

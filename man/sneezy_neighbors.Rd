@@ -4,19 +4,23 @@
 \alias{sneezy_neighbors}
 \title{Animate a tour path with a neighborhood overlay}
 \usage{
-sneezy_neighbors(.data, basis = 1, neighbor = 1, apf = 1/10,
-  frames = 100, height = 400, width = 400, ...)
+sneezy_neighbors(.data, basis = 1, neighbor = 1, row_subset = NULL,
+  apf = 1/10, frames = 100, height = 400, width = 400, ...)
 }
 \arguments{
 \item{.data}{A \link{TourExperiment} object}
 
 \item{basis}{The name or position of a \link{basisSet} in \code{.data},
-defaults to the first element. The name}
+defaults to the first element. The name of the \link{basisSet} will
+also be used to extract the underlying data.}
 
 \item{neighbor}{The name or position of a \link{neighborSet} in \code{.data},
 defaults to the first element.}
 
-\item{apf}{angles per frame (defulats to 1/30)}
+\item{row_subset}{The number of rows to subset the view on, the default
+which is NULL will select all rows.}
+
+\item{apf}{angles per frame (defaults to 1/30)}
 
 \item{frames}{number of frames in animation (defaults to 300)}
 
