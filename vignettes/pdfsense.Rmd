@@ -150,3 +150,20 @@ view <- link_left(highlight, pl)
 view 
 ```
 
+Next we can look at some diagnostics for the embedding, we can view
+the cluster centroids via a tour:
+
+```{r}
+pdfsense <- estimate_neighbors(pdfsense, 30, .on = "tsne_approx")
+pl +
+  overlay_snn_centroids(sampleFactors(tsne)[,1],
+                        sampleFactors(tsne)[,2],
+                        neighborSet(pdfsense),
+                        size = 5)
+```
+
+```{r sneezy-centroids}
+sneezy_centroids(pdfsense)
+```
+
+

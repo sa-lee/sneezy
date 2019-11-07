@@ -41,6 +41,9 @@ sneezy_tour <- function(.data, basis = 1, row_subset = NULL, apf = 1/10, frames 
   vals <- .retrieve_mat(.data, basis, .subset = row_subset)
   
   vals <- vals[, col_subset, drop = FALSE]
+  if (is(vals, "LinearEmbeddingMatrix")) {
+    vals <- sampleFactors(vals)
+  }
   
   extra_args <- list(...)
   
@@ -102,7 +105,7 @@ sneezy_neighbors <- function(.data, basis = 1, neighbor = 1, row_subset = NULL, 
   
   # figure out if we need to subset columns
   # column subset
-  col_subset <- seq_len(nrow(plan[[1]]))
+  col_subset <- seq_len(nrow(basisSet(.data, basis)))
   
   # extract neighborSet
   n_set <- neighborSet(.data, neighbor)
@@ -111,6 +114,9 @@ sneezy_neighbors <- function(.data, basis = 1, neighbor = 1, row_subset = NULL, 
   # named basisSet will be .data
   vals <- .retrieve_mat(.data, basis, row_subset)
   vals <- vals[, col_subset, drop = FALSE]
+  if (is(vals, "LinearEmbeddingMatrix")) {
+    vals <- sampleFactors(vals)
+  }
   
   extra_args <- list(...)
   
@@ -141,7 +147,7 @@ sneezy_neighbors <- function(.data, basis = 1, neighbor = 1, row_subset = NULL, 
 #' 
 #' sneezy_centroids(multi_te)
 #' @export
-sneezy_centroids <- function(.data, basis = 1, neighbor = 1, centroid.col = "black", apf = 1/10, frames = 100, height = 400, width = 400, ...) {
+sneezy_centroids <- function(.data, basis = 1, neighbor = 1, row_subset = NULL, centroid.col = "black", apf = 1/10, frames = 100, height = 400, width = 400, ...) {
   
   .norm_args_sneezy(.data, basis, neighbor)
   
@@ -149,7 +155,12 @@ sneezy_centroids <- function(.data, basis = 1, neighbor = 1, centroid.col = "bla
   
   plan <- .setup_plan(.data, basis)
   
-  vals <- .retrieve_mat(.data, basis)
+  col_subset <- seq_len(nrow(basisSet(.data, basis)))
+  vals <- .retrieve_mat(.data, basis, .subset = row_subset)
+  vals <- vals[, col_subset, drop = FALSE]
+  if (is(vals, "LinearEmbeddingMatrix")) {
+    vals <- sampleFactors(vals)
+  }
   
   indices <- neighborSet(.data, neighbor)
   snn <- scran::neighborsToSNNGraph(indices)
