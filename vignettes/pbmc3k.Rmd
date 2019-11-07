@@ -81,18 +81,9 @@ The arguments above add an embedding to the pbmc3k_te object,
 using randomized PCA, only on the highly variable genes we've constructed 
 above. Since, the procedure is random, we also set a seed. 
 
-We provide some simple wrappers for visualising the results
-of an embedding via `plotly`. This method allows us to choose
-the name or index of the embedding dimensions, and optionally overlay
-a vector of colors. 
 
 ```{r}
-view_xy(pbmc3k_te,
-        "pca_random",
-        .x = "PC1",
-        .y = "PC2",
-        .color = "ENSG00000090382"
-)
+
 ```
 
 
@@ -101,16 +92,9 @@ analysis on top of an embedding, here we have used the standard
 
 
 ```{r}
-g <- buildSNNGraph(pbmc3k_te, k=10, use.dimred = 'pca_random')
+g <- buildSNNGraph(pbmc3k_te, k=15, use.dimred = 'pca_random')
 clust <- igraph::cluster_louvain(g)
 pbmc3k_te$cluster <- factor(igraph::membership(clust))
-
-view_xy(pbmc3k_te,
-        "pca_random",
-        .x = "PC1",
-        .y = "PC2",
-        .color = "cluster"
-)
 ```
 
 We can also estimate a basis set via a grand tour: 
@@ -133,6 +117,6 @@ named `pca_random`. To access the underlying array use
 We can then view the principal components using the `view_tour_xy()`, this is a shiny application. You can view an example of it here:
 
 ```{r, eval = FALSE}
-view_tour_xy(pbmc3k_te, .on = "pca_random", .color = pbmc3k_te$cluster, fps = 50)
+sneezy_tour(pbmc3k_te)
 ```
 
