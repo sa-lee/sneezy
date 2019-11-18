@@ -24,3 +24,7 @@ likely break a lot*
 ``` r
 remotes::install_github("sa-lee/sneezy")
 ```
+
+# See also
+
+[liminal](github.com/sa-lee/liminal)
