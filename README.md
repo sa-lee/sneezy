@@ -27,4 +27,4 @@ remotes::install_github("sa-lee/sneezy")
 
 # See also
 
-[liminal](github.com/sa-lee/liminal)
+[liminal](https://github.com/sa-lee/liminal)
